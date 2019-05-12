@@ -22,5 +22,5 @@ is used in the example files in directory examples/ .
 @licence  MIT
 
 See 
-http://stoics.org.uk/~nicos/sware/bio_analytics
-http://stoics.org.uk/~nicos/sware/bio_db
+[bio_analytics][http://stoics.org.uk/~nicos/sware/bio_analytics]
+[bio_db][http://stoics.org.uk/~nicos/sware/bio_db]
