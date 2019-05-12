@@ -15,12 +15,13 @@ Installation and loading:
 The library comes with one experimental dataset: data/silac/bt.csv which
 is used in the example files in directory examples/ .
 
-@author nicos angelopoulos
-@version  0.1 2019/4/22
-@version  0.2 2019/5/08
-@version  0.3 2019/5/11
-@licence  MIT
+* author nicos angelopoulos
+* version  0.1 2019/4/22
+* version  0.2 2019/5/08
+* version  0.3 2019/5/11
+* licence  MIT
 
 See 
-[bio_analytics](http://stoics.org.uk/~nicos/sware/bio_analytics)
-[bio_db](http://stoics.org.uk/~nicos/sware/bio_db)
+[bio_analytics](http://stoics.org.uk/~nicos/sware/bio_analytics) 
+
+and [bio_db](http://stoics.org.uk/~nicos/sware/bio_db)
