@@ -1,0 +1,161 @@
+
+:- lib(stoics_lib:kv_decompose/3).
+
+exp_diffex_defaults( Args, Defs ) :-
+    % this makes EvLog default: true
+    ( (memberchk(exp_ev_log(EvLog),Args),EvLog==false) ->
+        EvDefs = [  as_non(pvalue),
+                    exp_ev_cnm('experiment'),
+                    exp_ev_cut_let(-1),
+                    exp_ev_cut_get(2),
+                    exp_ev_include_inf(false),
+                    exp_ev_log(false)
+            ]
+        ; 
+        EvDefs = [  as_non(all),
+                    exp_ev_cnm('log2FC'),
+                    exp_ev_cut_let(-1),
+                    exp_ev_cut_get(1),
+                    exp_ev_include_inf(true),
+                    exp_ev_log(true)
+            ]
+    ),
+    Defs = [   
+                exp_pv_cnm('adj.pvalue'),
+                exp_pv_cut(0.05),
+                gene_id_cnm('Symbols')
+                | EvDefs
+    ].
+
+/** exp_diffex( +Exp, -DEPrs, -NonDEPrs, +Opts ).
+
+Select a sublist of significanntly differenentially expressed genes in an experiment. Exp is in the form of a mtx/1 matrix.
+Both selected (DEPrs) and rejected (NonDEPrs) are in the form of Gene-Ev, where Ev is the expression value for Gene 
+in Exp. 
+
+We use ev as short for expression value, to avoid confusion with _exp_ which short for experiment.
+
+Opts
+  * as_non(AsNon)
+    what to return as non differentially expressed: either everything in Gcnm (AsNon=all, default when EvLog is true),
+    or only those with numeric pvalue (AsNon=pvalue, default when EvLog is false)
+
+  * exp_pv_cnm(ExpPcnm='adj.pvalue')
+    the experimental column (found in MsF) on which Pcut is applied as a filter
+
+  * exp_pv_cut(Pcut=0.05)
+    p.value cut off for experimental input from MSstats
+
+  * exp_ev_log(EvLog=true)
+    are the expression values log values 
+
+  * exp_ev_cnm(EvCnm)
+    expession value column name (_log2FC_ if EvLog=true, _expression_ otherwise)
+  
+  * exp_ev_cut_let(EvLet=-1)
+    expression values below (less or equal) which values are selected
+
+  * exp_ev_cut_get(EvGet)
+    expression values above (greater or equal) which values are selected (defaults is 2 if EvLog is false, and 1 otherwise)
+
+  * exp_ev_include_inf(IncInf)
+    include infinity values as diffexs ? (default is _false_ if EvLog is false, and _true_ otherwise)
+
+  * gene_id_cnm(Gcnm='Symbols')
+    column name for the key value in the pair lists: DEPrs and NonDEPrs.
+
+==
+?- lib(mtx),
+   absolute_file_name(pack('bio_analytics/data/silac/bt.csv'), CsvF),
+   mtx(CsvF, Mtx, convert(true)),
+   assert(mtx_data(Mtx)).
+
+CsvF = '/usr/local/users/nicos/local/git/lib/swipl/pack/bio_analytics/data/silac/bt.csv',
+Mtx = [row('Protein IDs', 'Symbols', log2FC, adj.pvalue), row('Q9P126', ...), row(..., ..., ..., ...)|...].
+
+?- lib(debug_call),
+   debug(testo),
+   mtx_data(Mtx),
+   debug_call(testo, dims, mtx/Mtx),
+   exp_diffex(Mtx, DEPrs, NonDEPrs, []),
+   debug_call(testo, length, de/DEPrs),
+   debug_call(testo, length, nde/NonDEPrs).
+
+% Dimensions for matrix,  (mtx) nR: 1245, nC: 4.
+% Length for list, de: 426.
+% Length for list, nde: 818.
+
+DEPrs = ['CLEC1B'- -4.80614893171469, 'LGALS1'- -2.065877096524, ... - ...|...],
+NonDEPrs = ['CNN2'- -0.69348026828097, 'CXCR4'-0.73039667221395, ... - ...|...].
+
+?- 
+    mtx_data(Mtx),
+    exp_diffex(Mtx, DEPrs, NonDEPrs, exp_pv_cut(0.01)),
+    debug_call(testo, length, de/DEPrs),
+    debug_call(testo, length, nde/NonDEPrs).
+
+% Length for list, de: 286.
+% Length for list, nde: 958.
+
+?-
+    mtx_data(Mtx),
+    Opts = [exp_ev_cut_let(inf),exp_ev_cut_get(-inf)],
+    exp_diffex(Mtx, DEPrs, NonDEPrs, Opts),
+    debug_call(testo, length, de/DEPrs),
+    debug_call(testo, length, nde/NonDEPrs).
+
+% Length for list, de: 581.
+% Length for list, nde: 663.
+
+==
+
+@author nicos angelopoulos
+@version  0.1 2019/5/2
+
+*/
+
+exp_diffex( MtxIn, DEPrs, NonDEPrs, Args ) :-
+    Self = exp_diffex,
+    options_append( Self, Args, Opts ),
+    options( as_non(AsNon), Opts ),
+    options( exp_pv_cnm(ExpPCnm), Opts ),
+    options( exp_pv_cut(Pcof), Opts ),
+    options( exp_ev_cnm(ExpEvCnm), Opts ),
+    options( exp_ev_cut_let(EvLet), Opts ),
+    options( exp_ev_cut_get(EvGet), Opts ),
+    options( exp_ev_include_inf(InfInc), Opts ),
+    options( gene_id_cnm(Gcnm), Opts ),
+    mtx( MtxIn, Mtx, convert(true) ),
+    Mtx = [Hdr|Rows],
+    Cids = [ExpPCnm,ExpEvCnm,Gcnm],
+    CPos = [PvPos,EvPos,GnPos],
+    maplist( mtx_header_column_name_pos(Hdr), Cids, _Cnms, CPos ),
+    exp_diffex_separate( Rows, PvPos, EvPos, GnPos, Pcof, EvLet, EvGet, InfInc, AsNon, DEPrs, NonDEPrs ).
+
+exp_diffex_separate( [], _PvPos, _EvPos, _GnPos, _Pcof, _EvLet, _EvGet, _InfInc, _AsNon, [], [] ).
+exp_diffex_separate( [Row|Rows], PvPos, EvPos, GnPos, Pcof, EvLet, EvGet, InfInc, AsNon, DEPrs, NonDEPrs ) :-
+    arg( PvPos, Row, Pv ), 
+    arg( EvPos, Row, Ev ),
+    arg( GnPos, Row, Gn ),
+    ( exp_diffex_select(Pv,Ev,Pcof,EvLet,EvGet,InfInc) ->
+        DEPrs = [Gn-Ev|TDEPrs],
+        NonDEPrs = TNonDEPrs
+        ;
+        DEPrs = TDEPrs,
+        ( (AsNon == pvalue, \+ number(Pv)) -> NonDEPrs = TNonDEPrs; NonDEPrs = [Gn-Ev|TNonDEPrs] )
+    ),
+    exp_diffex_separate( Rows, PvPos, EvPos, GnPos, Pcof, EvLet, EvGet, InfInc, AsNon, TDEPrs, TNonDEPrs ).
+
+
+exp_diffex_select( Pv, Ev, Pcof, EvLet, EvGet, InfInc ) :-
+    number( Pv ), 
+    Pv < Pcof,
+    number(Ev),
+    ( Ev =< EvLet ; EvGet =< Ev ),
+    exp_diffex_if_inf_include( Ev, InfInc ).
+
+exp_diffex_if_inf_include( Val, Incl ) :-
+    ( Val is inf; Val is - inf ),
+    !,
+    Incl == true.
+exp_diffex_if_inf_include( _Val, _Incl ).
