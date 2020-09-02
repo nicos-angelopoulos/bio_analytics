@@ -1,6 +1,8 @@
 ---   Releases   ---
 --------------------
 
+0.4 
+      20.09.02    FIXED:    lib(end(bio_db)) typo in loading code
 0.3               @ 19.05.12
       19.05.10    EXAMPLE:  bt_over_go_string
       19.05.09    CHANGED:  edge_strg_symb/4 to org_edge_strg_symb/4

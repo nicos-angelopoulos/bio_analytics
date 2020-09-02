@@ -71,4 +71,4 @@ bio_analytics_version( 0:3:0, date(2019,5,12) ).
 :- lib(exp_go_over/3).
 :- lib(exp_go_over_string_graphs/4).
 
-:- lib(end(bio_db), homonyms(true)).
+:- lib(end(bio_analytics), homonyms(true)).
