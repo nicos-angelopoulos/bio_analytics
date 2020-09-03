@@ -5,6 +5,7 @@
       20.09.03    OPTIM:    convert maplist to a loop
                   IFACE:    exp_diffex/4 can now return matrices
                   IFACE:    exp_go_over_string_graphs/4 allows restriction
+                  OPTS:     stem_type() more values and addition to exp_go_over_string_graphs/4
       20.09.02    FIXED:    lib(end(bio_db)) typo in loading code
 
 0.3               @ 19.05.12
