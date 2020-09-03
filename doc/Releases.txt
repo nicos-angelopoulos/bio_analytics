@@ -2,7 +2,11 @@
 --------------------
 
 0.4 
+      20.09.03    OPTIM:    convert maplist to a loop
+                  IFACE:    exp_diffex/4 can now return matrices
+                  IFACE:    exp_go_over_string_graphs/4 allows restriction
       20.09.02    FIXED:    lib(end(bio_db)) typo in loading code
+
 0.3               @ 19.05.12
       19.05.10    EXAMPLE:  bt_over_go_string
       19.05.09    CHANGED:  edge_strg_symb/4 to org_edge_strg_symb/4

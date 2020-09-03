@@ -1,18 +1,24 @@
 
 exp_go_over_string_graphs_defaults( Defs ) :-
     Wplots = [vjust= -1, node_size(3), format(svg)],
-    Defs = [ go_id_clm(1), dir_postfix(go_strings),
-             wgraph_plot_opts(Wplots) ].
+    Defs = [ dir_postfix(go_strings), go_id_clm(1),
+             viz_de_opts([]), wgraph_plot_opts(Wplots) ].
 
 /** exp_go_over_string_graphs( +Exp, ?GoOver, ?Dir, -Opts )
 
 Create string graphs for all the over-represented terms in GoOver.
 
 Opts
-  * go_id_clm(GoIdClm=1)
-    column id for over represented GO terms
   * dir_postfix(Psfx=go_strings)
     postfix for outputs directory (when Dir is a variable)
+  * go_id_clm(GoIdClm=1)
+    column id for over represented GO terms
+  * viz_de_opts(VizOpts=[])
+    options for restricting genes to visualise via exp_diff/4.
+    Default does not restrict what genes are visualised.
+  * wgraph_plot_opts(WgOpts=WgOpts)
+    defaults to =|[vjust = -1, node_size(3), format(svg)]|=.
+
 
 Options are passed to exp_gene_family_string_graph/4.
 
@@ -41,15 +47,20 @@ exp_go_over_string_graphs( Exp, GoOverIn, Dir, Args ) :-
     options( dir_postfix(Psfx), Opts ),
     exp_go_over_string_graphs_to_dir( Exp, Psfx, Dir ),
     debug( exp_go_over_string_graphs, 'Dir: ~p', [Dir] ),
+    options( viz_de_opts(VdfOpts), Opts ),
     options( wgraph_plot_opts(WgOpts), Opts ),
-    maplist( go_over_string_graphs_dir(Exp,Dir,WgOpts,Opts), GOs ).
+    ( VdfOpts == [] -> Exp = RedExp; exp_diffex(Exp,RedExp,_,[as_pairs(false)|VdfOpts]) ),
+    go_over_string_graphs_dir( GOs, RedExp,Dir,WgOpts,Opts ).
+    % maplist( go_over_string_graphs_dir(Exp,Dir,WgOpts,Opts), GOs ).
 
-go_over_string_graphs_dir( Exp, Dir, WgOpts, Opts, Go ) :-
+go_over_string_graphs_dir( [], _Exp, _Dir, _WgOpts, _Opts ).
+go_over_string_graphs_dir( [Go|Gos], Exp, Dir, WgOpts, Opts ) :-
     ( atom_concat('GO:',Stem,Go) -> atom_concat(go,Stem,GoTkn); GoTkn=Go ),
     directory_file_path( Dir, GoTkn, DirGo ),
     debug( exp_go_over_string_graphs, 'File: ~p', [DirGo] ),
     GoWgOpts = [stem(DirGo)|WgOpts],
-    exp_gene_family_string_graph( Exp, Go, _, [wgraph_plot_opts(GoWgOpts)|Opts] ).
+    exp_gene_family_string_graph( Exp, Go, _, [wgraph_plot_opts(GoWgOpts)|Opts] ),
+    go_over_string_graphs_dir( Gos, Exp, Dir, WgOpts, Opts ).
 
 exp_go_over_mtx( GoOverIn, Exp, GoOver, Dir, Opts ) :-
     var( GoOverIn ),
