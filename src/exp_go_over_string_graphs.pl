@@ -2,6 +2,7 @@
 exp_go_over_string_graphs_defaults( Defs ) :-
     Wplots = [vjust= -1, node_size(3), format(svg)],
     Defs = [ dir_postfix(go_strings), go_id_clm(1),
+             stem_type(go_pair),
              viz_de_opts([]), wgraph_plot_opts(Wplots) ].
 
 /** exp_go_over_string_graphs( +Exp, ?GoOver, ?Dir, -Opts )
