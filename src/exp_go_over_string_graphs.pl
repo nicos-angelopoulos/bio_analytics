@@ -60,6 +60,7 @@ exp_go_over_string_graphs( Exp, GoOverIn, Dir, Args ) :-
 go_over_string_graphs_dir( [], _Exp, _Dir, _WgOpts, _Sty, _Opts ).
 go_over_string_graphs_dir( [Go|Gos], Exp, Dir, WgOpts, Sty, Opts ) :-
     % ( atom_concat('GO:',Stem,Go) -> atom_concat(go,Stem,GoTkn); GoTkn=Go ),
+    debug( exp_go_over_string_graphs, 'Doing: ~w', [Go] ),
     go_string_graph_stem( Sty, Go, GoTkn ),
     directory_file_path( Dir, GoTkn, DirGo ),
     debug( exp_go_over_string_graphs, 'File: ~p', [DirGo] ),
