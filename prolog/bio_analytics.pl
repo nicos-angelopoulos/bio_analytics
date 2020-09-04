@@ -49,7 +49,8 @@ D = date(2019,5,12).
 */
 bio_analytics_version( 0:3:0, date(2019,5,12) ).
 
-:- ensure_loaded(library(lib)).
+:- use_module(library(lists)).
+:- use_module(library(lib)).
 
 :- lib(bio_db).
 :- lib(mtx).
