@@ -52,12 +52,13 @@ bio_analytics_version( 0:3:0, date(2019,5,12) ).
 :- use_module(library(lists)).
 :- use_module(library(lib)).
 
-:- lib(bio_db).
 :- lib(mtx).
 :- lib(real).
+:- lib(bio_db).
 :- lib(os_lib).
 :- lib(wgraph).
 :- lib(options).
+:- lib(debug_call).
 
 :- lib(source(bio_analytics), homonyms(true)).
 

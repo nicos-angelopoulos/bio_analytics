@@ -2,6 +2,9 @@
 --------------------
 
 0.4 
+      20.09.05    FIXED:    bug on mgim_symbol order in exp_go_over
+                  FIXED:    bug, missing argument in go_over_universe_exp/4
+                  OPTIM:    pass existing list of DE into go_over_universe/5
       20.09.03    OPTIM:    convert maplist to a loop
                   IFACE:    exp_diffex/4 can now return matrices
                   IFACE:    exp_go_over_string_graphs/4 allows restriction
