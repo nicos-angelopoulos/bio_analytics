@@ -9,7 +9,7 @@ exp_gene_family_string_graph_defaults( Defs ) :-
                 include_non_present(false),
                 % node_colours(clrs(red,green,yellow,khaki4,grey)),
                 node_colours(clrs(tomato,steelblue,yellow,khaki4,grey)),
-                organism(hs),
+                org(hs),
                 plot(true),
                 wgraph_plot_opts([]),
                 wgraph_plot_defs([])
@@ -41,7 +41,7 @@ Opts
     false excluded non-significant family genes 
   * node_colours(Clrs=clrs(red,green,yellow,khaki4,grey))
     colours for the different types of nodes
-  * organism(Org=hs)
+  * org(Org=hs)
     organism in which Family is looked in (and experiment was performed)
   * plot(Plot=true)
     whether to plot the graph via wgraph_plot/2
@@ -75,9 +75,10 @@ Produces file: bt.svg
 
 */
 exp_gene_family_string_graph( Exp, Fam, StGraph, Args ) :-
+    % fixme: allow for ground DEpPrs-NonDEPrs, (message also on caller)
     options_append( exp_gene_family_string_graph, Args, Opts ),
     exp_diffex( Exp, DEPrs, NonDEPrs, Opts ),
-    options( organism(Org), Opts ),
+    options( org(Org), Opts ),
     gene_family( Fam, Org, Fymbs ),
     %
     sort( Fymbs, Oymbs ),

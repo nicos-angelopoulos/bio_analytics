@@ -2,6 +2,7 @@
 exp_go_over_string_graphs_defaults( Defs ) :-
     Wplots = [vjust= -1, node_size(3), format(svg)],
     Defs = [ dir_postfix(go_strings), go_id_clm(1),
+             max_overs(false),
              stem_type(go_pair),
              viz_de_opts([]), wgraph_plot_opts(Wplots) ].
 
@@ -9,11 +10,15 @@ exp_go_over_string_graphs_defaults( Defs ) :-
 
 Create string graphs for all the over-represented terms in GoOver.
 
+When GoOver is a variable expr_go_over/3 is called to generate it.
+
 Opts
   * dir_postfix(Psfx=go_strings)
     postfix for outputs directory (when Dir is a variable)
   * go_id_clm(GoIdClm=1)
     column id for over represented GO terms
+  * max_overs(MaxOvs=false)
+    when a number, it is taken as the maximal integer of terms to plot graphs for
   * stem_type(Sty=go_pair)
     as in go_string_graph/3, (possibly different default), others: =|go_name|=, =|go_id|=
   * viz_de_opts(VizOpts = [])
@@ -37,6 +42,7 @@ Options are passed to exp_gene_family_string_graph/4.
 
 @author nicos angelopoulos
 @version  0.1 2019/5/5
+@version  0.2 2020/9/6,   option max_overs()
 @see exp_go_over/3
 @see exp_gene_family_string_graph/4
 
@@ -53,8 +59,10 @@ exp_go_over_string_graphs( Exp, GoOverIn, Dir, Args ) :-
     options( viz_de_opts(VdfOpts), Opts ),
     options( wgraph_plot_opts(WgOpts), Opts ),
     ( VdfOpts == [] -> Exp = RedExp; exp_diffex(Exp,RedExp,_,[as_pairs(false)|VdfOpts]) ),
+    options( max_overs(MaxOvsPrv), Opts ),
+    (number(MaxOvsPrv) -> MaxOvs is integer(MaxOvsPrv),findall(Go,(between(1,MaxOvs,I),nth1(I,GOs,Go)),MaxGOs); GOs = MaxGOs), 
     options( stem_type(Sty), Opts ),
-    go_over_string_graphs_dir( GOs, RedExp, Dir, WgOpts, Sty, Opts ).
+    go_over_string_graphs_dir( MaxGOs, RedExp, Dir, WgOpts, Sty, Opts ).
     % maplist( go_over_string_graphs_dir(Exp,Dir,WgOpts,Opts), GOs ).
 
 go_over_string_graphs_dir( [], _Exp, _Dir, _WgOpts, _Sty, _Opts ).
@@ -65,6 +73,7 @@ go_over_string_graphs_dir( [Go|Gos], Exp, Dir, WgOpts, Sty, Opts ) :-
     directory_file_path( Dir, GoTkn, DirGo ),
     debug( exp_go_over_string_graphs, 'File: ~p', [DirGo] ),
     GoWgOpts = [stem(DirGo)|WgOpts],
+    % fixme: you can pass DEPrs and NonDEPrs below, to avoid re-finding them...
     exp_gene_family_string_graph( Exp, Go, _, [wgraph_plot_opts(GoWgOpts)|Opts] ),
     go_over_string_graphs_dir( Gos, Exp, Dir, WgOpts, Sty, Opts ).
 

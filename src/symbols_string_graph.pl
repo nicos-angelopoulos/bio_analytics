@@ -3,8 +3,9 @@
 
 symbols_string_graph_defaults( Defs ) :-
 	Defs = [
+                cohese(max),
 				include_orphans(true),
-                organism(hs),
+                org(hs),
 				minw(500),
 				sort_pairs(true),
 				sort_graph(true)
@@ -15,10 +16,15 @@ symbols_string_graph_defaults( Defs ) :-
 Create the string database Graph between Symbols.
 
 Opts 
+  * cohese(Coh=max)
+    method for cohesing multiple edges between two nodes =|[false,max,min,umax,umin]|=
+    the =|max|= and =|min|= versions are more efficient but do sort the edges,
+    whereas =|umax|= and =|umin|= take much longer but leave edges in found order
+
   * include_orphans(Orph=true)
     set to false to exclude orphans from Graph
 
-  * organism(Org=hs)
+  * org(Org=hs)
     which organism do the gene symbols come from
 
   * minw(500)
@@ -50,7 +56,7 @@ SymbsLen = GraphLen, GraphLen = 28.
 
 % this the correct way for running the first query for mouse:
 ?- Got = 'GO:0043552', gene_family( Got, mouse, Symbs ), length( Symbs, SymbsLen ),
-   symbols_string_graph(Symbs, Graph, organism(mouse) ), length( Graph, GraphLen ).
+   symbols_string_graph(Symbs, Graph, org(mouse) ), length( Graph, GraphLen ).
 
 Got = 'GO:0043552',
 Symbs = ['Ambra1', 'Atg14', 'Ccl19', 'Cd19', 'Cdc42', 'Epha8'|...],
@@ -62,11 +68,13 @@ GraphLen = 117.
 @author nicos angelopoulos
 @version  0.1 2016/1/18
 @version  0.2 2019/4/8,    added organism to incorporate mouse
+@version  0.3 2020/9/5,    option cohese(), and debugs
+@tbd  implement cohese() values: min, umax and umin
 
 */
 symbols_string_graph( Symbols, Graph, Args ) :-
 	options_append( symbols_string_graph, Args, Opts ),
-	options( organism(Org), Opts ),
+	options( org(Org), Opts ),
 	options( minw(MinW), Opts ),
 	options( sort_pairs(Sprs), Opts ),
 	findall( SymbA-SymbB:W, ( member(Symb1,Symbols),
@@ -76,11 +84,48 @@ symbols_string_graph( Symbols, Graph, Args ) :-
                          org_edge_strg_symb( Org, Symb1, Symb2, W ),
 						 MinW =< W
 					    ),
-					    		Wgraph ),
+					    		Pgraph ),
+    debug_call( symbols_string_graph, length, string_edges_found/Pgraph ),
+    options( cohese(Coh), Opts ),
+    symbols_string_graph_cohese( Coh, Pgraph, Wgraph ),
+    debug_call( symbols_string_graph, length, string_edges_cohesed/Wgraph ),
 	options( include_orphans(IncO), Opts ),
 	symbols_string_graph_orphans( IncO, Wgraph, Symbols, Ograph ),
+    debug_call( symbols_string_graph, length, string_graph_w_orphans/Ograph ),
 	options( sort_graph(Sgra), Opts ),
 	symbols_string_graph_sort( Sgra, Ograph, Graph ).
+
+symbols_string_graph_cohese( false, Vgraph, Wgraph ) :-
+    Vgraph = Wgraph.
+symbols_string_graph_cohese( max, Vgraph, Wgraph ) :-
+    sort( Vgraph, [H|Graph] ),
+    H = HSA-HSB:Wei,
+    symbols_string_graph_cohese_max( Graph, HSA, HSB, Wei, Wgraph ).
+symbols_string_graph_cohese( min, Vgraph, Wgraph ) :-
+    throw( unimplemented_cohesion_method(min) ),
+    sort( Vgraph, Ograph ),
+    symbols_string_graph_cohese_min( Ograph, Wgraph ).
+symbols_string_graph_cohese( umax, Vgraph, Wgraph ) :-
+    throw( unimplemented_cohesion_method(umax) ),
+    symbols_string_graph_cohese_umax( Vgraph, Wgraph ).
+symbols_string_graph_cohese( umin, Vgraph, Wgraph ) :-
+    throw( unimplemented_cohesion_method(umin) ),
+    symbols_string_graph_cohese_umin( Vgraph, Wgraph ).
+
+symbols_string_graph_cohese_max( [], Csa, Csb, Cwe, [Csa-Csb:Cwe] ).
+symbols_string_graph_cohese_max( [Hsa-Hsb:Hwe|T], Csa, Csb, Cwe, Wgraph ) :-
+    ( Hsa-Hsb = Csa-Csb ->
+        Nsa = Csa,
+        Nsb = Csb,
+        Nwe is max( Cwe, Hwe ),
+        Wgraph = Tgraph
+        ;
+        Nsa = Hsa,
+        Nsb = Hsb,
+        Nwe = Hwe,
+        Wgraph = [Csa-Csb:Cwe|Tgraph]
+    ),
+    symbols_string_graph_cohese_max( T, Nsa, Nsb, Nwe, Tgraph ).
 
 symbols_string_graph_pair( true, Symb1, Symb2, SymbA, SymbB ) :-
 	sort( [Symb1,Symb2], [SymbA,SymbB] ).

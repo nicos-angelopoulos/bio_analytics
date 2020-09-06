@@ -30,7 +30,7 @@ Opts
   * go_over_pv_cut(0.05)
     p value filter for the results
   * org(hs)
-    one of bio_db_organism/2 first argument (hs or mouse for now)
+    one of bio_db_organism/2 first argument values (hs or mouse for now)
   * stem(Stem=false)
     stem for output csv file. when false use basename of CsvF 
   * to_file(ToF=false)
