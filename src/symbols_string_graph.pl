@@ -79,7 +79,8 @@ symbols_string_graph( Symbols, Graph, Args ) :-
 	options( sort_pairs(Sprs), Opts ),
 	findall( SymbA-SymbB:W, ( member(Symb1,Symbols),
 						 member(Symb2,Symbols),
-						 Symb1 \== Symb2,
+						 Symb1 @< Symb2,
+						 % Symb1 \== Symb2,
 						 symbols_string_graph_pair(Sprs,Symb1,Symb2,SymbA,SymbB),
                          org_edge_strg_symb( Org, Symb1, Symb2, W ),
 						 MinW =< W
