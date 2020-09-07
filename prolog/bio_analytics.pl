@@ -60,6 +60,8 @@ bio_analytics_version( 0:3:0, date(2019,5,12) ).
 :- lib(options).
 :- lib(debug_call).
 
+:- debug_call:debug(ba(info)).
+
 :- lib(source(bio_analytics), homonyms(true)).
 
 :- lib(gene_family/3).

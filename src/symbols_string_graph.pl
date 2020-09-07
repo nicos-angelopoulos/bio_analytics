@@ -99,9 +99,13 @@ symbols_string_graph( Symbols, Graph, Args ) :-
 symbols_string_graph_cohese( false, Vgraph, Wgraph ) :-
     Vgraph = Wgraph.
 symbols_string_graph_cohese( max, Vgraph, Wgraph ) :-
-    sort( Vgraph, [H|Graph] ),
-    H = HSA-HSB:Wei,
-    symbols_string_graph_cohese_max( Graph, HSA, HSB, Wei, Wgraph ).
+    ( sort(Vgraph,[H|Graph]) ->
+        H = HSA-HSB:Wei,
+        symbols_string_graph_cohese_max( Graph, HSA, HSB, Wei, Wgraph )
+        ;
+        % only possibility is Vgraph is emtpy list...
+        Vgraph = Wgraph
+    ).
 symbols_string_graph_cohese( min, Vgraph, Wgraph ) :-
     throw( unimplemented_cohesion_method(min) ),
     sort( Vgraph, Ograph ),
@@ -119,7 +123,10 @@ symbols_string_graph_cohese_max( [Hsa-Hsb:Hwe|T], Csa, Csb, Cwe, Wgraph ) :-
         Nsa = Csa,
         Nsb = Csb,
         Nwe is max( Cwe, Hwe ),
-        Wgraph = Tgraph
+        Wgraph = Tgraph,
+        % debugging only
+        Rwe is min( Cwe, Hwe ),
+        debug_call( ba(info), info, 'Removing duplicate (pair only) edge: ~w'/[Hsa-Hsb:Rwe] )
         ;
         Nsa = Hsa,
         Nsb = Hsb,
