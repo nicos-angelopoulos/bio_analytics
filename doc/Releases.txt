@@ -8,6 +8,7 @@ TBD
 0.4 
       20.09.07    DEBUG:    started channel ba(info) (see debug_call(_,info,_))
                   DEBUG:    removed edges (duplicate entries in string) are info displayed
+                  OPTS:     go_pair_ord() in both exp_go_over_string_graphs/4 & go_string_graph/3
       20.09.06    IFACE:    max_overs() option
                   OPTS:     standarised organism() option to org()
                   IFACE:    cohese() option (only max, currently)

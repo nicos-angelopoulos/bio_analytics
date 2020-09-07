@@ -24,7 +24,7 @@ Opts
   * save(Save=false)
     whether to save the graph (passed to wgraph_plot/2
   * stem_type(Sty=go_name)
-    constructs stem for the output filenames: =|go_id|=, =|go_pair|=.
+    constructs stem for the output filenames: =|go_id|=, =|go_pair|=, =|go_pair_ord(I,Len)|=.
 
 ==
 ?- go_string_graph( 'GO:0016601', G, true ).
@@ -63,6 +63,17 @@ go_string_graph_plot( true, Graph, GoTerm, Opts ) :-
 go_string_graph_plot( false, _Graph, _GoTerm, _Opts ).
 
 % go_string_graph_stem( null, _GoTerm, ). % fixme: breaks backward compatibility
+go_string_graph_stem( go_pair_ord(I,Len), GoTerm, Stem ) :-
+    go_string_graph_stem( go_id, GoTerm, IdStem ),
+    go_string_graph_stem( go_name, GoTerm, NmStem ),
+    number_codes( I, ICs ),
+    length( ICs, ICsLen ),
+    From is ICsLen + 1,
+    findall( 0, between(From,Len,_), Zeros ),
+    append( Zeros, [I], Numbs ),
+    atomic_list_concat( Numbs, '', Pfx ),
+    atomic_list_concat( [Pfx,IdStem,NmStem], '-', Stem ).
+
 go_string_graph_stem( go_pair, GoTerm, Stem ) :-
     go_string_graph_stem( go_id, GoTerm, IdStem ),
     go_string_graph_stem( go_name, GoTerm, NmStem ),
