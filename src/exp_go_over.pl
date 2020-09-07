@@ -37,7 +37,7 @@ Opts
     when GoOver is unbound, this controls whether the output
     goes to a file or a values list 
   * universe(experiment)
-    or genome
+    available: =|genome|= or =|go_exp|=
 
 Options are also passed to exp_diffex/4.
 
@@ -150,6 +150,8 @@ go_over_universe( experiment, Org, DeGids, NDEPrs, Univ ) :-
     go_over_universe_exp( Org, DeGids, NDEPrs, Univ ).
 go_over_universe( genome, Org, _DEGids, _NDEPrs, Univ ) :-
     go_over_universe_genome( Org, Univ ).
+go_over_universe( go_exp, Org, DEGids, NDEPrs, Univ ) :-
+    go_over_universe_go_exp( Org, DEGids, NDEPrs, Univ ).
 
 go_over_universe_genome( hs, Univ ) :-
     findall( Entz, map_hgnc_symb_entz(_Symb,Entz), Entzs ),
@@ -167,6 +169,17 @@ go_over_universe_exp( hs, DeGids, NDEPrs, Univ ) :-
 go_over_universe_exp( mouse, DeGids, NDEPrs, Univ ) :-
     findall( Mgim, (member(Symb-_,NDEPrs),map_mgim_mouse_mgim_symb(Mgim,Symb)), NDEMgims ),
     append( DeGids, NDEMgims, Mgims ),
+    sort( Mgims, Univ ).
+
+go_over_universe_go_exp( hs, DEGids, NDEPrs, Univ ) :-
+    findall( Entz, (member(Symb-_,NDEPrs),once(map_gont_gont_symb(_,_,Symb)),map_hgnc_symb_entz(Symb,Entz)), NDEMgims ),
+    findall( Entz, (member(Entz,DEGids),map_hgnc_symb_entz(Symb,Entz),once(map_gont_gont_symb(_,_,Symb))), DEMgims ),
+    append( DEMgims, NDEMgims, Mgims ),
+    sort( Mgims, Univ ).
+go_over_universe_go_exp( mouse, DEGids, NDEPrs, Univ ) :-
+    findall( Mgim, (member(Symb-_,NDEPrs),once(map_gont_mouse_gont_symb(_,_,Symb)),map_mgim_mouse_mgim_symb(Mgim,Symb)), NDEMgims ),
+    findall( Mgim, (member(Mgim,DEGids),map_mgim_mouse_mgim_symb(Mgim,Symb),once(map_gont_mouse_gont_symb(_,_,Symb))), DEMgims ),
+    append( DEMgims, NDEMgims, Mgims ),
     sort( Mgims, Univ ).
 
 org_symb_go_over_gene_ids( hs, Set, Gids ) :-
