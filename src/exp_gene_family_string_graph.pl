@@ -16,6 +16,7 @@ exp_gene_family_string_graph_defaults( Defs ) :-
     ].
 
 /** exp_gene_family_string_graph( +Exp, +Family, -Graph, +Opts )
+    exp_gene_family_string_graph( +Exp, +Family, ?DEPrs, ?NonDEPrs, -Graph, +Opts )
 
 Generate and possibly plot the STRING graph of a known gene family as affected in a biological Exp_eriment.
 Each family gene is placed of the following states according to wether it was identified in Exp and 
@@ -29,6 +30,9 @@ how it was modified (in relation to background conditions):
 Note that if de-reguation trumps identification. That is there currently no distiction
 between genes that seen to be both significantly de-regulated and identified versus
 just those that are simply significantly de-regulated.
+
+In the exp_gene_family_string_graph/6 version DEPrs and NonDEPrs can be provided, which optimises use in
+loops over families (see exp_go_over_string_graphs/4).
 
 Opts
   * exp_ev_log(EvLog=true)
@@ -46,11 +50,11 @@ Opts
   * plot(Plot=true)
     whether to plot the graph via wgraph_plot/2
   * wgraph_plot_opts(WgOpts=[])
-    options that override this predicates' options in the call to wgraph_plot/2
+    options for wgraph_plot/2 (in preference to any defaults from Self)
   * wgraph_plot_defs(WgDefs=[])
-    options that are overriden by this predicates' options in the call to wgraph_plot/2
+    options for wgraph_plot/2 (added to the end, after any defaults from Self)
 
-Options are passed to a number of other predicates.
+These ptions are passed to a number of other pack predicates.
 
 See [pack('bio_analytics/examples/bt.pl')].
 
@@ -76,8 +80,15 @@ Produces file: bt.svg
 */
 exp_gene_family_string_graph( Exp, Fam, StGraph, Args ) :-
     % fixme: allow for ground DEpPrs-NonDEPrs, (message also on caller)
+    exp_gene_family_string_graph( Exp, Fam, _DEPrs, _NonDEPrs, StGraph, Args ).
+
+exp_gene_family_string_graph( Exp, Fam, DEPrs, NonDEPrs, StGraph, Args ) :-
     options_append( exp_gene_family_string_graph, Args, Opts ),
-    exp_diffex( Exp, DEPrs, NonDEPrs, Opts ),
+    ( var(DEPrs) ->
+        exp_diffex( Exp, DEPrs, NonDEPrs, Opts )
+        ;
+        true
+    ),
     options( org(Org), Opts ),
     gene_family( Fam, Org, Fymbs ),
     %
@@ -101,11 +112,11 @@ exp_gene_family_string_graph( Exp, Fam, StGraph, Args ) :-
 
 exp_wgraph_plot( [], Fam, _WGOpts ) :-
     !,
-    debug( exp_gene_family_string_graph, 'Empty string graph removed, for family: ~w', [Fam] ).
-exp_wgraph_plot( [Node], Fam, _WGOpts ) :-
-    atomic(Node),
-    !,
-    debug( exp_gene_family_string_graph, 'Single node graph removed, for family: ~w', [Fam] ).
+    debug( ba(info), 'Empty string graph removed, for family: ~w', [Fam] ).
+% exp_wgraph_plot( [Node], Fam, _WGOpts ) :-
+    % atomic(Node),
+    % !,
+    % debug( exp_gene_family_string_graph, 'Single node graph removed, for family: ~w', [Fam] ).
 exp_wgraph_plot( Graph, _Fam, Opts ) :-
     wgraph_plot( Graph, Opts ).
 

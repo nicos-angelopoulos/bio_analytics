@@ -60,6 +60,7 @@ exp_go_over_string_graphs( Exp, GoOverIn, Dir, Args ) :-
     options( viz_de_opts(VdfOpts), Opts ),
     options( wgraph_plot_opts(WgOpts), Opts ),
     ( VdfOpts == [] -> Exp = RedExp; exp_diffex(Exp,RedExp,_,[as_pairs(false)|VdfOpts]) ),
+    mtx( red_exp.csv, RedExp ),
     options( max_overs(MaxOvsPrv), Opts ),
     (number(MaxOvsPrv) -> MaxOvs is integer(MaxOvsPrv),findall(Go,(between(1,MaxOvs,I),nth1(I,GOs,Go)),MaxGOs); GOs = MaxGOs), 
     options( stem_type(Sty), Opts ),
@@ -70,22 +71,24 @@ exp_go_over_string_graphs( Exp, GoOverIn, Dir, Args ) :-
         ;
         PadLen = 0
     ),
-    go_over_string_graphs_dir( MaxGOs, 1, RedExp, Dir, WgOpts, Sty, PadLen, Opts ).
+    exp_diffex( RedExp, DEPrs, NonDEPrs, [as_pairs(true)|Opts] ),
+    go_over_string_graphs_dir( MaxGOs, 1, RedExp, Dir, WgOpts, Sty, PadLen, DEPrs, NonDEPrs, Opts ).
     % maplist( go_over_string_graphs_dir(Exp,Dir,WgOpts,Opts), GOs ).
 
-go_over_string_graphs_dir( [], _I, _Exp, _Dir, _WgOpts, _Sty, _Pad, _Opts ).
-go_over_string_graphs_dir( [Go|Gos], I, Exp, Dir, WgOpts, Sty, Pad, Opts ) :-
+go_over_string_graphs_dir( [], _I, _Exp, _Dir, _WgOpts, _Sty, _Pad, _DEPrs, _NonDEPrs, _Opts ).
+go_over_string_graphs_dir( [Go|Gos], I, Exp, Dir, WgOpts, Sty, Pad, DEPrs, NonDEPrs, Opts ) :-
     % ( atom_concat('GO:',Stem,Go) -> atom_concat(go,Stem,GoTkn); GoTkn=Go ),
     debug( exp_go_over_string_graphs, 'Doing: ~w', [Go] ),
     ( Sty == go_pair_ord -> Tty = go_pair_ord(I,Pad) ; Tty = Sty ),
     go_string_graph_stem( Tty, Go, GoTkn ),
+    % ( Go == 'GO:0034447' -> trace; true ),
     directory_file_path( Dir, GoTkn, DirGo ),
     debug( exp_go_over_string_graphs, 'File: ~p', [DirGo] ),
     GoWgOpts = [stem(DirGo)|WgOpts],
     % fixme: you can pass DEPrs and NonDEPrs below, to avoid re-finding them...
-    exp_gene_family_string_graph( Exp, Go, _, [wgraph_plot_opts(GoWgOpts)|Opts] ),
+    exp_gene_family_string_graph( Exp, Go, DEPrs, NonDEPrs, _, [wgraph_plot_opts(GoWgOpts)|Opts] ),
     J is I + 1,
-    go_over_string_graphs_dir( Gos, J, Exp, Dir, WgOpts, Sty, Pad, Opts ).
+    go_over_string_graphs_dir( Gos, J, Exp, Dir, WgOpts, Sty, Pad, DEPrs, NonDEPrs, Opts ).
 
 exp_go_over_mtx( GoOverIn, Exp, GoOver, Dir, Opts ) :-
     var( GoOverIn ),

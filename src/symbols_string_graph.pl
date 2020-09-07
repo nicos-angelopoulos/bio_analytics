@@ -93,6 +93,7 @@ symbols_string_graph( Symbols, Graph, Args ) :-
 	options( include_orphans(IncO), Opts ),
 	symbols_string_graph_orphans( IncO, Wgraph, Symbols, Ograph ),
     debug_call( symbols_string_graph, length, string_graph_w_orphans/Ograph ),
+    % ( (Wgraph==[],Ograph=[_]) -> trace; true ),
 	options( sort_graph(Sgra), Opts ),
 	symbols_string_graph_sort( Sgra, Ograph, Graph ).
 
