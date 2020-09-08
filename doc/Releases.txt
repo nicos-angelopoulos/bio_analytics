@@ -3,9 +3,9 @@
 
 TBD
       20.09.06    EXAMPLES: mouse example
-      20.09.06    IFACE:    add option for intersection(bio_id,exp) ids for diff.ex 
 
 0.4 
+      20.09.08    FIXED:    replace / in go term name based filenames to _OR_
       20.09.07    DEBUG:    started channel ba(info) (see debug_call(_,info,_))
                   DEBUG:    removed edges (duplicate entries in string) are info displayed
                   OPTS:     go_pair_ord() in both exp_go_over_string_graphs/4 & go_string_graph/3

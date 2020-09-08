@@ -13,7 +13,7 @@ exp_go_over_defaults( Defs ) :-
                 org(hs),
                 stem(go_over),
                 to_file(false),
-                universe(experiment)
+                universe(go_exp)
     ].
 
 /** exp_go_over( +CsvF, -GoOver, +Opts ).
@@ -25,19 +25,19 @@ those perform over representation analysis in gene ontology.<br>
 Results in GoOver are either as a values list of a csv file.
 
 Opts
-  * go('BP')
-    gene ontology section (BP,MF,CC)
-  * go_over_pv_cut(0.05)
+  * go(GoSec='BP')
+    gene ontology section, in: =|[BP,MF,CC]|=
+  * go_over_pv_cut(PvCut=0.05)
     p value filter for the results
-  * org(hs)
+  * org(Org=hs)
     one of bio_db_organism/2 first argument values (hs or mouse for now)
   * stem(Stem=false)
     stem for output csv file. when false use basename of CsvF 
   * to_file(ToF=false)
     when GoOver is unbound, this controls whether the output
     goes to a file or a values list 
-  * universe(experiment)
-    available: =|genome|= or =|go_exp|=
+  * universe(Univ=go_exp)
+    Univ in : =|[genome,go_exp,experiment]|=
 
 Options are also passed to exp_diffex/4.
 
@@ -78,10 +78,13 @@ OverF = '.../swipl/pack/bio_analytics/data/silac/bt_gontBP_p0.05_univExp.csv'.
 
 @author nicos angelopoulos
 @version  0.1 2019/5/2
+@see go_over_universe/5
+
 */
 exp_go_over( CsvF, GoOver, Args ) :-
     Self = exp_go_over,
     options_append( Self, Args, Opts ),
+    debug_call( exp_go_over, options, Self/Opts ),
     exp_diffex( CsvF, DEPrs, NDEPrs, Opts ),
     options( org(OrgPrv), Opts ),
     bio_db_organism( OrgPrv, Org ),
@@ -104,6 +107,11 @@ exp_go_over( CsvF, GoOver, Args ) :-
     universe <- 'as.character'(universe),
     genes <- 'as.character'(genes),
     options( go_over_pv_cut(PvCut), Opts ),
+    ( debugging(Self) ->
+        <- print(paste("length of universe: ", length(universe)))
+        ;
+        true
+    ),
     gGparams <- 'GSEAGOHyperGParams'(
                     name="bio_analytics_gont",
                     geneSetCollection=gsc,
@@ -144,8 +152,14 @@ exp_go_over_return( GoOver, DfOveR, CsvF, Use, Opts ) :-
     % <- print( warnings() ),
     debug( Self, 'Wrote: ~p', GoOver ).
 
-% go_over_universe( experiment, Org, DEGenes, NDEPrs, Univ ) :-
-% we now are passing DeGids, so no need to re-find those
+%% go_over_universe( +Token, +Org, +DEGenes, +NDEPrs, -Universe )
+%
+% Universe is the list of gene identifiers to be used as universe/background for GOstats.
+%
+% In human (=|Org=hs|=), this is a list of Entrez ids, and in =|Org=mouse|=, a list of Mgim identifiers.<br>
+% DEGenes is a list of deferentially expressed gene identifiers, and NDEPrs is a list of non-differential <br>
+% expressed Symbol-Pvalue pairs.
+% 
 go_over_universe( experiment, Org, DeGids, NDEPrs, Univ ) :-
     go_over_universe_exp( Org, DeGids, NDEPrs, Univ ).
 go_over_universe( genome, Org, _DEGids, _NDEPrs, Univ ) :-
@@ -181,7 +195,6 @@ go_over_universe_go_exp( mouse, DEGids, NDEPrs, Univ ) :-
     findall( Mgim, (member(Mgim,DEGids),map_mgim_mouse_mgim_symb(Mgim,Symb),once(map_gont_mouse_gont_symb(_,_,Symb))), DEMgims ),
     append( DEMgims, NDEMgims, Mgims ),
     sort( Mgims, Univ ).
-
 org_symb_go_over_gene_ids( hs, Set, Gids ) :-
     findall( Entz,  (member(Symb,Set),map_hgnc_symb_entz(Symb,Entz)), Entzs ),
     sort( Entzs, Gids ).

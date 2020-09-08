@@ -99,8 +99,10 @@ go_string_graph_stem( go_name, GoTermIn, Stem ) :-
 	% codes_replace( GoNameCs, 0' , 0'_, GoUnderCs ),
 	% atom_codes( GoUnder, GoUnderCs ),
 	% atomic_list_concat( [go,GoUnder], '_', Stem ).
-    atomic_list_concat( Parts, ' ', GoName ),
-    atomic_list_concat( Parts, '_', Stem ).  % removing go_ prefix
+    atomic_list_concat( PartsA, '/', GoName ),
+    atomic_list_concat( PartsA, '_OR_', OredGoName ),
+    atomic_list_concat( PartsB, ' ', OredGoName ),
+    atomic_list_concat( PartsB, '_', Stem ).  % removing go_ prefix
 
 	
 codes_replace( [], _C, _W, [] ).

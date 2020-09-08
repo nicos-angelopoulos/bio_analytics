@@ -10,18 +10,25 @@
 % Colours was a list.
 % 
 % RGBtype should define the form of RGBs. 
-%  * *hexed* return a string or strings of the form "#RRGGBB"
-%  * hexed_atom  at hexed but atom(s) rather than strings
-%  * hex    return string without leading #
-%  * term_hex  return rgb(RR,GG,BB), with each colour as hex atom
-%  * term_dec return rgb(RR,GG,BB), with each RGB as decimal number this is the
-%     cannonical representation, see rgb_term/2.
-%  * dec    to decimal strings
-%  * dec_atom  as decimal atoms
+%  * *hexed*
+%    return a string or strings of the form "#RRGGBB"
+%  * hexed_atom
+%    at hexed but atom(s) rather than strings
+%  * hex
+%    return string without leading #
+%  * term_hex
+%    return rgb(RR,GG,BB), with each colour as hex atom
+%  * term_dec
+%    return rgb(RR,GG,BB), with each RGB as decimal number this is the
+%    cannonical representation, see rgb_term/2.
+%  * dec
+%    to decimal strings
+%  * dec_atom
+%    as decimal atoms
 % 
 %==
 % ?- CC <- colours(), length( CC, Len ), col_rgb( CC, RGBs ), length( RGBs, Len ).
-% ?- requires( colours_pie/1 ).
+% ?- lib(b_real:colours_pie/1).
 % ?- PP <- palette(), length( PP, Len ), col_rgb( PP, RGBs ), length( RGBs, Len ), colours_pie( RGBs ), maplist( rgb_term, RGBs, Terms ).
 %
 %==

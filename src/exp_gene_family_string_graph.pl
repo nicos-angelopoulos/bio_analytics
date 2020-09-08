@@ -15,8 +15,8 @@ exp_gene_family_string_graph_defaults( Defs ) :-
                 wgraph_plot_defs([])
     ].
 
-/** exp_gene_family_string_graph( +Exp, +Family, -Graph, +Opts )
-    exp_gene_family_string_graph( +Exp, +Family, ?DEPrs, ?NonDEPrs, -Graph, +Opts )
+/** exp_gene_family_string_graph( +Exp, +Family, -Graph, +Opts ).
+    exp_gene_family_string_graph( +Exp, +Family, ?DEPrs, ?NonDEPrs, -Graph, +Opts ).
 
 Generate and possibly plot the STRING graph of a known gene family as affected in a biological Exp_eriment.
 Each family gene is placed of the following states according to wether it was identified in Exp and 
@@ -27,7 +27,7 @@ how it was modified (in relation to background conditions):
   * Orange = either both directions or unknown direction
   * Grey = not identified
 
-Note that if de-reguation trumps identification. That is there currently no distiction
+Note that de-reguation trumps identification, that is, currently there is no distiction
 between genes that seen to be both significantly de-regulated and identified versus
 just those that are simply significantly de-regulated.
 
@@ -54,7 +54,7 @@ Opts
   * wgraph_plot_defs(WgDefs=[])
     options for wgraph_plot/2 (added to the end, after any defaults from Self)
 
-These ptions are passed to a number of other pack predicates.
+These Options are passed to a number of other pack predicates.
 
 See [pack('bio_analytics/examples/bt.pl')].
 
