@@ -85,7 +85,6 @@ go_over_string_graphs_dir( [Go|Gos], I, Exp, Dir, WgOpts, Sty, Pad, DEPrs, NonDE
     directory_file_path( Dir, GoTkn, DirGo ),
     debug( exp_go_over_string_graphs, 'File: ~p', [DirGo] ),
     GoWgOpts = [stem(DirGo)|WgOpts],
-    % fixme: you can pass DEPrs and NonDEPrs below, to avoid re-finding them...
     exp_gene_family_string_graph( Exp, Go, DEPrs, NonDEPrs, _, [wgraph_plot_opts(GoWgOpts)|Opts] ),
     J is I + 1,
     go_over_string_graphs_dir( Gos, J, Exp, Dir, WgOpts, Sty, Pad, DEPrs, NonDEPrs, Opts ).

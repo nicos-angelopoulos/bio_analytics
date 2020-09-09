@@ -79,7 +79,6 @@ Produces file: bt.svg
 
 */
 exp_gene_family_string_graph( Exp, Fam, StGraph, Args ) :-
-    % fixme: allow for ground DEpPrs-NonDEPrs, (message also on caller)
     exp_gene_family_string_graph( Exp, Fam, _DEPrs, _NonDEPrs, StGraph, Args ).
 
 exp_gene_family_string_graph( Exp, Fam, DEPrs, NonDEPrs, StGraph, Args ) :-
