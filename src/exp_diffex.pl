@@ -43,6 +43,8 @@ Opts
     what to return as non differentially expressed: either everything in Gcnm (AsNon=all, default when EvLog is true), or only those with numeric pvalue (AsNon=pvalue, default when EvLog is false)
   * as_pairs(AsPairs=true)
     whether to return pairs or matrices
+  * diffex_max(DexMax=false)
+    puts a cap on the number of differentially expressed genes returned
   * exp_pv_cnm(ExpPcnm='adj.pvalue')
     the experimental column (found in MsF) on which Pcut is applied as a filter
   * exp_pv_cut(Pcut=0.05)
@@ -137,29 +139,34 @@ exp_diffex( MtxIn, DEs, NonDEs, Args ) :-
     options( exp_ev_cut_get(EvGet), Opts ),
     options( exp_ev_include_inf(InfInc), Opts ),
     options( gene_id_cnm(Gcnm), Opts ),
+    options( diffex_max(DEMax), Opts ),
     mtx( MtxIn, Mtx, convert(true) ),
     Mtx = [Hdr|Rows],
     Cids = [ExpPCnm,ExpEvCnm,Gcnm],
     CPos = [PvPos,EvPos,GnPos],
     maplist( mtx_header_column_name_pos(Hdr), Cids, _Cnms, CPos ),
-    exp_diffex_separate( Rows, PvPos, EvPos, GnPos, Pcof, EvLet, EvGet, InfInc, AsNon, AsPrs, TDEs, TNonDEs ),
+    options( diffex_max(DEMaxPrv), Opts ),
+    ( number(DEMaxPrv) -> DEMaxPrv = DEMax; length(Rows,RsLen), DEMax is (RsLen + 2) * 2 ),  % ideally we want infinity ...
+    exp_diffex_separate( Rows, DEMax, PvPos, EvPos, GnPos, Pcof, EvLet, EvGet, InfInc, AsNon, AsPrs, TDEs, TNonDEs ),
     exp_diff_add_header( AsPrs, Hdr, TDEs, TNonDEs, DEs, NonDEs ).
 
-exp_diffex_separate( [], _PvPos, _EvPos, _GnPos, _Pcof, _EvLet, _EvGet, _InfInc, _AsNon, _AsPrs, [], [] ).
-exp_diffex_separate( [Row|Rows], PvPos, EvPos, GnPos, Pcof, EvLet, EvGet, InfInc, AsNon, AsPrs, DEs, NonDEs ) :-
+exp_diffex_separate( [], _I, _PvPos, _EvPos, _GnPos, _Pcof, _EvLet, _EvGet, _InfInc, _AsNon, _AsPrs, [], [] ).
+exp_diffex_separate( [Row|Rows], I, PvPos, EvPos, GnPos, Pcof, EvLet, EvGet, InfInc, AsNon, AsPrs, DEs, NonDEs ) :-
     arg( PvPos, Row, Pv ), 
     arg( EvPos, Row, Ev ),
     arg( GnPos, Row, Gn ),
-    ( exp_diffex_select(Pv,Ev,Pcof,EvLet,EvGet,InfInc) ->
+    ( (I>0,exp_diffex_select(Pv,Ev,Pcof,EvLet,EvGet,InfInc)) ->
         exp_diffex_ret_elem( AsPrs, Row, Gn, Ev, DEs, TDEs ),
+        J is I - 1,
         NonDEs = TNonDEs
         ;
+        J is I,
         DEs = TDEs,
         ( (AsNon == pvalue, \+ number(Pv)) -> NonDEs = TNonDEs; exp_diffex_ret_elem(AsPrs,Row,Gn,Ev,NonDEs,TNonDEs)
                 % NonDEs = [Gn-Ev|TNonDEs] 
         )
     ),
-    exp_diffex_separate( Rows, PvPos, EvPos, GnPos, Pcof, EvLet, EvGet, InfInc, AsNon, AsPrs, TDEs, TNonDEs ).
+    exp_diffex_separate( Rows, J, PvPos, EvPos, GnPos, Pcof, EvLet, EvGet, InfInc, AsNon, AsPrs, TDEs, TNonDEs ).
 
 exp_diff_add_header( false, Hdr, TDEs, TNonDEs, DEs, NonDEs ) :-
     !,
