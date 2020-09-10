@@ -61,6 +61,7 @@ exp_go_over_string_graphs( Exp, GoOverIn, Dir, Args ) :-
     options( viz_de_opts(VdfOpts), Opts ),
     options( wgraph_plot_opts(WgOpts), Opts ),
     ( VdfOpts == [] -> Exp = RedExp; exp_diffex(Exp,RedExp,_,[as_pairs(false)|VdfOpts]) ),
+    debuc( Self, length, [exp_in,exp_red]/[Exp,RedExp] ),
     % mtx( red_exp.csv, RedExp ), % fixme: do it properly (in subdirectory)
     options( max_overs(MaxOvsPrv), Opts ),
     (number(MaxOvsPrv) -> MaxOvs is integer(MaxOvsPrv),findall(Go,(between(1,MaxOvs,I),nth1(I,GOs,Go)),MaxGOs); GOs = MaxGOs), 
