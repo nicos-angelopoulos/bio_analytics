@@ -22,6 +22,7 @@ exp_diffex_defaults( Args, Defs ) :-
     ),
     Defs = [   
                 as_pairs(true),
+                diffex_max(false),
                 exp_pv_cnm('adj.pvalue'),
                 exp_pv_cut(0.05),
                 gene_id_cnm('Symbols')
