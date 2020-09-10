@@ -49,18 +49,19 @@ Options are passed to exp_gene_family_string_graph/4.
 
 */
 exp_go_over_string_graphs( Exp, GoOverIn, Dir, Args ) :-
+    Self = exp_go_over_string_graphs,
     options_append( exp_go_over_string_graphs, Args, Opts ),
     os_make_path( Dir ),
-    exp_go_over_mtx( GoOverIn, Exp, GoOver, Dir, Opts ),
+    exp_go_over_mtx( GoOverIn, Exp, GoOver, Dir, Self, Opts ),
     options( go_id_clm(Cid), Opts ),
     mtx_column( GoOver, Cid, GOs ),
     options( dir_postfix(Psfx), Opts ),
     exp_go_over_string_graphs_to_dir( Exp, Psfx, Dir ),
-    debug( exp_go_over_string_graphs, 'Dir: ~p', [Dir] ),
+    debuc( Self, 'Dir: ~p', [Dir] ),
     options( viz_de_opts(VdfOpts), Opts ),
     options( wgraph_plot_opts(WgOpts), Opts ),
     ( VdfOpts == [] -> Exp = RedExp; exp_diffex(Exp,RedExp,_,[as_pairs(false)|VdfOpts]) ),
-    mtx( red_exp.csv, RedExp ),
+    % mtx( red_exp.csv, RedExp ), % fixme: do it properly (in subdirectory)
     options( max_overs(MaxOvsPrv), Opts ),
     (number(MaxOvsPrv) -> MaxOvs is integer(MaxOvsPrv),findall(Go,(between(1,MaxOvs,I),nth1(I,GOs,Go)),MaxGOs); GOs = MaxGOs), 
     options( stem_type(Sty), Opts ),
@@ -72,32 +73,33 @@ exp_go_over_string_graphs( Exp, GoOverIn, Dir, Args ) :-
         PadLen = 0
     ),
     exp_diffex( RedExp, DEPrs, NonDEPrs, [as_pairs(true)|Opts] ),
-    go_over_string_graphs_dir( MaxGOs, 1, RedExp, Dir, WgOpts, Sty, PadLen, DEPrs, NonDEPrs, Opts ).
+    debuc( Self, length, [de_prs,non_de_prs]/[DEPrs,NonDEPrs] ),
+    go_over_string_graphs_dir( MaxGOs, 1, RedExp, Dir, WgOpts, Sty, PadLen, DEPrs, NonDEPrs, Self, Opts ).
     % maplist( go_over_string_graphs_dir(Exp,Dir,WgOpts,Opts), GOs ).
 
-go_over_string_graphs_dir( [], _I, _Exp, _Dir, _WgOpts, _Sty, _Pad, _DEPrs, _NonDEPrs, _Opts ).
-go_over_string_graphs_dir( [Go|Gos], I, Exp, Dir, WgOpts, Sty, Pad, DEPrs, NonDEPrs, Opts ) :-
+go_over_string_graphs_dir( [], _I, _Exp, _Dir, _WgOpts, _Sty, _Pad, _DEPrs, _NonDEPrs, _Self, _Opts ).
+go_over_string_graphs_dir( [Go|Gos], I, Exp, Dir, WgOpts, Sty, Pad, DEPrs, NonDEPrs, Self, Opts ) :-
     % ( atom_concat('GO:',Stem,Go) -> atom_concat(go,Stem,GoTkn); GoTkn=Go ),
-    debug( exp_go_over_string_graphs, 'Doing: ~w', [Go] ),
+    debuc( Self, 'Doing: ~w', [Go] ),
     ( Sty == go_pair_ord -> Tty = go_pair_ord(I,Pad) ; Tty = Sty ),
     go_string_graph_stem( Tty, Go, GoTkn ),
     % ( Go == 'GO:0034447' -> trace; true ),
     directory_file_path( Dir, GoTkn, DirGo ),
-    debug( exp_go_over_string_graphs, 'File: ~p', [DirGo] ),
+    debuc( Self, 'File: ~p', [DirGo] ),
     GoWgOpts = [stem(DirGo)|WgOpts],
     exp_gene_family_string_graph( Exp, Go, DEPrs, NonDEPrs, _, [wgraph_plot_opts(GoWgOpts)|Opts] ),
     J is I + 1,
-    go_over_string_graphs_dir( Gos, J, Exp, Dir, WgOpts, Sty, Pad, DEPrs, NonDEPrs, Opts ).
+    go_over_string_graphs_dir( Gos, J, Exp, Dir, WgOpts, Sty, Pad, DEPrs, NonDEPrs, Self, Opts ).
 
-exp_go_over_mtx( GoOverIn, Exp, GoOver, Dir, Opts ) :-
+exp_go_over_mtx( GoOverIn, Exp, GoOver, Dir, _Self, Opts ) :-
     var( GoOverIn ),
     !,
     os_path( Dir, 'go_over', + Stem ),
     append( Opts, [to_file(true),stem(Stem)], GoOpts ),
     exp_go_over( Exp, GoOver, GoOpts ),
     GoOverIn = GoOver.
-exp_go_over_mtx( GoOverIn, _Exp, GoOver, _Dir, _Opts ) :-
-    debug( exp_go_over_string_graphs, 'Using stored go_over results from: ~p', [GoOverIn] ),
+exp_go_over_mtx( GoOverIn, _Exp, GoOver, _Dir, Self, _Opts ) :-
+    debuc( Self, 'Using stored go_over results from: ~p', [GoOverIn] ),
     mtx( GoOverIn, GoOver ). % fixme: pass Opts ?
 
 exp_go_over_string_graphs_to_dir( _Exp, _Psfx, Dir ) :-
