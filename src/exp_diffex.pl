@@ -139,7 +139,7 @@ exp_diffex( MtxIn, DEs, NonDEs, Args ) :-
     options( exp_ev_cut_get(EvGet), Opts ),
     options( exp_ev_include_inf(InfInc), Opts ),
     options( gene_id_cnm(Gcnm), Opts ),
-    options( diffex_max(DEMax), Opts ),
+    options( diffex_max(DEMaxPrv), Opts ),
     mtx( MtxIn, Mtx, convert(true) ),
     Mtx = [Hdr|Rows],
     Cids = [ExpPCnm,ExpEvCnm,Gcnm],
