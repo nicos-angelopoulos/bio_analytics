@@ -37,7 +37,7 @@ Options are passed to exp_gene_family_string_graph/4.
 ?- absolute_file_name( pack('bio_analytics/data/silac/bt.csv'), Exp ),
    exp_go_over_string_graphs( Exp, Gov, Dir, [] ).
 
-% Sending to R: pltv <- ggnet2(lp_adj,vjust = -1,size = 3,label = pl_v_1,color = pl_v_2,edge.size = pl_v_3,edge.color = "#BEAED4")
+% Sending to R: pltv <- ggnet2(lp_adj,vjexp_go_over_mtxust = -1,size = 3,label = pl_v_1,color = pl_v_2,edge.size = pl_v_3,edge.color = "#BEAED4")
 
 ==
 
@@ -51,12 +51,12 @@ Options are passed to exp_gene_family_string_graph/4.
 exp_go_over_string_graphs( Exp, GoOverIn, Dir, Args ) :-
     Self = exp_go_over_string_graphs,
     options_append( exp_go_over_string_graphs, Args, Opts ),
+    options( dir_postfix(Psfx), Opts ),
+    exp_go_over_string_graphs_to_dir( Exp, Psfx, Dir ),
     os_make_path( Dir ),
     exp_go_over_mtx( GoOverIn, Exp, GoOver, Dir, Self, Opts ),
     options( go_id_clm(Cid), Opts ),
     mtx_column( GoOver, Cid, GOs ),
-    options( dir_postfix(Psfx), Opts ),
-    exp_go_over_string_graphs_to_dir( Exp, Psfx, Dir ),
     debuc( Self, 'Dir: ~p', [Dir] ),
     options( viz_de_opts(VdfOpts), Opts ),
     options( wgraph_plot_opts(WgOpts), Opts ),

@@ -5,6 +5,7 @@ TBD
       20.09.06    EXAMPLES: mouse examples
 
 0.4 
+      20.09.14    OPTS:     diffex_mtx() return or record diffex portion of matrix
       20.09.09    OPTS:     diffex_max() maximum number of DEs
       20.09.08    FIXED:    replace / in go term name based filenames to _OR_
       20.09.07    DEBUG:    started channel ba(info) (see debug_call(_,info,_))
