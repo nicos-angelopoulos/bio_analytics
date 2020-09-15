@@ -81,12 +81,10 @@ exp_go_over_string_graphs( Exp, GoOverIn, Dir, Args ) :-
 go_over_string_graphs_dir( [], _I, _Exp, _Dir, _WgOpts, _Sty, _Pad, _DEPrs, _NonDEPrs, _Self, _Opts ).
 go_over_string_graphs_dir( [Go|Gos], I, Exp, Dir, WgOpts, Sty, Pad, DEPrs, NonDEPrs, Self, Opts ) :-
     % ( atom_concat('GO:',Stem,Go) -> atom_concat(go,Stem,GoTkn); GoTkn=Go ),
-    debuc( Self, 'Doing: ~w', [Go] ),
     ( Sty == go_pair_ord -> Tty = go_pair_ord(I,Pad) ; Tty = Sty ),
     go_string_graph_stem( Tty, Go, GoTkn ),
-    % ( Go == 'GO:0034447' -> trace; true ),
     directory_file_path( Dir, GoTkn, DirGo ),
-    debuc( Self, 'File: ~p', [DirGo] ),
+    debuc( Self, 'GOid: ~w, File: ~p', [Go,GoTkn] ),
     GoWgOpts = [stem(DirGo)|WgOpts],
     exp_gene_family_string_graph( Exp, Go, DEPrs, NonDEPrs, _, [wgraph_plot_opts(GoWgOpts)|Opts] ),
     J is I + 1,

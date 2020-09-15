@@ -73,6 +73,7 @@ GraphLen = 117.
 
 */
 symbols_string_graph( Symbols, Graph, Args ) :-
+    Self = symbols_string_graph,
 	options_append( symbols_string_graph, Args, Opts ),
 	options( org(Org), Opts ),
 	options( minw(MinW), Opts ),
@@ -86,13 +87,11 @@ symbols_string_graph( Symbols, Graph, Args ) :-
 						 MinW =< W
 					    ),
 					    		Pgraph ),
-    debug_call( symbols_string_graph, length, string_edges_found/Pgraph ),
     options( cohese(Coh), Opts ),
     symbols_string_graph_cohese( Coh, Pgraph, Wgraph ),
-    debug_call( symbols_string_graph, length, string_edges_cohesed/Wgraph ),
 	options( include_orphans(IncO), Opts ),
 	symbols_string_graph_orphans( IncO, Wgraph, Symbols, Ograph ),
-    debug_call( symbols_string_graph, length, string_graph_w_orphans/Ograph ),
+    debuc( Self, length, [string_edges_found,edges_cohesed,w_orphans]/[Pgraph,Wgraph,Ograph] ),
     % ( (Wgraph==[],Ograph=[_]) -> trace; true ),
 	options( sort_graph(Sgra), Opts ),
 	symbols_string_graph_sort( Sgra, Ograph, Graph ).
@@ -127,7 +126,7 @@ symbols_string_graph_cohese_max( [Hsa-Hsb:Hwe|T], Csa, Csb, Cwe, Wgraph ) :-
         Wgraph = Tgraph,
         % debugging only
         Rwe is min( Cwe, Hwe ),
-        debug_call( ba(info), info, 'Removing duplicate (pair only) edge: ~w'/[Hsa-Hsb:Rwe] )
+        debuc( symbols_string_graph(details), info, 'Removing duplicate (pair only) edge: ~w'/[Hsa-Hsb:Rwe] )
         ;
         Nsa = Hsa,
         Nsb = Hsb,
