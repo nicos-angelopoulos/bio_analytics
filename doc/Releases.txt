@@ -5,6 +5,7 @@ TBD
       20.09.06    EXAMPLES: mouse examples
 
 0.4 
+      20.09.17    OPTS:     viz_de_opts() new value diffex_only
       20.09.14    OPTS:     diffex_mtx() return or record diffex portion of matrix
       20.09.09    OPTS:     diffex_max() maximum number of DEs
       20.09.08    FIXED:    replace / in go term name based filenames to _OR_

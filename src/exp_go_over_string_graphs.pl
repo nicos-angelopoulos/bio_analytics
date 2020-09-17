@@ -20,11 +20,11 @@ Opts
   * max_overs(MaxOvs=false)
     when a number, it is taken as the maximal integer of terms to plot graphs for
   * stem_type(Sty=go_pair_ord)
-    similar to go_string_graph/3, but different default, others: =|go_name|=, =|go_id|=.
+    similar to go_string_graph/3, but different default, others: =|go_name, go_id|=.
     Here the length of GO terms (Len) is added to form go_pair_ord(I,Len) for forwarding
   * viz_de_opts(VizOpts = [])
     options for restricting genes to visualise via exp_diff/4.
-    Default does not restrict what genes are visualised.
+    Default does not restrict what genes are visualised. =|diffex_only = VizOpts|= restricts genes to significants only.
   * wgraph_plot_opts(WgOpts=WgOpts)
     defaults to =|[vjust = -1, node_size(3), format(svg)]|=.
 
@@ -60,7 +60,9 @@ exp_go_over_string_graphs( Exp, GoOverIn, Dir, Args ) :-
     debuc( Self, 'Dir: ~p', [Dir] ),
     options( viz_de_opts(VdfOpts), Opts ),
     options( wgraph_plot_opts(WgOpts), Opts ),
-    ( VdfOpts == [] -> Exp = RedExp; exp_diffex(Exp,RedExp,_,[as_pairs(false)|VdfOpts]) ),
+    % ( VdfOpts == [] -> Exp = RedExp; exp_diffex(Exp,RedExp,_,[as_pairs(false)|VdfOpts]) ),
+    % VdfOpts -> [] or diffex_only  succeed on the following
+    ( atomic(VdfOpts) -> Exp = RedExp; exp_diffex(Exp,RedExp,_,[as_pairs(false)|VdfOpts]) ),
     debuc( Self, length, [exp_in,exp_red]/[Exp,RedExp] ),
     % mtx( red_exp.csv, RedExp ), % fixme: do it properly (in subdirectory)
     options( max_overs(MaxOvsPrv), Opts ),
@@ -73,9 +75,14 @@ exp_go_over_string_graphs( Exp, GoOverIn, Dir, Args ) :-
         ;
         PadLen = 0
     ),
-    exp_diffex( RedExp, DEPrs, NonDEPrs, [as_pairs(true)|Opts] ),
+    exp_diffex( RedExp, DEPrs, NonDEPrs, [diffex_mtx(DiffMtx),as_pairs(true)|Opts] ),
     debuc( Self, length, [de_prs,non_de_prs]/[DEPrs,NonDEPrs] ),
-    go_over_string_graphs_dir( MaxGOs, 1, RedExp, Dir, WgOpts, Sty, PadLen, DEPrs, NonDEPrs, Self, Opts ).
+    ( memberchk(diffex_mtx(PpgUpDiffMtx),Opts ) -> mtx( PpgUpDiffMtx, DiffMtx ) ; true ),
+    % debuc( Self, length, exp_go_over_mtx/ExpGoOver ),
+    % ( VdfOpts == diffex_only -> ExpGoOver = DiffMtx; ExpGoOver = RedExp ),
+    ( VdfOpts == diffex_only -> RedNonDEPrs = [] ; RedNonDEPrs = NonDEPrs ),
+    debuc( Self, length, go_over_non_de_prs/RedNonDEPrs ),
+    go_over_string_graphs_dir( MaxGOs, 1, RedExp, Dir, WgOpts, Sty, PadLen, DEPrs, RedNonDEPrs, Self, Opts ).
     % maplist( go_over_string_graphs_dir(Exp,Dir,WgOpts,Opts), GOs ).
 
 go_over_string_graphs_dir( [], _I, _Exp, _Dir, _WgOpts, _Sty, _Pad, _DEPrs, _NonDEPrs, _Self, _Opts ).
