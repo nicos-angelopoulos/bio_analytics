@@ -2,7 +2,7 @@
 exp_go_over_string_graphs_defaults( Defs ) :-
     Wplots = [vjust= -1, node_size(3), format(svg)],
     Defs = [ dir_postfix(go_strings), go_id_clm(1),
-             max_overs(false),
+             ov_max(false),
              stem_type(go_pair_ord),
              viz_de_opts([]), wgraph_plot_opts(Wplots) ].
 
@@ -17,7 +17,7 @@ Opts
     postfix for outputs directory (when Dir is a variable)
   * go_id_clm(GoIdClm=1)
     column id for over represented GO terms
-  * max_overs(MaxOvs=false)
+  * ov_max(MaxOvs=false)
     when a number, it is taken as the maximal integer of terms to plot graphs for
   * stem_type(Sty=go_pair_ord)
     similar to go_string_graph/3, but different default, others: =|go_name, go_id|=.
@@ -43,7 +43,7 @@ Options are passed to exp_gene_family_string_graph/4.
 
 @author nicos angelopoulos
 @version  0.1 2019/5/5
-@version  0.2 2020/9/6,   option max_overs()
+@version  0.2 2020/9/6,   option ov_max()
 @see exp_go_over/3
 @see exp_gene_family_string_graph/4
 
@@ -65,7 +65,7 @@ exp_go_over_string_graphs( Exp, GoOverIn, Dir, Args ) :-
     ( atomic(VdfOpts) -> Exp = RedExp; exp_diffex(Exp,RedExp,_,[as_pairs(false)|VdfOpts]) ),
     debuc( Self, length, [exp_in,exp_red]/[Exp,RedExp] ),
     % mtx( red_exp.csv, RedExp ), % fixme: do it properly (in subdirectory)
-    options( max_overs(MaxOvsPrv), Opts ),
+    options( ov_max(MaxOvsPrv), Opts ),
     (number(MaxOvsPrv) -> MaxOvs is integer(MaxOvsPrv),findall(Go,(between(1,MaxOvs,I),nth1(I,GOs,Go)),MaxGOs); GOs = MaxGOs), 
     options( stem_type(Sty), Opts ),
     ( Sty == go_pair_ord ->
