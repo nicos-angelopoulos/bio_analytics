@@ -1,15 +1,16 @@
 :- module( bio_analytics, [
-                bio_analytics_version/2,        % -Vers, -Date
-                exp_diffex/4,                   % +Exp, -DEs -NDEs, +Opts
-                exp_gene_family_string_graph/4, % +Exp, +Fam, -Graph, +Opts
-                exp_go_over/3,                  % +Exp, NDEs, +Opts
-                exp_go_over_string_graphs/4,    % +Exp, ?GoOver, ?Dir, -Opts
-                gene_family/3,                  % +Alias, +Org, +Symbols
-                go_org_symbol/3,                % +Org, +GoT, -Symbol
-                go_org_symbols/3,               % +Org, +GoT, -Symbols
-                go_string_graph/3,              % +GoT, -Graph, +Opts
-                go_symbols_reach/3,             % +GoT, -Symbs, +Opts
-                symbols_string_graph/3          % +Symbs, -Graph, +Opts
+                bio_analytics_version/2,          % -Vers, -Date
+                exp_diffex/4,                     % +Exp, -DEs -NDEs, +Opts
+                exp_gene_family_string_graph/4,   % +Exp, +Fam, -Graph, +Opts
+                exp_go_over/3,                    % +Exp, NDEs, +Opts
+                exp_go_over_string_graphs/4,      % +Exp, ?GoOver, ?Dir, +Opts
+                exp_go_over_string_graphs_multi/1,% +Opts
+                gene_family/3,                    % +Alias, +Org, +Symbols
+                go_org_symbol/3,                  % +Org, +GoT, -Symbol
+                go_org_symbols/3,                 % +Org, +GoT, -Symbols
+                go_string_graph/3,                % +GoT, -Graph, +Opts
+                go_symbols_reach/3,               % +GoT, -Symbs, +Opts
+                symbols_string_graph/3            % +Symbs, -Graph, +Opts
         ] ).
 
 /** <module> Computational biology data analytics.
@@ -76,5 +77,6 @@ bio_analytics_version( 0:3:0, date(2019,5,12) ).
 :- lib(exp_gene_family_string_graph/4).
 :- lib(exp_go_over/3).
 :- lib(exp_go_over_string_graphs/4).
+:- lib(exp_go_over_string_graphs_multi/1).
 
 :- lib(end(bio_analytics), homonyms(true)).

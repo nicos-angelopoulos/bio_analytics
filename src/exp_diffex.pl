@@ -45,9 +45,9 @@ Opts
     what to return as non differentially expressed: either everything in Gcnm (AsNon=all, default when EvLog is true), or only those with numeric pvalue (AsNon=pvalue, default when EvLog is false)
   * as_pairs(AsPairs=true)
     whether to return pairs or matrices
-  * diffex_max(DexMax=false)
+  * de_max(DexMax=false)
     puts a cap on the number of differentially expressed genes returned
-  * diffex_mtx(DexMtx)
+  * de_mtx(DexMtx)
     returns the selected matrix. if an atom, its taken to be a filename
   * exp_pv_cnm(ExpPcnm='adj.pvalue')
     the experimental column (found in MsF) on which Pcut is applied as a filter
@@ -143,14 +143,14 @@ exp_diffex( MtxIn, DEs, NonDEs, Args ) :-
     options( exp_ev_cut_get(EvGet), Opts ),
     options( exp_ev_include_inf(InfInc), Opts ),
     options( gene_id_cnm(Gcnm), Opts ),
-    options( diffex_max(DEMaxPrv), Opts ),
-    options( diffex_mtx(DEMtx), Opts ),
+    options( de_max(DEMaxPrv), Opts ),
+    options( de_mtx(DEMtx), Opts ),
     mtx( MtxIn, Mtx, convert(true) ),
     Mtx = [Hdr|Rows],
     Cids = [ExpPCnm,ExpEvCnm,Gcnm],
     CPos = [PvPos,EvPos,GnPos],
     maplist( mtx_header_column_name_pos(Hdr), Cids, _Cnms, CPos ),
-    options( diffex_max(DEMaxPrv), Opts ),
+    options( de_max(DEMaxPrv), Opts ),
     ( number(DEMaxPrv) -> DEMaxPrv = DEMax; length(Rows,RsLen), DEMax is (RsLen + 2) * 2 ),  % ideally we want infinity ...
     exp_diffex_separate( Rows, DEMax, PvPos, EvPos, GnPos, Pcof, EvLet, EvGet, InfInc, AsNon, AsPrs, TDEs, TNonDEs, DERows ),
     exp_diff_add_header( AsPrs, Hdr, TDEs, TNonDEs, DEs, NonDEs ),
