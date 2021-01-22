@@ -13,7 +13,7 @@ exp_go_over_defaults( Defs ) :-
                 org(hs),
                 stem(go_over),
                 to_file(false),
-                universe(experiment)
+                universe(go_exp)
     ].
 
 /** exp_go_over( +CsvF, -GoOver, +Opts ).
@@ -25,19 +25,19 @@ those perform over representation analysis in gene ontology.<br>
 Results in GoOver are either as a values list of a csv file.
 
 Opts
-  * go('BP')
-    gene ontology section (BP,MF,CC)
-  * go_over_pv_cut(0.05)
+  * go(GoSec='BP')
+    gene ontology section, in: =|[BP,MF,CC]|=
+  * go_over_pv_cut(PvCut=0.05)
     p value filter for the results
-  * org(hs)
-    one of bio_db_organism/2 first argument (hs or mouse for now)
+  * org(Org=hs)
+    one of bio_db_organism/2 first argument values (hs or mouse for now)
   * stem(Stem=false)
     stem for output csv file. when false use basename of CsvF 
   * to_file(ToF=false)
     when GoOver is unbound, this controls whether the output
     goes to a file or a values list 
-  * universe(experiment)
-    or genome
+  * universe(Univ=go_exp)
+    Univ in : =|[genome,go_exp,experiment]|=
 
 Options are also passed to exp_diffex/4.
 
@@ -78,28 +78,40 @@ OverF = '.../swipl/pack/bio_analytics/data/silac/bt_gontBP_p0.05_univExp.csv'.
 
 @author nicos angelopoulos
 @version  0.1 2019/5/2
+@see go_over_universe/5
+
 */
 exp_go_over( CsvF, GoOver, Args ) :-
     Self = exp_go_over,
     options_append( Self, Args, Opts ),
+    debug_call( exp_go_over, options, Self/Opts ),
     exp_diffex( CsvF, DEPrs, NDEPrs, Opts ),
     options( org(OrgPrv), Opts ),
     bio_db_organism( OrgPrv, Org ),
     kv_decompose( DEPrs, DEGenes, _ ),
+    debug_call( exp_go_over, length, de_pairs/DEPrs ),
     sort( DEGenes, DEGenesSet ),
+    debug_call( exp_go_over, length, de_genes_set/DEGenesSet ),
     org_symb_go_over_gene_ids( Org, DEGenesSet, Gids ),
+    debug_call( exp_go_over, length, gids/Gids ),
     go_over_frame( Org, goFrameData, GofOrg ),
     goFrame <- 'GOFrame'(goFrameData, organism= +GofOrg),
     goAllFrame <- 'GOAllFrame'(goFrame),
     gsc <- 'GeneSetCollection'(goAllFrame, setType = 'GOCollection'() ),
     genes <- Gids,
     options( universe(UnivOpt), Opts ),
-    go_over_universe( UnivOpt, Org, DEGenes, NDEPrs, Univ ),
+    go_over_universe( UnivOpt, Org, Gids, NDEPrs, Univ ),
+    debug_call( exp_go_over, length, universe/Univ ),
     options( go(GoAspect), Opts ),
     universe <- Univ,
     universe <- 'as.character'(universe),
     genes <- 'as.character'(genes),
     options( go_over_pv_cut(PvCut), Opts ),
+    ( debugging(Self) ->
+        <- print(paste("length of universe: ", length(universe)))
+        ;
+        true
+    ),
     gGparams <- 'GSEAGOHyperGParams'(
                     name="bio_analytics_gont",
                     geneSetCollection=gsc,
@@ -140,10 +152,20 @@ exp_go_over_return( GoOver, DfOveR, CsvF, Use, Opts ) :-
     % <- print( warnings() ),
     debug( Self, 'Wrote: ~p', GoOver ).
 
-go_over_universe( experiment, Org, DEGenes, NDEPrs, Univ ) :-
-    go_over_universe_exp( Org, DEGenes, NDEPrs, Univ ).
-go_over_universe( genome, Org, _DEGenes, _NDEPrs, Univ ) :-
+%% go_over_universe( +Token, +Org, +DEGenes, +NDEPrs, -Universe )
+%
+% Universe is the list of gene identifiers to be used as universe/background for GOstats.
+%
+% In human (=|Org=hs|=), this is a list of Entrez ids, and in =|Org=mouse|=, a list of Mgim identifiers.<br>
+% DEGenes is a list of deferentially expressed gene identifiers, and NDEPrs is a list of non-differential <br>
+% expressed Symbol-Pvalue pairs.
+% 
+go_over_universe( experiment, Org, DeGids, NDEPrs, Univ ) :-
+    go_over_universe_exp( Org, DeGids, NDEPrs, Univ ).
+go_over_universe( genome, Org, _DEGids, _NDEPrs, Univ ) :-
     go_over_universe_genome( Org, Univ ).
+go_over_universe( go_exp, Org, DEGids, NDEPrs, Univ ) :-
+    go_over_universe_go_exp( Org, DEGids, NDEPrs, Univ ).
 
 go_over_universe_genome( hs, Univ ) :-
     findall( Entz, map_hgnc_symb_entz(_Symb,Entz), Entzs ),
@@ -152,20 +174,32 @@ go_over_universe_genome( mouse, Univ ) :-
     findall( Mgim, map_mgim_mouse_mgim_symb(Mgim,_Symb), Mgims ),
     sort( Mgims, Univ ).
 
-go_over_universe_exp( hs, DEGenes, NDEPrs, Univ ) :-
+go_over_universe_exp( hs, DeGids, NDEPrs, Univ ) :-
     findall( Entz, (member(Symb-_,NDEPrs),map_hgnc_symb_entz(Symb,Entz)), NDEEntzs ),
-    findall( Entz1, (member(Symb,DEGenes),map_hgnc_symb_entz(Symb,Entz1)), DEEntzs ),
-    append( DEEntzs, NDEEntzs, Entzs ),
+    % findall( Entz1, (member(Symb,DEGenes),map_hgnc_symb_entz(Symb,Entz1)), DEEntzs ),
+    % append( DEEntzs, NDEEntzs, Entzs ),
+    append( DeGids, NDEEntzs, Entzs ),
     sort( Entzs, Univ ).
-go_over_universe_exp( mouse, NDEPrs, Univ ) :-
-    findall( Mgim, (member(Symb-_,NDEPrs),map_mgim_mouse_mgim_symb(Mgim,Symb)), Mgims ),
+go_over_universe_exp( mouse, DeGids, NDEPrs, Univ ) :-
+    findall( Mgim, (member(Symb-_,NDEPrs),map_mgim_mouse_mgim_symb(Mgim,Symb)), NDEMgims ),
+    append( DeGids, NDEMgims, Mgims ),
     sort( Mgims, Univ ).
 
+go_over_universe_go_exp( hs, DEGids, NDEPrs, Univ ) :-
+    findall( Entz, (member(Symb-_,NDEPrs),once(map_gont_gont_symb(_,_,Symb)),map_hgnc_symb_entz(Symb,Entz)), NDEMgims ),
+    findall( Entz, (member(Entz,DEGids),map_hgnc_symb_entz(Symb,Entz),once(map_gont_gont_symb(_,_,Symb))), DEMgims ),
+    append( DEMgims, NDEMgims, Mgims ),
+    sort( Mgims, Univ ).
+go_over_universe_go_exp( mouse, DEGids, NDEPrs, Univ ) :-
+    findall( Mgim, (member(Symb-_,NDEPrs),once(map_gont_mouse_gont_symb(_,_,Symb)),map_mgim_mouse_mgim_symb(Mgim,Symb)), NDEMgims ),
+    findall( Mgim, (member(Mgim,DEGids),map_mgim_mouse_mgim_symb(Mgim,Symb),once(map_gont_mouse_gont_symb(_,_,Symb))), DEMgims ),
+    append( DEMgims, NDEMgims, Mgims ),
+    sort( Mgims, Univ ).
 org_symb_go_over_gene_ids( hs, Set, Gids ) :-
     findall( Entz,  (member(Symb,Set),map_hgnc_symb_entz(Symb,Entz)), Entzs ),
     sort( Entzs, Gids ).
 org_symb_go_over_gene_ids( mouse, Set, Gids ) :-
-    findall( Mgim,  (member(Symb,Set),map_mgim_mouse_mgim_symb(Symb,Mgim)), Mgims ),
+    findall( Mgim,  (member(Symb,Set),map_mgim_mouse_mgim_symb(Mgim,Symb)), Mgims ),
     sort( Mgims, Gids ).
 
 go_over_frame( mouse, GoFra, GofOrg ) :-

@@ -1,6 +1,32 @@
 ---   Releases   ---
 --------------------
 
+TBD
+      20.09.06    EXAMPLES: mouse examples
+
+0.4               @ 20.09.18   
+      20.09.17    OPTS:     viz_de_opts() new value diffex_only
+                  IFACE:    exp_go_over_string_graphs_multi/1
+      20.09.14    OPTS:     de_mtx() return or record diffex portion of matrix
+      20.09.09    OPTS:     de_max() maximum number of DEs
+      20.09.08    FIXED:    replace / in go term name based filenames to _OR_
+      20.09.07    DEBUG:    started channel ba(info) (see debug_call(_,info,_))
+                  DEBUG:    removed edges (duplicate entries in string) are info displayed
+                  OPTS:     go_pair_ord() in both exp_go_over_string_graphs/4 & go_string_graph/3
+                  OPTS:     universe(go_exp), combining experimental and go identifiers
+      20.09.06    IFACE:    max_overs() option
+                  OPTS:     standarised organism() option to org()
+                  IFACE:    cohese() option (only max, currently)
+                  OPTIM:    only look up half the string edges (ordered)
+      20.09.05    FIXED:    bug on mgim_symbol order in exp_go_over
+                  FIXED:    bug, missing argument in go_over_universe_exp/4
+                  OPTIM:    pass existing list of DE into go_over_universe/5
+      20.09.03    OPTIM:    convert maplist to a loop
+                  IFACE:    exp_diffex/4 can now return matrices
+                  IFACE:    exp_go_over_string_graphs/4 allows restriction
+                  OPTS:     stem_type() more values and addition to exp_go_over_string_graphs/4
+      20.09.02    FIXED:    lib(end(bio_db)) typo in loading code
+
 0.3               @ 19.05.12
       19.05.10    EXAMPLE:  bt_over_go_string
       19.05.09    CHANGED:  edge_strg_symb/4 to org_edge_strg_symb/4
