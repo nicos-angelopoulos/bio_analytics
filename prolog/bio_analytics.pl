@@ -1,6 +1,6 @@
 :- module( bio_analytics, [
                 bio_analytics_version/2,          % -Vers, -Date
-                exp_diffex/4,                     % +Exp, -DEs -NDEs, +Opts
+                bio_diffex/4,                     % +Exp, -DEs -NDEs, +Opts
                 exp_gene_family_string_graph/4,   % +Exp, +Fam, -Graph, +Opts
                 exp_go_over/3,                    % +Exp, NDEs, +Opts
                 exp_go_over_string_graphs/4,      % +Exp, ?GoOver, ?Dir, +Opts
@@ -74,7 +74,7 @@ bio_analytics_version( 0:4:0, date(2019,9,18) ).
 :- lib(go_symbols_reach/3).
 :- lib(go_string_graph/3).
 :- lib(symbols_string_graph/3).
-:- lib(exp_diffex/4).
+:- lib(bio_diffex/4).
 :- lib(exp_gene_family_string_graph/4).
 :- lib(exp_go_over/3).
 :- lib(exp_go_over_string_graphs/4).

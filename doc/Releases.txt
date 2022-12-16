@@ -5,6 +5,7 @@ TBD
       20.09.06    EXAMPLES: mouse examples
 
 0.5 
+      22.12.16    IFACE:    exp_diffex/4 -> bio_diffex/4
       22.12.15    OPTS:     which(Up,Down) returning indexes of selected
 
 0.4               @ 20.09.18   

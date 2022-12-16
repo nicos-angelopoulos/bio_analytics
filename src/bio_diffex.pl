@@ -1,7 +1,7 @@
 
 :- lib(stoics_lib:kv_decompose/3).
 
-exp_diffex_defaults( Args, Defs ) :-
+bio_diffex_defaults( Args, Defs ) :-
     % this makes EvLog default: true
     ( (memberchk(exp_ev_log(EvLog),Args),EvLog==false) ->
         EvDefs = [  as_non(pvalue),
@@ -31,7 +31,7 @@ exp_diffex_defaults( Args, Defs ) :-
                 | EvDefs
     ].
 
-/** exp_diffex( +Exp, -DEs, -NonDEs, +Opts ).
+/** bio_diffex( +Exp, -DEs, -NonDEs, +Opts ).
 
 Select a sublist of significantly, differentially expressed genes in an experiment.
 
@@ -82,7 +82,7 @@ Mtx = [row('Protein IDs', 'Symbols', log2FC, adj.pvalue), row('Q9P126', ...), ro
    debug(testo),
    mtx_data(Mtx),
    debug_call(testo, dims, mtx/Mtx),
-   exp_diffex(Mtx, DEPrs, NonDEPrs, []),
+   bio_diffex(Mtx, DEPrs, NonDEPrs, []),
    debug_call(testo, length, de/DEPrs),
    debug_call(testo, length, nde/NonDEPrs).
 
@@ -95,7 +95,7 @@ NonDEPrs = ['CNN2'- -0.69348026828097, 'CXCR4'-0.73039667221395, ... - ...|...].
 
 ?- 
     mtx_data(Mtx),
-    exp_diffex(Mtx, DEPrs, NonDEPrs, exp_pv_cut(0.01)),
+    bio_diffex(Mtx, DEPrs, NonDEPrs, exp_pv_cut(0.01)),
     debug_call(testo, length, de/DEPrs),
     debug_call(testo, length, nde/NonDEPrs).
 
@@ -105,7 +105,7 @@ NonDEPrs = ['CNN2'- -0.69348026828097, 'CXCR4'-0.73039667221395, ... - ...|...].
 ?-
     mtx_data(Mtx),
     Opts = [exp_ev_cut_let(inf),exp_ev_cut_get(-inf)],
-    exp_diffex(Mtx, DEPrs, NonDEPrs, Opts),
+    bio_diffex(Mtx, DEPrs, NonDEPrs, Opts),
     debug_call(testo, length, de/DEPrs),
     debug_call(testo, length, nde/NonDEPrs).
 
@@ -114,7 +114,7 @@ NonDEPrs = ['CNN2'- -0.69348026828097, 'CXCR4'-0.73039667221395, ... - ...|...].
 
 ?- mtx_data(Mtx),
     Opts = [exp_ev_cut_let(inf),exp_ev_cut_get(-inf),as_pairs(false)],
-    exp_diffex(Mtx, DEs, NonDEs, Opts),
+    bio_diffex(Mtx, DEs, NonDEs, Opts),
     debug_call(testo, length, de/DEPrs),
     debug_call(testo, length, nde/NonDEPrs).
 
@@ -131,11 +131,12 @@ NonDEs = [row('Protein IDs', 'Symbols', log2FC, adj.pvalue), row('B4DUT8;Q6FHC3;
 @author nicos angelopoulos
 @version  0.1 2019/5/2
 @version  0.2 2020/9/3,  ability to return sub-matrices (9/14): diffex_mtx()
+@verions  0.3 2022/12/16, changed name from exp_diffex/4 to bio_diffex/4.
 
 */
 
-exp_diffex( MtxIn, DEs, NonDEs, Args ) :-
-    Self = exp_diffex,
+bio_diffex( MtxIn, DEs, NonDEs, Args ) :-
+    Self = bio_diffex,
     options_append( Self, Args, Opts ),
     options( as_non(AsNon), Opts ),
     options( as_pairs(AsPrs), Opts ),
@@ -155,19 +156,19 @@ exp_diffex( MtxIn, DEs, NonDEs, Args ) :-
     maplist( mtx_header_column_name_pos(Hdr), Cids, _Cnms, CPos ),
     options( de_max(DEMaxPrv), Opts ),
     ( number(DEMaxPrv) -> DEMaxPrv = DEMax; length(Rows,RsLen), DEMax is (RsLen + 2) * 2 ),  % ideally we want infinity ...
-    exp_diffex_separate( Rows, DEMax, 1, PvPos, EvPos, GnPos, Pcof, EvLet, EvGet, InfInc, AsNon, AsPrs, TDEs, TNonDEs, Iu, Id, DERows ),
+    bio_diffex_separate( Rows, DEMax, 1, PvPos, EvPos, GnPos, Pcof, EvLet, EvGet, InfInc, AsNon, AsPrs, TDEs, TNonDEs, Iu, Id, DERows ),
     options( which(Iu,Id), Opts ),
     exp_diff_add_header( AsPrs, Hdr, TDEs, TNonDEs, DEs, NonDEs ),
     mtx( DEMtx, [Hdr|DERows] ).
 
-exp_diffex_separate( [], _X, _I, _PvPos, _EvPos, _GnPos, _Pcof, _EvLet, _EvGet, _InfInc, _AsNon, _AsPrs, [], [], [], [], [] ).
-exp_diffex_separate( [Row|Rows], X, I, PvPos, EvPos, GnPos, Pcof, EvLet, EvGet, InfInc, AsNon, AsPrs, DEs, NonDEs, Iu, Id, DERows ) :-
+bio_diffex_separate( [], _X, _I, _PvPos, _EvPos, _GnPos, _Pcof, _EvLet, _EvGet, _InfInc, _AsNon, _AsPrs, [], [], [], [], [] ).
+bio_diffex_separate( [Row|Rows], X, I, PvPos, EvPos, GnPos, Pcof, EvLet, EvGet, InfInc, AsNon, AsPrs, DEs, NonDEs, Iu, Id, DERows ) :-
     arg( PvPos, Row, Pv ), 
     arg( EvPos, Row, Ev ),
     arg( GnPos, Row, Gn ),
-    ( (X>0,exp_diffex_select(Pv,Ev,Pcof,EvLet,EvGet,Dir,InfInc)) ->
+    ( (X>0,bio_diffex_select(Pv,Ev,Pcof,EvLet,EvGet,Dir,InfInc)) ->
         ( Dir == up -> Iu = [I|IuT], IdT = Id; IuT = Iu, Id = [I|IdT] ),
-        exp_diffex_ret_elem( AsPrs, Row, Gn, Ev, DEs, TDEs ),
+        bio_diffex_ret_elem( AsPrs, Row, Gn, Ev, DEs, TDEs ),
         Y is X - 1,
         NonDEs = TNonDEs,
         DERows = [Row|TDERows]
@@ -176,13 +177,13 @@ exp_diffex_separate( [Row|Rows], X, I, PvPos, EvPos, GnPos, Pcof, EvLet, EvGet, 
         IdT = Id,
         Y is X,
         DEs = TDEs,
-        ( (AsNon == pvalue, \+ number(Pv)) -> NonDEs = TNonDEs; exp_diffex_ret_elem(AsPrs,Row,Gn,Ev,NonDEs,TNonDEs)
+        ( (AsNon == pvalue, \+ number(Pv)) -> NonDEs = TNonDEs; bio_diffex_ret_elem(AsPrs,Row,Gn,Ev,NonDEs,TNonDEs)
                 % NonDEs = [Gn-Ev|TNonDEs] 
         ),
         DERows = TDERows
     ),
     J is I + 1,
-    exp_diffex_separate( Rows, Y, J, PvPos, EvPos, GnPos, Pcof, EvLet, EvGet, InfInc, AsNon, AsPrs, TDEs, TNonDEs, IuT, IdT, TDERows ).
+    bio_diffex_separate( Rows, Y, J, PvPos, EvPos, GnPos, Pcof, EvLet, EvGet, InfInc, AsNon, AsPrs, TDEs, TNonDEs, IuT, IdT, TDERows ).
 
 exp_diff_add_header( false, Hdr, TDEs, TNonDEs, DEs, NonDEs ) :-
     !,
@@ -192,14 +193,14 @@ exp_diff_add_header( _Defaulty, _Hdr, TDEs, TNonDEs, DEs, NonDEs ) :-
     DEs = TDEs,
     NonDEs = TNonDEs.
 
-exp_diffex_ret_elem( false, Row, _Gn, _Ev, List, Tail ) :-
+bio_diffex_ret_elem( false, Row, _Gn, _Ev, List, Tail ) :-
     !,
     List = [Row|Tail].
-exp_diffex_ret_elem( _Defaulty, _Row, Gn, Ev, List, Tail ) :-
+bio_diffex_ret_elem( _Defaulty, _Row, Gn, Ev, List, Tail ) :-
     % DEs = [Gn-Ev|TDEs],
     List = [Gn-Ev|Tail].
 
-exp_diffex_select( Pv, Ev, Pcof, EvLet, EvGet, Dir, InfInc ) :-
+bio_diffex_select( Pv, Ev, Pcof, EvLet, EvGet, Dir, InfInc ) :-
     number( Pv ), 
     Pv < Pcof,
     number(Ev),
@@ -209,10 +210,10 @@ exp_diffex_select( Pv, Ev, Pcof, EvLet, EvGet, Dir, InfInc ) :-
                     EvGet =< Ev,
                     Dir = up
     ),
-    exp_diffex_if_inf_include( Ev, InfInc ).
+    bio_diffex_if_inf_include( Ev, InfInc ).
 
-exp_diffex_if_inf_include( Val, Incl ) :-
+bio_diffex_if_inf_include( Val, Incl ) :-
     ( Val is inf; Val is - inf ),
     !,
     Incl == true.
-exp_diffex_if_inf_include( _Val, _Incl ).
+bio_diffex_if_inf_include( _Val, _Incl ).
