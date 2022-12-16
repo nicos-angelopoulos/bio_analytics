@@ -5,7 +5,9 @@ TBD
       20.09.06    EXAMPLES: mouse examples
 
 0.5 
-      22.12.16    IFACE:    exp_diffex/4 -> bio_diffex/4
+      22.12.16    IFACE:    exp_diffex/4 -> bio_diffex/4 (+ option which(dx(Up,Dw)))
+                  IFACE:    new predicate, bio_volcano_plot/2
+                  CHANGE:   all R loads are now promised loads
       22.12.15    OPTS:     which(Up,Down) returning indexes of selected
 
 0.4               @ 20.09.18   

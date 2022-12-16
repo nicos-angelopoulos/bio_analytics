@@ -36,7 +36,7 @@ loops over families (see exp_go_over_string_graphs/4).
 
 Opts
   * exp_ev_log(EvLog=true)
-    are the expression values (ev) log values ? (also passed to exp_diffex/4)
+    are the expression values (ev) log values ? (also passed to bio_diffex/4)
   * faint_factor(Fctr=1.2)
     faint factor for non-significant nodes
   * include_non_present(IncP=true)
@@ -73,7 +73,7 @@ Produces file: bt.svg
 
 @author nicos angelopoulos
 @version  0.1 2019/4/15
-@see exp_diffex/4
+@see bio_diffex/4
 @see gene_family/3
 @see wgraph_plot/2
 
@@ -84,7 +84,7 @@ exp_gene_family_string_graph( Exp, Fam, StGraph, Args ) :-
 exp_gene_family_string_graph( Exp, Fam, DEPrs, NonDEPrs, StGraph, Args ) :-
     options_append( exp_gene_family_string_graph, Args, Opts ),
     ( var(DEPrs) ->
-        exp_diffex( Exp, DEPrs, NonDEPrs, Opts )
+        bio_diffex( Exp, DEPrs, NonDEPrs, Opts )
         ;
         true
     ),

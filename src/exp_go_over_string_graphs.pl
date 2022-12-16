@@ -60,9 +60,9 @@ exp_go_over_string_graphs( Exp, GoOverIn, Dir, Args ) :-
     debuc( Self, 'Dir: ~p', [Dir] ),
     options( viz_de_opts(VdfOpts), Opts ),
     options( wgraph_plot_opts(WgOpts), Opts ),
-    % ( VdfOpts == [] -> Exp = RedExp; exp_diffex(Exp,RedExp,_,[as_pairs(false)|VdfOpts]) ),
+    % ( VdfOpts == [] -> Exp = RedExp; bio_diffex(Exp,RedExp,_,[as_pairs(false)|VdfOpts]) ),
     % VdfOpts -> [] or diffex_only  succeed on the following
-    ( atomic(VdfOpts) -> Exp = RedExp; exp_diffex(Exp,RedExp,_,[as_pairs(false)|VdfOpts]) ),
+    ( atomic(VdfOpts) -> Exp = RedExp; bio_diffex(Exp,RedExp,_,[as_pairs(false)|VdfOpts]) ),
     debuc( Self, length, [exp_in,exp_red]/[Exp,RedExp] ),
     % mtx( red_exp.csv, RedExp ), % fixme: do it properly (in subdirectory)
     options( ov_max(MaxOvsPrv), Opts ),
@@ -75,7 +75,7 @@ exp_go_over_string_graphs( Exp, GoOverIn, Dir, Args ) :-
         ;
         PadLen = 0
     ),
-    exp_diffex( RedExp, DEPrs, NonDEPrs, [diffex_mtx(DiffMtx),as_pairs(true)|Opts] ),
+    bio_diffex( RedExp, DEPrs, NonDEPrs, [diffex_mtx(DiffMtx),as_pairs(true)|Opts] ),
     debuc( Self, length, [de_prs,non_de_prs]/[DEPrs,NonDEPrs] ),
     ( memberchk(diffex_mtx(PpgUpDiffMtx),Opts ) -> mtx( PpgUpDiffMtx, DiffMtx ) ; true ),
     % debuc( Self, length, exp_go_over_mtx/ExpGoOver ),

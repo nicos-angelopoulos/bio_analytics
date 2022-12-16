@@ -1,6 +1,7 @@
 :- module( bio_analytics, [
                 bio_analytics_version/2,          % -Vers, -Date
                 bio_diffex/4,                     % +Exp, -DEs -NDEs, +Opts
+                bio_volcano_plot/2,               % +Mtx, Opts
                 exp_gene_family_string_graph/4,   % +Exp, +Fam, -Graph, +Opts
                 exp_go_over/3,                    % +Exp, NDEs, +Opts
                 exp_go_over_string_graphs/4,      % +Exp, ?GoOver, ?Dir, +Opts
@@ -60,9 +61,9 @@ bio_analytics_version( 0:4:0, date(2019,9,18) ).
 :- lib(real).
 :- lib(bio_db).
 :- lib(os_lib).
-:- lib(wgraph).
 :- lib(options).
 :- lib(debug_call).
+:- lib(promise(wgaph_plot/2,lib(wgraph))).
 
 :- debug_call:debug(ba(info)).
 
@@ -79,5 +80,5 @@ bio_analytics_version( 0:4:0, date(2019,9,18) ).
 :- lib(exp_go_over/3).
 :- lib(exp_go_over_string_graphs/4).
 :- lib(exp_go_over_string_graphs_multi/1).
-
+:- lib(bio_volcano_plot/2).
 :- lib(end(bio_analytics), homonyms(true)).

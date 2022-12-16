@@ -66,7 +66,7 @@ Opts
     include infinity values as diffexs ? (default is _false_ if EvLog is false, and _true_ otherwise)
   * gene_id_cnm(Gcnm='Symbols')
     column name for the key value in the pair lists: DEs and NonDEs.
-  * which(Wch=which(UpIs,DownIs))
+  * which(Wch=dx(UpIs,DownIs))
     returns the up and down-regulated indices
 
 ==
@@ -131,7 +131,7 @@ NonDEs = [row('Protein IDs', 'Symbols', log2FC, adj.pvalue), row('B4DUT8;Q6FHC3;
 @author nicos angelopoulos
 @version  0.1 2019/5/2
 @version  0.2 2020/9/3,  ability to return sub-matrices (9/14): diffex_mtx()
-@verions  0.3 2022/12/16, changed name from exp_diffex/4 to bio_diffex/4.
+@version  0.3 2022/12/16, changed name from exp_diffex/4 to bio_diffex/4.
 
 */
 
@@ -157,7 +157,7 @@ bio_diffex( MtxIn, DEs, NonDEs, Args ) :-
     options( de_max(DEMaxPrv), Opts ),
     ( number(DEMaxPrv) -> DEMaxPrv = DEMax; length(Rows,RsLen), DEMax is (RsLen + 2) * 2 ),  % ideally we want infinity ...
     bio_diffex_separate( Rows, DEMax, 1, PvPos, EvPos, GnPos, Pcof, EvLet, EvGet, InfInc, AsNon, AsPrs, TDEs, TNonDEs, Iu, Id, DERows ),
-    options( which(Iu,Id), Opts ),
+    options( which(dx(Iu,Id)), Opts ),
     exp_diff_add_header( AsPrs, Hdr, TDEs, TNonDEs, DEs, NonDEs ),
     mtx( DEMtx, [Hdr|DERows] ).
 

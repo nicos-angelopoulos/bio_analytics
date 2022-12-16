@@ -1,10 +1,13 @@
 
-:- lib(suggests(bioc("GOstats"))).
-:- lib(suggests(bioc("GSEABase"))).  % installed with GOstats
-:- lib(suggests(bioc("GO.db"))).     % installed with GOstats
-:- lib(suggests(bioc("Category"))).  % installed with GOstats
-
+:- lib(promise(exp_go_over_bioc_deps/0,call(exp_go_over_bioc_deps_load))).
 :- lib(stoics_lib:kv_decompose/3).
+
+exp_go_over_bioc_deps_load :-
+     lib(suggests(bioc("GOstats"))),
+     lib(suggests(bioc("GSEABase"))),  % installed with GOstats
+     lib(suggests(bioc("GO.db"))),     % installed with GOstats
+     lib(suggests(bioc("Category"))),  % installed with GOstats
+     assert(exp_go_over_bioc_deps).
 
 exp_go_over_defaults( Defs ) :-
     Defs = [
@@ -39,7 +42,7 @@ Opts
   * universe(Univ=go_exp)
     Univ in : =|[genome,go_exp,experiment]|=
 
-Options are also passed to exp_diffex/4.
+Options are also passed to bio_diffex/4.
 
 ==
 ?- absolute_file_name( pack('bio_analytics/data/silac/bt.csv'), CsvF ),
@@ -84,8 +87,9 @@ OverF = '.../swipl/pack/bio_analytics/data/silac/bt_gontBP_p0.05_univExp.csv'.
 exp_go_over( CsvF, GoOver, Args ) :-
     Self = exp_go_over,
     options_append( Self, Args, Opts ),
+    exp_go_over_bioc_deps,  % make sure deps are loaded
     debug_call( exp_go_over, options, Self/Opts ),
-    exp_diffex( CsvF, DEPrs, NDEPrs, Opts ),
+    bio_diffex( CsvF, DEPrs, NDEPrs, Opts ),
     options( org(OrgPrv), Opts ),
     bio_db_organism( OrgPrv, Org ),
     kv_decompose( DEPrs, DEGenes, _ ),
