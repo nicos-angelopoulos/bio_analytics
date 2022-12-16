@@ -4,6 +4,9 @@
 TBD
       20.09.06    EXAMPLES: mouse examples
 
+0.5 
+      22.12.15    OPTS:     which(Up,Down) returning indexes of selected
+
 0.4               @ 20.09.18   
       20.09.17    OPTS:     viz_de_opts() new value diffex_only
                   IFACE:    exp_go_over_string_graphs_multi/1
