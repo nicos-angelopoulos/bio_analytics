@@ -49,6 +49,8 @@ Opts
     colour for cut-off lines
   * clr_up(ClrUp=cadmiumred)
     colour for up regulated entries
+  * dir(Dir)
+    as understood by os_dir_stem_ext/2- see Odir, below too
   * debug(Dbg=true)
     informational, progress messages
   * ext(Ext=pdf)
@@ -71,6 +73,8 @@ Opts
     By default ggplot2 decides this.
   * lim_y_min(LimY=0)
     this is not used unless LimYmax is given
+  * odir(Odir)
+    as understood by os_dir_stem_ext/2- preferred to Dir above
   * plot_file(File)
     returns the output file
   * rvar_cv(Rvar=bvp_cv)

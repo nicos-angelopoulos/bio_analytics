@@ -206,15 +206,8 @@ org_symb_go_over_gene_ids( mouse, Set, Gids ) :-
     findall( Mgim,  (member(Symb,Set),map_mgim_mouse_mgim_symb(Mgim,Symb)), Mgims ),
     sort( Mgims, Gids ).
 
-go_over_frame( mouse, GoFra, GofOrg ) :-
-    !,
-    findall( row(Gid,E,M), 
-            ( map_gont_mouse_mgim_gont(M,E,G),
-              go_id(Gid,G)
-            ),
-                Rows ),
-    go_mtx_df( [row(go_id,evidence,gene_id)|Rows], GoFra, [] ),
-    GofOrg = "Mus musculus".
+% go_over_frame( gallus, GoFra, GofOrg ) :-
+% 
 go_over_frame( hs, GoFra, GofOrg ) :-
     !,
     findall( row(Gid,E,Entz), 
@@ -225,6 +218,15 @@ go_over_frame( hs, GoFra, GofOrg ) :-
                 Rows ),
     go_mtx_df( [row(go_id,'Evidence',gene_id)|Rows], GoFra, [] ),
     GofOrg = "Homo sapiens".
+go_over_frame( mouse, GoFra, GofOrg ) :-
+    !,
+    findall( row(Gid,E,M), 
+            ( map_gont_mouse_mgim_gont(M,E,G),
+              go_id(Gid,G)
+            ),
+                Rows ),
+    go_mtx_df( [row(go_id,evidence,gene_id)|Rows], GoFra, [] ),
+    GofOrg = "Mus musculus".
 
 capit( Atom, Capit ) :-
     atom_codes( Atom, [A,B,C|_] ),
