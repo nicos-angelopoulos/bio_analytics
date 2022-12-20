@@ -264,7 +264,7 @@ go_over_universe_go_exp( mouse, DEGids, NDEPrs, Univ ) :-
     sort( Mgims, Univ ).
 
 org_symb_go_over_gene_ids( chicken, Set, Gids ) :-
-    findall( Entz,  (member(Symb,Set),map_cgnc_gallus_cgnc_symb(Cgnc,Symb),map_cgnc_gallus_cgnc_entz(Cgnc,Entz), Entzs ),
+    findall( Entz,  (member(Symb,Set),map_cgnc_gallus_cgnc_symb(Cgnc,Symb),map_cgnc_gallus_cgnc_entz(Cgnc,Entz)), Entzs ),
     sort( Entzs, Gids ).
 org_symb_go_over_gene_ids( hs, Set, Gids ) :-
     findall( Entz,  (member(Symb,Set),map_hgnc_symb_entz(Symb,Entz)), Entzs ),
