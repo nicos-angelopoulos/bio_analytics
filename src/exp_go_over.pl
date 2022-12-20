@@ -40,7 +40,17 @@ Opts
     when GoOver is unbound, this controls whether the output
     goes to a file or a values list 
   * universe(Univ=go_exp)
-    Univ in : =|[genome,go_exp,experiment]|=
+    Univ in : =|[genome,go,go_exp,experiment]|=
+    * genome(Gen)
+      all gene identifiers in relevant map predicates
+    * go(Go)
+      all gene identifies appearing in any ontology
+    * go_exp(GoExp)
+      gene ontology genes that appear in experiment
+    * experiment(Exp)
+      all identifiers in the experiment
+    * ontology(Onto)
+      not implemented yet. like OG above, but only include this Ontology branch
 
 Options are also passed to bio_diffex/4.
 
@@ -168,10 +178,26 @@ go_over_universe( experiment, Org, DeGids, NDEPrs, Univ ) :-
     go_over_universe_exp( Org, DeGids, NDEPrs, Univ ).
 go_over_universe( genome, Org, _DEGids, _NDEPrs, Univ ) :-
     go_over_universe_genome( Org, Univ ).
+go_over_universe( go, Org, _DEGids, _NDEPrs, Univ ) :-
+    go_over_universe_go( Org, Univ ).
 go_over_universe( go_exp, Org, DEGids, NDEPrs, Univ ) :-
     go_over_universe_go_exp( Org, DEGids, NDEPrs, Univ ).
 
 go_over_universe_genome( chicken, Univ ) :-
+    findall( Entz, ( map_cgnc_gallus_cgnc_symb(Cgnc,Symb),
+                     map_cgnc_gallus_cgnc_entz(Cgnc,Entz)
+                   ),
+                    Entzs
+           ),
+    sort( Entzs, Univ ).
+go_over_universe_genome( hs, Univ ) :-
+    findall( Entz, map_hgnc_symb_entz(_Symb,Entz), Entzs ),
+    sort( Entzs, Univ ).
+go_over_universe_genome( mouse, Univ ) :-
+    findall( Mgim, map_mgim_mouse_mgim_symb(Mgim,_Symb), Mgims ),
+    sort( Mgims, Univ ).
+
+go_over_universe_go( chicken, Univ ) :-
     findall( Entz, ( map_gont_gallus_symb_gont(Symb,_Rl,_Ev,_Go),
                      map_cgnc_gallus_cgnc_symb(Cgnc,Symb),
                      map_cgnc_gallus_cgnc_entz(Cgnc,Entz)
@@ -179,19 +205,25 @@ go_over_universe_genome( chicken, Univ ) :-
                     Entzs
            ),
     sort( Entzs, Univ ).
-go_over_universe_genome( hs, Univ ) :-
-    % 22.12.20: findall( Entz, map_hgnc_symb_entz(_Symb,Entz), Entzs ),
+go_over_universe_go( hs, Univ ) :-
     findall( Entz,   (   map_gont_gont_symb(_Go,_En,Symb),
                          map_hgnc_symb_entz(Symb,Entz)
                      ),
                          Entzs
            ),
     sort( Entzs, Univ ).
-go_over_universe_genome( mouse, Univ ) :-
-    % 22.12.20: findall( Mgim, map_mgim_mouse_mgim_symb(Mgim,_Symb), Mgims ),
+go_over_universe_go( mouse, Univ ) :-
     findall( Mgim, map_gont_mouse_mgim_gont(Mgim,_E,_G), Mgims ),
     sort( Mgims, Univ ).
 
+% fixme: give doc here, what is this for ?
+go_over_universe_exp( chicken, DeGids, NDEPrs, Univ ) :-
+    findall( Entz, ( member(Symb-NDEPrs),
+                     map_cgnc_gallus_cgnc_symb(Cgnc,Symb),
+                     map_cgnc_gallus_cgnc_entz(Cgnc,Entz)
+                   ), Entzs ),
+    append( DeGids, NDEEntzs, Entzs ),
+    sort( Entzs, Univ ).
 go_over_universe_exp( hs, DeGids, NDEPrs, Univ ) :-
     findall( Entz, (member(Symb-_,NDEPrs),map_hgnc_symb_entz(Symb,Entz)), NDEEntzs ),
     % findall( Entz1, (member(Symb,DEGenes),map_hgnc_symb_entz(Symb,Entz1)), DEEntzs ),
@@ -201,6 +233,11 @@ go_over_universe_exp( hs, DeGids, NDEPrs, Univ ) :-
 go_over_universe_exp( mouse, DeGids, NDEPrs, Univ ) :-
     findall( Mgim, (member(Symb-_,NDEPrs),map_mgim_mouse_mgim_symb(Mgim,Symb)), NDEMgims ),
     append( DeGids, NDEMgims, Mgims ),
+    sort( Mgims, Univ ).
+
+here()
+go_over_universe_go_exp( chicken, DEGids, NDEPrs, Univ ) :-
+    append( DEMgims, NDEMgims, Mgims ),
     sort( Mgims, Univ ).
 
 go_over_universe_go_exp( hs, DEGids, NDEPrs, Univ ) :-
@@ -213,6 +250,7 @@ go_over_universe_go_exp( mouse, DEGids, NDEPrs, Univ ) :-
     findall( Mgim, (member(Mgim,DEGids),map_mgim_mouse_mgim_symb(Mgim,Symb),once(map_gont_mouse_gont_symb(_,_,Symb))), DEMgims ),
     append( DEMgims, NDEMgims, Mgims ),
     sort( Mgims, Univ ).
+
 org_symb_go_over_gene_ids( hs, Set, Gids ) :-
     findall( Entz,  (member(Symb,Set),map_hgnc_symb_entz(Symb,Entz)), Entzs ),
     sort( Entzs, Gids ).

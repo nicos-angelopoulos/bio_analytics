@@ -5,7 +5,7 @@ TBD
       20.09.06    EXAMPLES: mouse examples
 
 0.5 
-      22.12.20    CHANGED:  make sure that in go_over_universe we only include Entz that are in the GO
+      22.12.20    OPTS:     new universe value: go
       22.12.16    IFACE:    exp_diffex/4 -> bio_diffex/4 (+ option which(dx(Up,Dw)))
                   IFACE:    new predicate, bio_volcano_plot/2
                   CHANGED:  all R loads are now promised loads
