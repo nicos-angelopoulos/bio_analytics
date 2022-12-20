@@ -6,6 +6,7 @@ TBD
 
 0.5 
       22.12.20    OPTS:     new universe value: go
+                  OPTS:     new Org(anism): chicken
       22.12.16    IFACE:    exp_diffex/4 -> bio_diffex/4 (+ option which(dx(Up,Dw)))
                   IFACE:    new predicate, bio_volcano_plot/2
                   CHANGED:  all R loads are now promised loads

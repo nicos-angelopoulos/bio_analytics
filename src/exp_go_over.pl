@@ -25,7 +25,9 @@ Perform gene ontology over-representation analysis.
 
 For experimental data in CsvF select de-regulated genes and on<br>
 those perform over representation analysis in gene ontology.<br>
-Results in GoOver are either as a values list of a csv file.
+Results in GoOver are either as a values list or a csv file, the name of which is 
+assumed to be the ground value of GoOVer.
+
 
 Opts
   * go(GoSec='BP')
@@ -33,7 +35,7 @@ Opts
   * go_over_pv_cut(PvCut=0.05)
     p value filter for the results
   * org(Org=hs)
-    one of bio_db_organism/2 first argument values (hs, chicken or mouse for now)
+    one of bio_db_organism/2 first argument values (hs, chicken and mouse for now)
   * stem(Stem=false)
     stem for output csv file. when false use basename of CsvF 
   * to_file(ToF=false)
@@ -91,6 +93,7 @@ OverF = '.../swipl/pack/bio_analytics/data/silac/bt_gontBP_p0.05_univExp.csv'.
 
 @author nicos angelopoulos
 @version  0.1 2019/5/2
+@version  0.2 2022/12/20,   =|Univ=go|= and =|Org=chicken|=
 @see go_over_universe/5
 
 */
@@ -184,11 +187,7 @@ go_over_universe( go_exp, Org, DEGids, NDEPrs, Univ ) :-
     go_over_universe_go_exp( Org, DEGids, NDEPrs, Univ ).
 
 go_over_universe_genome( chicken, Univ ) :-
-    findall( Entz, ( map_cgnc_gallus_cgnc_symb(Cgnc,Symb),
-                     map_cgnc_gallus_cgnc_entz(Cgnc,Entz)
-                   ),
-                    Entzs
-           ),
+    findall( Entz, map_cgnc_gallus_cgnc_entz(_Cgnc,Entz), Entzs ),
     sort( Entzs, Univ ).
 go_over_universe_genome( hs, Univ ) :-
     findall( Entz, map_hgnc_symb_entz(_Symb,Entz), Entzs ),
@@ -221,7 +220,7 @@ go_over_universe_exp( chicken, DeGids, NDEPrs, Univ ) :-
     findall( Entz, ( member(Symb-NDEPrs),
                      map_cgnc_gallus_cgnc_symb(Cgnc,Symb),
                      map_cgnc_gallus_cgnc_entz(Cgnc,Entz)
-                   ), Entzs ),
+                   ), NDEEntzs ),
     append( DeGids, NDEEntzs, Entzs ),
     sort( Entzs, Univ ).
 go_over_universe_exp( hs, DeGids, NDEPrs, Univ ) :-
@@ -235,11 +234,24 @@ go_over_universe_exp( mouse, DeGids, NDEPrs, Univ ) :-
     append( DeGids, NDEMgims, Mgims ),
     sort( Mgims, Univ ).
 
-here()
+% fixme: this is copy-generated from hs version. Ensure DEGids are Entz ids
 go_over_universe_go_exp( chicken, DEGids, NDEPrs, Univ ) :-
-    append( DEMgims, NDEMgims, Mgims ),
-    sort( Mgims, Univ ).
-
+    findall( NdEntz, (   member(Symb-_,NDEPrs),
+                         once(map_gont_gallus_symb_gont(Symb,_,_,_)),
+                         map_cgnc_gallus_cgnc_symb(Cgnc,Symb),
+                         map_cgnc_gallus_cgnc_entz(Cgnc,NdEntz)
+                   ),
+                         NdEntzs ),
+    findall( DfEntz, (
+                         member(DfEntz,DEGids),
+                         map_cgnc_gallus_cgnc_entz(Cgnc,DfEntz),
+                         map_cgnc_gallus_cgnc_symb(Cgnc,Symb),
+                         once(map_gont_gallus_symb_gont(Symb,_,_,_))
+                     ),
+                         DfEntzs ),
+    append( NdEntzs, DfEntzs, Entzs ),
+    sort( Entzs, Univ ).
+% fixme: this contamis mgim vars. Needs clean up at the very list.
 go_over_universe_go_exp( hs, DEGids, NDEPrs, Univ ) :-
     findall( Entz, (member(Symb-_,NDEPrs),once(map_gont_gont_symb(_,_,Symb)),map_hgnc_symb_entz(Symb,Entz)), NDEMgims ),
     findall( Entz, (member(Entz,DEGids),map_hgnc_symb_entz(Symb,Entz),once(map_gont_gont_symb(_,_,Symb))), DEMgims ),
@@ -251,6 +263,9 @@ go_over_universe_go_exp( mouse, DEGids, NDEPrs, Univ ) :-
     append( DEMgims, NDEMgims, Mgims ),
     sort( Mgims, Univ ).
 
+org_symb_go_over_gene_ids( chicken, Set, Gids ) :-
+    findall( Entz,  (member(Symb,Set),map_cgnc_gallus_cgnc_symb(Cgnc,Symb),map_cgnc_gallus_cgnc_entz(Cgnc,Entz), Entzs ),
+    sort( Entzs, Gids ).
 org_symb_go_over_gene_ids( hs, Set, Gids ) :-
     findall( Entz,  (member(Symb,Set),map_hgnc_symb_entz(Symb,Entz)), Entzs ),
     sort( Entzs, Gids ).
@@ -260,7 +275,7 @@ org_symb_go_over_gene_ids( mouse, Set, Gids ) :-
 
 go_over_frame( chicken, GoFra, GofOrg ) :-
      !, 
-     findall( row(Gid,E,Entz)  (
+     findall( row(Gid,E,Entz), (
                                      map_gont_gallus_symb_gont(Symb,_,E,G),
                                      go_id(Gid,G),
                                      map_cgnc_gallus_cgnc_symb(Cgnc,Symb),
@@ -269,7 +284,7 @@ go_over_frame( chicken, GoFra, GofOrg ) :-
                               Rows
             ),
     go_mtx_df( [row(go_id,evidence,gene_id)|Rows], GoFra, [] ),
-    GoOrg = "Gallus gallus".
+    GofOrg = "Gallus gallus".
 go_over_frame( hs, GoFra, GofOrg ) :-
     !,
     findall( row(Gid,E,Entz), 
