@@ -7,6 +7,7 @@ TBD
 0.5 
       22.12.20    OPTS:     new exp_go_over/3 opt(universe) value: go
                   OPTS:     new Org(anism): gallus
+                  OPTS:     new org_exp_id(ExpID) adds more flexibilty to inputs
       22.12.16    IFACE:    exp_diffex/4 -> bio_diffex/4 (+ option which(dx(Up,Dw)))
                   IFACE:    new predicate, bio_volcano_plot/2
                   CHANGED:  all R loads are now promised loads

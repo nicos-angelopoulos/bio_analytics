@@ -9,15 +9,23 @@ exp_go_over_bioc_deps_load :-
      lib(suggests(bioc("Category"))),  % installed with GOstats
      assert(exp_go_over_bioc_deps).
 
-exp_go_over_defaults( Defs ) :-
+exp_go_exp_id_default( hs, symb ).
+exp_go_exp_id_default( gallus, ensg ).
+exp_go_exp_id_default( mouse, symb ).
+
+exp_go_over_defaults( Args, Defs ) :-
     Defs = [
                 go('BP'),
                 go_over_pv_cut(0.05),
                 org(hs),
+                org_exp_id(ExpId),
                 stem(go_over),
                 to_file(false),
                 universe(go_exp)
-    ].
+    ],
+    ( (memberchk(org(InOrg),Args),ground(InOrg)) -> true; InOrg=hs ),
+    bio_db_organism( InOrg, BdOrg ),
+    exp_go_exp_id_default( BdOrg, ExpId ).
 
 /** exp_go_over( +CsvF, -GoOver, +Opts ).
 
@@ -36,6 +44,8 @@ Opts
     p value filter for the results
   * org(Org=hs)
     one of bio_db_organism/2 first argument values (hs, gallus and mouse for now)
+  * org_exp_id(OrgExpId)
+    the type of the experimental gene ids for the organism. default depends on Org, (hs->symb, gallus->ensg, mouse->symb)
   * stem(Stem=false)
     stem for output csv file. when false use basename of CsvF 
   * to_file(ToF=false)
@@ -109,7 +119,8 @@ exp_go_over( CsvF, GoOver, Args ) :-
     debug_call( exp_go_over, length, de_pairs/DEPrs ),
     sort( DEGenes, DEGenesSet ),
     debug_call( exp_go_over, length, de_genes_set/DEGenesSet ),
-    org_symb_go_over_gene_ids( Org, DEGenesSet, Gids ),
+    options( org_exp_id(ExpId), Opts ),
+    org_go_over_std_gene_ids( Org, ExpId, DEGenesSet, Gids ),
     debug_call( exp_go_over, length, gids/Gids ),
     go_over_frame( Org, goFrameData, GofOrg ),
     goFrame <- 'GOFrame'(goFrameData, organism= +GofOrg),
@@ -263,13 +274,31 @@ go_over_universe_go_exp( mouse, DEGids, NDEPrs, Univ ) :-
     append( DEMgims, NDEMgims, Mgims ),
     sort( Mgims, Univ ).
 
-org_symb_go_over_gene_ids( gallus, Set, Gids ) :-
-    findall( Entz,  (member(Symb,Set),map_cgnc_gallus_cgnc_symb(Cgnc,Symb),map_cgnc_gallus_cgnc_entz(Cgnc,Entz)), Entzs ),
+org_go_over_std_gene_ids( Org, Gtyp, Set, Gids ) :-
+     at_con( [org_go_over_std_gene_ids,Org], '_', Pname ),
+     ( call(Pname,Gtyp,Set,Gids) ->
+          true
+          ;
+          throw( go_over(could_not_convert(org(Org),gene_id_type(Gypt))) )
+     ).
+
+% it should for ensg and symb
+org_go_over_std_gene_ids_gallus( entz, Set, Gids ) :-
+     !,  % not really needes as it called from an if() above
+     Set = Gids.
+org_go_over_std_gene_ids_gallus( cgnc, Set, Gids ) :-
+     !,
+    findall( Entz,  (member(Cgnc,Set),map_cgnc_gallus_cgnc_entz(Cgnc,Entz)), Entzs ),
     sort( Entzs, Gids ).
-org_symb_go_over_gene_ids( hs, Set, Gids ) :-
+org_go_over_std_gene_ids_gallus( SrcT, Set, Gids ) :-
+    atom_concat( map_cgnc_gallus_cgnc_, SrcT, SrcNm ),
+    findall( Entz,  (member(SrcG,Set),call(SrcNm,Ggnc,SrcG),map_cgnc_gallus_cgnc_entz(Cgnc,Entz)), Entzs ),
+    sort( Entzs, Gids ).
+% fixme: add more rules... for hs and mouse
+org_go_over_std_gene_ids( hs, symb, Set, Gids ) :-
     findall( Entz,  (member(Symb,Set),map_hgnc_symb_entz(Symb,Entz)), Entzs ),
     sort( Entzs, Gids ).
-org_symb_go_over_gene_ids( mouse, Set, Gids ) :-
+org_go_over_std_gene_ids( mouse, Set, Gids ) :-
     findall( Mgim,  (member(Symb,Set),map_mgim_mouse_mgim_symb(Mgim,Symb)), Mgims ),
     sort( Mgims, Gids ).
 
