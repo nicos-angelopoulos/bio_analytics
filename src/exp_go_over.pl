@@ -279,7 +279,7 @@ org_go_over_std_gene_ids( Org, Gtyp, Set, Gids ) :-
      ( call(Pname,Gtyp,Set,Gids) ->
           true
           ;
-          throw( go_over(could_not_convert(org(Org),gene_id_type(Gypt))) )
+          throw( go_over(could_not_convert(org(Org),gene_id_type(Gtyp))) )
      ).
 
 % it should for ensg and symb
@@ -292,13 +292,13 @@ org_go_over_std_gene_ids_gallus( cgnc, Set, Gids ) :-
     sort( Entzs, Gids ).
 org_go_over_std_gene_ids_gallus( SrcT, Set, Gids ) :-
     atom_concat( map_cgnc_gallus_cgnc_, SrcT, SrcNm ),
-    findall( Entz,  (member(SrcG,Set),call(SrcNm,Ggnc,SrcG),map_cgnc_gallus_cgnc_entz(Cgnc,Entz)), Entzs ),
+    findall( Entz,  (member(SrcG,Set),call(SrcNm,Cgnc,SrcG),map_cgnc_gallus_cgnc_entz(Cgnc,Entz)), Entzs ),
     sort( Entzs, Gids ).
 % fixme: add more rules... for hs and mouse
-org_go_over_std_gene_ids( hs, symb, Set, Gids ) :-
+org_go_over_std_gene_ids_hs( symb, Set, Gids ) :-
     findall( Entz,  (member(Symb,Set),map_hgnc_symb_entz(Symb,Entz)), Entzs ),
     sort( Entzs, Gids ).
-org_go_over_std_gene_ids( mouse, Set, Gids ) :-
+org_go_over_std_gene_ids_mouse( Set, Gids ) :-
     findall( Mgim,  (member(Symb,Set),map_mgim_mouse_mgim_symb(Mgim,Symb)), Mgims ),
     sort( Mgims, Gids ).
 
