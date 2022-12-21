@@ -100,10 +100,9 @@ exp_gene_family_string_graph( Exp, Fam, DEPrs, NonDEPrs, StGraph, Args ) :-
     exp_gene_family_string_graph_node_colours( Nlrs, Flrs, Opts ),
     options( include_non_present(IncP), Opts ),
     options( include_non_significant(IncS), Opts ),
-    % bio_symbols( DEPrs, DESymbs, Opts ),
     bio_symbols( DEPrs, DESymbPrs, Opts ),
     bio_symbols( NonDEPrs, NonDESymbPrs, Opts ),
-    exp_gene_family_string_graph_nodes( Oymbs, DEPrs, NonDEPrs, Zero, Nlrs, Flrs, IncP, IncS, Nodes, NdClrs ),
+    exp_gene_family_string_graph_nodes( Oymbs, DESymbPrs, NonDESymbPrs, Zero, Nlrs, Flrs, IncP, IncS, Nodes, NdClrs ),
     % 
     % construct_graph( Oymbs, DEPrs, NonDEPrs, Graph, GraphWGOpts ),
     symbols_string_graph( Nodes, StGraphPrv, Opts ),

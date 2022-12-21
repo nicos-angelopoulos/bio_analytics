@@ -62,8 +62,13 @@ exp_go_over_string_graphs( Exp, GoOverIn, Dir, Args ) :-
     options( wgraph_plot_opts(WgOpts), Opts ),
     % ( VdfOpts == [] -> Exp = RedExp; bio_diffex(Exp,RedExp,_,[as_pairs(false)|VdfOpts]) ),
     % VdfOpts -> [] or diffex_only  succeed on the following
-    ( atomic(VdfOpts) -> Exp = RedExp; bio_diffex(Exp,RedExp,_,[as_pairs(false)|VdfOpts]) ),
-    debuc( Self, length, [exp_in,exp_red]/[Exp,RedExp] ),
+    ( atomic(VdfOpts) -> 
+          debuc( Self, 'Not reducing the input matrix.', [] ),
+          Exp = RedExp
+          ;
+          bio_diffex(Exp,RedExp,_,[as_pairs(false)|VdfOpts]),
+          debuc( Self, length, [exp_in,exp_red]/[Exp,RedExp] )
+    ),
     % mtx( red_exp.csv, RedExp ), % fixme: do it properly (in subdirectory)
     options( ov_max(MaxOvsPrv), Opts ),
     (number(MaxOvsPrv) -> MaxOvs is integer(MaxOvsPrv),findall(Go,(between(1,MaxOvs,I),nth1(I,GOs,Go)),MaxGOs); GOs = MaxGOs), 

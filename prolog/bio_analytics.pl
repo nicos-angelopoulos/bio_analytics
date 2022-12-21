@@ -56,6 +56,7 @@ bio_analytics_version( 0:4:0, date(2019,9,18) ).
 :- use_module(library(lists)).
 :- use_module(library(apply)).
 :- use_module(library(debug)).
+:- use_module(library(filesex)).
 :- use_module(library(lib)).
 
 :- lib(mtx).
