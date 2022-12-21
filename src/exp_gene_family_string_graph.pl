@@ -47,6 +47,8 @@ Opts
     colours for the different types of nodes
   * org(Org=hs)
     organism in which Family is looked in (and experiment was performed)
+  * org_exp_id(ExpID)
+    the type of the experimental gene ids for the organism. default depends on Org, but currently all map to symb
   * plot(Plot=true)
     whether to plot the graph via wgraph_plot/2
   * wgraph_plot_opts(WgOpts=[])
@@ -76,6 +78,7 @@ Produces file: bt.svg
 @see bio_diffex/4
 @see gene_family/3
 @see wgraph_plot/2
+@see bio_symbols/3
 
 */
 exp_gene_family_string_graph( Exp, Fam, StGraph, Args ) :-
@@ -97,6 +100,9 @@ exp_gene_family_string_graph( Exp, Fam, DEPrs, NonDEPrs, StGraph, Args ) :-
     exp_gene_family_string_graph_node_colours( Nlrs, Flrs, Opts ),
     options( include_non_present(IncP), Opts ),
     options( include_non_significant(IncS), Opts ),
+    % bio_symbols( DEPrs, DESymbs, Opts ),
+    bio_symbols( DEPrs, DESymbPrs, Opts ),
+    bio_symbols( NonDEPrs, NonDESymbPrs, Opts ),
     exp_gene_family_string_graph_nodes( Oymbs, DEPrs, NonDEPrs, Zero, Nlrs, Flrs, IncP, IncS, Nodes, NdClrs ),
     % 
     % construct_graph( Oymbs, DEPrs, NonDEPrs, Graph, GraphWGOpts ),
