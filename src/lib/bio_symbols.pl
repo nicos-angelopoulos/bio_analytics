@@ -85,13 +85,13 @@ bio_symbols_map_mouse( entz, Values, Symbs ) :-
                     ),
                          Symbs ).
 
+bio_symbols_values( Ids, Ids, _Opts ) :-
+     is_list( Ids ),
+     !.
 bio_symbols_values( Vect, Ids, Opts ) :-
      atomic( Vect ),
      !,
      options( mtx(Mtx), Opts ),
      mtx_column( Mtx, Vect, Ids ).
-bio_symbols_values( Ids, Ids, _Opts ) :-
-     is_list( Ids ),
-     !.
 bio_symbols_values( Oth, _Ids, Opts ) :-
      thrown( bio_symbols(cannot_id_vect(Oth,Opts)) ).

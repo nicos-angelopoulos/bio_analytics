@@ -75,7 +75,8 @@ GraphLen = 117.
 symbols_string_graph( Symbols, Graph, Args ) :-
     Self = symbols_string_graph,
 	options_append( symbols_string_graph, Args, Opts ),
-	options( org(Org), Opts ),
+	options( org(OrgIn), Opts ),
+     bio_db_organism( OrgIn, Org ),
 	options( minw(MinW), Opts ),
 	options( sort_pairs(Sprs), Opts ),
 	findall( SymbA-SymbB:W, ( member(Symb1,Symbols),
@@ -83,7 +84,7 @@ symbols_string_graph( Symbols, Graph, Args ) :-
 						 Symb1 @< Symb2,
 						 % Symb1 \== Symb2,
 						 symbols_string_graph_pair(Sprs,Symb1,Symb2,SymbA,SymbB),
-                         org_edge_strg_symb( Org, Symb1, Symb2, W ),
+                               bio_db:org_edge_strg_symb_ord(Org,Symb1,Symb2,W),
 						 MinW =< W
 					    ),
 					    		Pgraph ),

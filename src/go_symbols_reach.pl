@@ -1,7 +1,7 @@
 
 go_symbols_reach_defaults( Defs ) :-
 	Defs = [ descent(true), 
-             organism(hs),
+             org(hs),
 	         as_child_includes(true),
 		     as_child_consists_of(true),
 		     as_child_regulates(false),
@@ -16,7 +16,7 @@ which by default are includes (reverse of is_a) and consists_of (reverse of part
 to pick up Symbols recursively.
 
 Opts 
-  * organism(Org=hs)
+  * org(Org=hs)
     also known is: mouse. Note that human, also resolves to hs
   * descent(Desc=true)
     whether to collect symbols from descendant GO terms
@@ -40,7 +40,7 @@ Listens to debug(go_symbols_reach).
 Symbs = ['AAR2', 'ALYREF', 'AQR', 'ARC', 'BCAS2', 'BUD13', 'BUD31', 'CACTIN', 'CASC3'|...],
 Len = 293.
 
-?- go_symbols_reach( 'GO:0000375', Symbs, organism(mouse) ), length( Symbs, Len ).
+?- go_symbols_reach( 'GO:0000375', Symbs, org(mouse) ), length( Symbs, Len ).
 Symbs = ['4930595M18Rik', 'Aar2', 'Aqr', 'Bud13', 'Bud31', 'Casc3', 'Cdc40', 'Cdc5l', 'Cdk13'|...].
 Len = 190.
 
@@ -51,13 +51,13 @@ Len = 293.
 
 @author nicos angelopoulos
 @version  0.1 2015/7/26
-@version  0.2 2019/4/7           added organism, moved to new pack
+@version  0.2 2019/4/7           added org, moved to new pack
 
 */
 go_symbols_reach( GO, Symbs, Args ) :-
 	options_append( go_symbols_reach, Args, Opts ),
 	options( descent(Desc), Opts ),
-	options( organism(Org), Opts ),
+	options( org(Org), Opts ),
 	go_symbs_descent_term( Desc, GoT, Child, Term, Opts ),
 	go_symbs( [GO], Org, GoT, Child, Term, [], [], Symbs ).
 
@@ -80,8 +80,8 @@ go_symbs( [GoIn|GOs], Org, GoT, ChGo, FTerm, GoSeen, Seen, Symbs ) :-
 
 go_symbs_descent_term( false, _, false, false, _ ).
 go_symbs_descent_term( true, GoT, Child, Term, Opts ) :-
-	Rships = [ includes, consists_of, regulates,
-	           positively_regulates, negatively_regulates
+	Rships = [ includes, consists_of, 
+                regulates, positively_regulates, negatively_regulates
 			 ],
 	findall( Pname, (
 				        member(Rship,Rships),
@@ -103,3 +103,10 @@ go_symbs_descent_disjunction_1( [], _Term, _Child, Goal,  Goal ).
 go_symbs_descent_disjunction_1( [H|T], Term, Child, Left, Goal ) :-
 	G =.. [H,Term,Child],
 	go_symbs_descent_disjunction_1( T, Term, Child, (Left;G), Goal ).
+
+% bio_db script no longer produce this: 22.12.21
+edge_gont_includes( A, B ) :-
+     bio_db:edge_gont_is_a( B, A ).
+
+edge_gont_consists_of( A, B ) :-
+     bio_db:edge_gont_part_of( B, A ).
