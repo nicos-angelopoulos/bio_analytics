@@ -5,6 +5,7 @@ TBD
       20.09.06    EXAMPLES: mouse examples
 
 0.5 
+      22.12.21    CHANGED:  remove '' from DE lists in exp_go_over/3 
       22.12.20    OPTS:     new exp_go_over/3 opt(universe) value: go
                   OPTS:     new Org(anism): gallus
                   OPTS:     new org_exp_id(ExpID) adds more flexibilty to inputs

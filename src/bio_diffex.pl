@@ -24,6 +24,7 @@ bio_diffex_defaults( Args, Defs ) :-
                 as_pairs(true),
                 de_max(false),
                 de_mtx(_),
+                mtx_dx_in(_),
                 exp_pv_cnm('adj.pvalue'),
                 exp_pv_cut(0.05),
                 gene_id_cnm('Symbols'),
@@ -66,6 +67,8 @@ Opts
     include infinity values as diffexs ? (default is _false_ if EvLog is false, and _true_ otherwise)
   * gene_id_cnm(Gcnm='Symbols')
     column name for the key value in the pair lists: DEs and NonDEs.
+  * mtx_dx_in(Mtx)
+    can be used to return the Mtx used (from mtx(Exp,Mtx) call)
   * which(Wch=dx(UpIs,DownIs))
     returns the up and down-regulated indices
 
@@ -159,7 +162,8 @@ bio_diffex( MtxIn, DEs, NonDEs, Args ) :-
     bio_diffex_separate( Rows, DEMax, 1, PvPos, EvPos, GnPos, Pcof, EvLet, EvGet, InfInc, AsNon, AsPrs, TDEs, TNonDEs, Iu, Id, DERows ),
     options( which(dx(Iu,Id)), Opts ),
     exp_diff_add_header( AsPrs, Hdr, TDEs, TNonDEs, DEs, NonDEs ),
-    mtx( DEMtx, [Hdr|DERows] ).
+    mtx( DEMtx, [Hdr|DERows] ),
+    options( mtx_dx_in(Mtx), Opts ).
 
 bio_diffex_separate( [], _X, _I, _PvPos, _EvPos, _GnPos, _Pcof, _EvLet, _EvGet, _InfInc, _AsNon, _AsPrs, [], [], [], [], [] ).
 bio_diffex_separate( [Row|Rows], X, I, PvPos, EvPos, GnPos, Pcof, EvLet, EvGet, InfInc, AsNon, AsPrs, DEs, NonDEs, Iu, Id, DERows ) :-

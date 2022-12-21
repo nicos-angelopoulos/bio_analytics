@@ -10,7 +10,7 @@ exp_go_over_bioc_deps_load :-
      assert(exp_go_over_bioc_deps).
 
 exp_go_exp_id_default( hs, symb ).
-exp_go_exp_id_default( gallus, ensg ).
+exp_go_exp_id_default( gallus, symb).
 exp_go_exp_id_default( mouse, symb ).
 
 exp_go_over_defaults( Args, Defs ) :-
@@ -45,7 +45,7 @@ Opts
   * org(Org=hs)
     one of bio_db_organism/2 first argument values (hs, gallus and mouse for now)
   * org_exp_id(OrgExpId)
-    the type of the experimental gene ids for the organism. default depends on Org, (hs->symb, gallus->ensg, mouse->symb)
+    the type of the experimental gene ids for the organism. default depends on Org, but currently all map to symb
   * stem(Stem=false)
     stem for output csv file. when false use basename of CsvF 
   * to_file(ToF=false)
@@ -112,12 +112,13 @@ exp_go_over( CsvF, GoOver, Args ) :-
     options_append( Self, Args, Opts ),
     exp_go_over_bioc_deps,  % make sure deps are loaded
     debug_call( exp_go_over, options, Self/Opts ),
-    bio_diffex( CsvF, DEPrs, NDEPrs, Opts ),
+    bio_diffex( CsvF, DEPrs, NDEPrs, [mtx(Mtx)|Opts] ),
     options( org(OrgPrv), Opts ),
     bio_db_organism( OrgPrv, Org ),
     kv_decompose( DEPrs, DEGenes, _ ),
     debug_call( exp_go_over, length, de_pairs/DEPrs ),
-    sort( DEGenes, DEGenesSet ),
+    sort( DEGenes, DEGenesSetPrv ),
+    ( select('',DEGenesSetPrv,DEGenesSet) -> true; DEGenesSet = DEGenesSetPrv ),
     debug_call( exp_go_over, length, de_genes_set/DEGenesSet ),
     options( org_exp_id(ExpId), Opts ),
     org_go_over_std_gene_ids( Org, ExpId, DEGenesSet, Gids ),
@@ -298,7 +299,7 @@ org_go_over_std_gene_ids_gallus( SrcT, Set, Gids ) :-
 org_go_over_std_gene_ids_hs( symb, Set, Gids ) :-
     findall( Entz,  (member(Symb,Set),map_hgnc_symb_entz(Symb,Entz)), Entzs ),
     sort( Entzs, Gids ).
-org_go_over_std_gene_ids_mouse( Set, Gids ) :-
+org_go_over_std_gene_ids_mouse( symb, Set, Gids ) :-
     findall( Mgim,  (member(Symb,Set),map_mgim_mouse_mgim_symb(Mgim,Symb)), Mgims ),
     sort( Mgims, Gids ).
 
