@@ -6,6 +6,8 @@ TBD
 
 0.5 
       22.12.21    CHANGED:  remove '' from DE lists in exp_go_over/3 
+                  FIXED:    properly propagate id modifiers in unversse of exp_go_over/3
+                  IFACE:    bio_symbols/3 uniform way to produce symbol lists
       22.12.20    OPTS:     new exp_go_over/3 opt(universe) value: go
                   OPTS:     new Org(anism): gallus
                   OPTS:     new org_exp_id(ExpID) adds more flexibilty to inputs

@@ -112,14 +112,14 @@ exp_go_over( CsvF, GoOver, Args ) :-
     options_append( Self, Args, Opts ),
     exp_go_over_bioc_deps,  % make sure deps are loaded
     debug_call( exp_go_over, options, Self/Opts ),
-    bio_diffex( CsvF, DEPrs, NDEPrs, [mtx(Mtx)|Opts] ),
+    bio_diffex( CsvF, DEPrs, NDEPrs, Opts ),
     options( org(OrgPrv), Opts ),
     bio_db_organism( OrgPrv, Org ),
     kv_decompose( DEPrs, DEGenes, _ ),
     debug_call( exp_go_over, length, de_pairs/DEPrs ),
-    sort( DEGenes, DEGenesSetPrv ),
-    ( select('',DEGenesSetPrv,DEGenesSet) -> true; DEGenesSet = DEGenesSetPrv ),
+    bio_list_sort_ne( DEGenes, DEGenesSet ),
     debug_call( exp_go_over, length, de_genes_set/DEGenesSet ),
+    bio_list_sort_ne( DEGenes, DEGenesSet ),
     options( org_exp_id(ExpId), Opts ),
     org_go_over_std_gene_ids( Org, ExpId, DEGenesSet, Gids ),
     debug_call( exp_go_over, length, gids/Gids ),
@@ -129,7 +129,7 @@ exp_go_over( CsvF, GoOver, Args ) :-
     gsc <- 'GeneSetCollection'(goAllFrame, setType = 'GOCollection'() ),
     genes <- Gids,
     options( universe(UnivOpt), Opts ),
-    go_over_universe( UnivOpt, Org, Gids, NDEPrs, Univ ),
+    go_over_universe( UnivOpt, Org, ExpId, Gids, NDEPrs, Univ ),
     debug_call( exp_go_over, length, universe/Univ ),
     options( go(GoAspect), Opts ),
     universe <- Univ,
@@ -158,6 +158,10 @@ exp_go_over( CsvF, GoOver, Args ) :-
     Use = use(Self,GoAspect,UnivOpt,PvCut),
     exp_go_over_return( GoOver, dfOver, CsvF, Use, Opts ).
 
+bio_list_sort_ne( List, SetNe ) :-
+    sort( List, Set ),
+    ( select('',Set,SetNe) -> true; Set = SetNe ).
+
 exp_go_over_return( GoOver, DfOveR, _CsvF, _Use, Opts ) :-
     var( GoOver ),
     options( to_file(false), Opts ),
@@ -181,7 +185,7 @@ exp_go_over_return( GoOver, DfOveR, CsvF, Use, Opts ) :-
     % <- print( warnings() ),
     debug( Self, 'Wrote: ~p', GoOver ).
 
-%% go_over_universe( +Token, +Org, +DEGenes, +NDEPrs, -Universe )
+%% go_over_universe( +Token, +Org, +ExpIdTkn, +DEGenes, +NDEPrs, -Universe )
 %
 % Universe is the list of gene identifiers to be used as universe/background for GOstats.
 %
@@ -189,14 +193,15 @@ exp_go_over_return( GoOver, DfOveR, CsvF, Use, Opts ) :-
 % DEGenes is a list of deferentially expressed gene identifiers, and NDEPrs is a list of non-differential <br>
 % expressed Symbol-Pvalue pairs.
 % 
-go_over_universe( experiment, Org, DeGids, NDEPrs, Univ ) :-
-    go_over_universe_exp( Org, DeGids, NDEPrs, Univ ).
-go_over_universe( genome, Org, _DEGids, _NDEPrs, Univ ) :-
+% ExpIdTkn identifies the type of ids coming in in NDEPrs, DEGens, are already in standard form for Org.
+go_over_universe( experiment, Org, ExpId, DeGids, NDEPrs, Univ ) :-
+    go_over_universe_exp( Org, ExpId, DeGids, NDEPrs, Univ ).
+go_over_universe( genome, Org, _ExpId, _DEGids, _NDEPrs, Univ ) :-
     go_over_universe_genome( Org, Univ ).
-go_over_universe( go, Org, _DEGids, _NDEPrs, Univ ) :-
+go_over_universe( go, Org, _ExpId, _DEGids, _NDEPrs, Univ ) :-
     go_over_universe_go( Org, Univ ).
-go_over_universe( go_exp, Org, DEGids, NDEPrs, Univ ) :-
-    go_over_universe_go_exp( Org, DEGids, NDEPrs, Univ ).
+go_over_universe( go_exp, Org, ExpId, DEGids, NDEPrs, Univ ) :-
+    go_over_universe_go_exp( Org, ExpId, DEGids, NDEPrs, Univ ).
 
 go_over_universe_genome( gallus, Univ ) :-
     findall( Entz, map_cgnc_gallus_cgnc_entz(_Cgnc,Entz), Entzs ),
@@ -246,34 +251,56 @@ go_over_universe_exp( mouse, DeGids, NDEPrs, Univ ) :-
     append( DeGids, NDEMgims, Mgims ),
     sort( Mgims, Univ ).
 
-% fixme: this is copy-generated from hs version. Ensure DEGids are Entz ids
-go_over_universe_go_exp( gallus, DEGids, NDEPrs, Univ ) :-
-    findall( NdEntz, (   member(Symb-_,NDEPrs),
-                         once(map_gont_gallus_symb_gont(Symb,_,_,_)),
-                         map_cgnc_gallus_cgnc_symb(Cgnc,Symb),
-                         map_cgnc_gallus_cgnc_entz(Cgnc,NdEntz)
-                   ),
-                         NdEntzs ),
-    findall( DfEntz, (
-                         member(DfEntz,DEGids),
-                         map_cgnc_gallus_cgnc_entz(Cgnc,DfEntz),
-                         map_cgnc_gallus_cgnc_symb(Cgnc,Symb),
-                         once(map_gont_gallus_symb_gont(Symb,_,_,_))
-                     ),
-                         DfEntzs ),
-    append( NdEntzs, DfEntzs, Entzs ),
-    sort( Entzs, Univ ).
-% fixme: this contamis mgim vars. Needs clean up at the very list.
-go_over_universe_go_exp( hs, DEGids, NDEPrs, Univ ) :-
-    findall( Entz, (member(Symb-_,NDEPrs),once(map_gont_gont_symb(_,_,Symb)),map_hgnc_symb_entz(Symb,Entz)), NDEMgims ),
-    findall( Entz, (member(Entz,DEGids),map_hgnc_symb_entz(Symb,Entz),once(map_gont_gont_symb(_,_,Symb))), DEMgims ),
-    append( DEMgims, NDEMgims, Mgims ),
-    sort( Mgims, Univ ).
-go_over_universe_go_exp( mouse, DEGids, NDEPrs, Univ ) :-
-    findall( Mgim, (member(Symb-_,NDEPrs),once(map_gont_mouse_gont_symb(_,_,Symb)),map_mgim_mouse_mgim_symb(Mgim,Symb)), NDEMgims ),
-    findall( Mgim, (member(Mgim,DEGids),map_mgim_mouse_mgim_symb(Mgim,Symb),once(map_gont_mouse_gont_symb(_,_,Symb))), DEMgims ),
-    append( DEMgims, NDEMgims, Mgims ),
-    sort( Mgims, Univ ).
+go_over_universe_exp( gallus, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
+    findall( Id, member(Id-_,NDEPrs), Ids ),
+    org_go_over_std_gene_ids_gallus( ExpIdTkn, Ids, NDGids ),
+    append( DEGids, NDGids, ExpGids ),
+    % fixme: we can add tests here, that the ids exist in some table ? 
+    bio_list_sort_ne( ExpGids, Univ ).
+go_over_universe_exp( hs, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
+    findall( Id, member(Id-_,NDEPrs), Ids ),
+    org_go_over_std_gene_ids_hs( ExpIdTkn, Ids, NDGids ),
+    append( DEGids, NDGids, ExpGids ),
+    % fixme: we can add tests here, that the ids exist in some table ? 
+    bio_list_sort_ne( ExpGids, Univ ).
+go_over_universe_exp( mouse, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
+    findall( Id, member(Id-_,NDEPrs), Ids ),
+    org_go_over_std_gene_ids_hs( ExpIdTkn, Ids, NDGids ),
+    append( DEGids, NDGids, ExpGids ),
+    % fixme: we can add tests here, that the ids exist in some table ? 
+    bio_list_sort_ne( ExpGids, Univ ).
+
+go_over_universe_go_exp( gallus, ExpId, DEGids, NDEPrs, Univ ) :-
+    findall( Id, member(Id-_,NDEPrs), Ids ),
+    org_go_over_std_gene_ids_gallus( ExpId, Ids, NDGids ),
+    append( DEGids, NDGids, ExpGids ),
+    findall( ExpGid,( member(ExpGid,ExpGids),   % these are std form, here NCBI Gene ids
+                      map_cgnc_gallus_cgnc_entz(Cgnc,ExpGid),
+                      map_cgnc_gallus_cgnc_symb(Cgnc,Symb),
+                      once(map_gont_gallus_symb_gont(Symb,_,_,_))
+                    ),
+                         List ),
+    bio_list_sort_ne( List, Univ ).
+go_over_universe_go_exp( hs, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
+    findall( Id, member(Id-_,NDEPrs), Ids ),
+    org_go_over_std_gene_ids_hs( ExpIdTkn, Ids, NDGids ),
+    append( DEGids, NDGids, ExpGids ),
+    findall( Entz,  ( member(Entz,ExpGids),
+                      map_hgnc_symb_entz(Symb,Entz),
+                      once(map_gont_symb(_,_,Symb))
+                    ),
+                         List ),
+    bio_list_sort_ne( List, Univ ).
+go_over_universe_go_exp( mouse, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
+    findall( Id, member(Id-_,NDEPrs), Ids ),
+    org_go_over_std_gene_ids_hs( ExpIdTkn, Ids, NDGids ),
+    append( DEGids, NDGids, ExpGids ),
+    findall( Mgim,  ( member(Mgim,ExpGids),
+                      map_mgim_mouse_mgim_symb(Mgim,Symb),
+                      once(map_gont_mouse_gont_symb(_,_,Symb))
+                    ), 
+                         List ),
+    bio_list_sort_ne( List, Univ ).
 
 org_go_over_std_gene_ids( Org, Gtyp, Set, Gids ) :-
      at_con( [org_go_over_std_gene_ids,Org], '_', Pname ),
@@ -296,9 +323,14 @@ org_go_over_std_gene_ids_gallus( SrcT, Set, Gids ) :-
     findall( Entz,  (member(SrcG,Set),call(SrcNm,Cgnc,SrcG),map_cgnc_gallus_cgnc_entz(Cgnc,Entz)), Entzs ),
     sort( Entzs, Gids ).
 % fixme: add more rules... for hs and mouse
+org_go_over_std_gene_ids_hs( entz, Set, Gids ) :-
+    sort( Set, Gids ).
 org_go_over_std_gene_ids_hs( symb, Set, Gids ) :-
     findall( Entz,  (member(Symb,Set),map_hgnc_symb_entz(Symb,Entz)), Entzs ),
     sort( Entzs, Gids ).
+org_go_over_std_gene_ids_mouse( entz, Set, Gids ) :-
+    findall( Mgim,  (member(Entz,Set),map_mgim_mouse_mgim_entz(Mgim,Entz)), Mgims ),
+    sort( Mgims, Gids ).
 org_go_over_std_gene_ids_mouse( symb, Set, Gids ) :-
     findall( Mgim,  (member(Symb,Set),map_mgim_mouse_mgim_symb(Mgim,Symb)), Mgims ),
     sort( Mgims, Gids ).
