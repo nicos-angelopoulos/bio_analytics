@@ -30,17 +30,17 @@ Opts
 */
 bio_symbols( Vect, Symbs, Opts ) :-
      ground( Vect ),
-     bio_symbols_values( Vect, Ids, Opts ),
+     bio_symbols_values( Vect, GIds, Opts ),
      options( org(OrgIn), Opts ),
      options( org_exp_id(ExpId), Opts ),
      bio_db_organism( OrgIn, Org ),
-     ( bio_symbols_map( Org, ExpId, Values, Symbs ) ->
+     ( bio_symbols_map( Org, ExpId, GIds, Symbs ) ->
           true
           ;
           throw( bio_symbols(3,possible_exp_id_missing(Org,ExpId)) )
      ).
 
-bio_symbols_map( Org, symb, Values, Symbs ) :-
+bio_symbols_map( _Org, symb, Values, Symbs ) :-
      !,
      Values = Symbs.
 bio_symbols_map( gallus, ExpId, Values, Symbs ) :-
@@ -65,7 +65,7 @@ bio_symbols_map_hs( entz, Values, Symbs ) :-
                       map_hgnc_hgnc_symb(Cgnc,Symb)
                     ),
                          Symbs ).
-bio_symbols_map_mouse( ExpId, Values, Symbs ) :-
+bio_symbols_map_mouse( entz, Values, Symbs ) :-
      % fixme: additionals ?
      findall( Symb, ( member(Valu,Values),
                       map_mgim_mouse_mgim_entz(Cgnc,Valu),
@@ -78,8 +78,8 @@ bio_symbols_values( Vect, Ids, Opts ) :-
      !,
      options( mtx(Mtx), Opts ),
      mtx_column( Mtx, Vect, Ids ).
-bio_symbols_values( [H|T], Ids, Opts ) :-
-     ( (compound(H),functor(_,_2) -> 
+bio_symbols_values( [H|T], Ids, _Opts ) :-
+     ( (compound(H),functor(_,_2)) -> 
           findall( Fst, (member(Elem,[H|T]),arg(1,Elem,Fst)), Ids )
           ;
           Ids = [H|T]
