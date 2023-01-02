@@ -45,8 +45,8 @@ go_org_symbol( Alias, Go, Symb ) :-
     go_org_symbol_1( Org, Gi, Symb ).
     
 go_org_symbol_1( gallus, Gi, Symb ) :-
-    map_gont_gallus_gont_symb( Gi, _Rel, _Evid, Symb ).
+    gont_galg_gont_symb( Gi, _Rel, _Evid, Symb ).
 go_org_symbol_1( hs, Gi, Symb ) :-
-    map_gont_gont_symb( Gi, _Evid, Symb ).
+    gont_homs_gont_symb( Gi, _Evid, Symb ).
 go_org_symbol_1( mouse, Gi, Symb ) :-
-    map_gont_mouse_gont_symb( Gi, _Evid, Symb ).
+    gont_musm_gont_symb( Gi, _Evid, Symb ).

@@ -65,7 +65,7 @@ go_symbs( [], _Org, _GoT, _Ch, _Term, _, Symbs, Symbs ).
 go_symbs( [GoIn|GOs], Org, GoT, ChGo, FTerm, GoSeen, Seen, Symbs ) :-
     go_id( GoIn, _GoAtm, GoId ),
 	ord_add_element( GoSeen, GoId, NxGoSeen ),
-	% findall( GoSymb, map_gont_gont_symb(GO,GoSymb), GoSymbs ),
+	% findall( GoSymb, gont_homs_gont_symb(GO,GoSymb), GoSymbs ),
 	findall( GoSymb, go_org_symbol(Org,GoId,GoSymb), GoSymbs ),
 	sort( GoSymbs, OSymbs ),
 	debug( go_symbols_reach, '~w, Symbols: ~w', [GoIn,OSymbs] ),

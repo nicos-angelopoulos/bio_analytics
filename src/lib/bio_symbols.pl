@@ -24,8 +24,8 @@ Opts
     the type of the experimental gene ids for the organism. default depends on Org, but currently all map to symb
 
 ==
-?- map_hgnc_hgnc_entz( 19295, Entz ), bio_symbols( [Entz], Symbs, org_exp_id(entz) ).
-Entz = 114783,
+?- hgnc_homs_hgnc_ncbi( 19295, Ncbi ), bio_symbols( [Ncbi], Symbs, org_exp_id(Ncbi) ).
+Ncbi = 114783,
 Symbs = ['LMTK3'].
 ==
 
@@ -58,30 +58,30 @@ bio_symbols_map( hs, ExpId, Values, Symbs ) :-
 bio_symbols_map( mouse, ExpId, Values, Symbs ) :-
      bio_symbols_map_mouse( ExpId, Values, Symbs ).
 
-bio_symbols_map_gallus( entz, Values, Symbs ) :-
+bio_symbols_map_gallus( ncbi, Values, Symbs ) :-
      % fixme: additionals ?
      findall( SymbTerm, ( 
                       member(Valu,Values),
-                      ( Valu = Entz-V -> SymbTerm=Symb-V; Valu = Entz, SymbTerm=Symb ),
-                      map_cgnc_gallus_cgnc_entz(Cgnc,Entz),
-                      map_cgnc_gallus_cgnc_symb(Cgnc,Symb)
+                      ( Valu = Ncbi-V -> SymbTerm=Symb-V; Valu = Ncbi, SymbTerm=Symb ),
+                      cgnc_galg_cgnc_ncbi(Cgnc,Ncbi),
+                      cgnc_galg_cgnc_symb(Cgnc,Symb)
                     ),
                          Symbs ).
 
-bio_symbols_map_hs( entz, Values, Symbs ) :-
+bio_symbols_map_hs( ncbi, Values, Symbs ) :-
      % fixme: additionals ?
      findall( SymbTerm, ( member(Valu,Values),
-                      ( Valu = Entz-V -> SymbTerm=Symb-V; Valu = Entz, SymbTerm=Symb ),
-                      map_hgnc_hgnc_entz(Cgnc,Entz),
-                      map_hgnc_hgnc_symb(Cgnc,Symb)
+                      ( Valu = Ncbi-V -> SymbTerm=Symb-V; Valu = Ncbi, SymbTerm=Symb ),
+                      hgnc_homs_hgnc_ncbi(Cgnc,Ncbi),
+                      hgnc_homs_hgnc_symb(Cgnc,Symb)
                     ),
                          Symbs ).
-bio_symbols_map_mouse( entz, Values, Symbs ) :-
+bio_symbols_map_mouse( ncbi, Values, Symbs ) :-
      % fixme: additionals ?
      findall( SymbTerm, ( member(Valu,Values),
-                      ( Valu = Entz-V -> SymbTerm=Symb-V; Valu = Entz, SymbTerm=Symb ),
-                      map_mgim_mouse_mgim_entz(Cgnc,Entz),
-                      map_mgim_mouse_mgim_symb(Cgnc,Symb)
+                      ( Valu = Ncbi-V -> SymbTerm=Symb-V; Valu = Ncbi, SymbTerm=Symb ),
+                      mgim_musm_mgim_ncbi(Cgnc,Ncbi),
+                      mgim_musm_mgim_symb(Cgnc,Symb)
                     ),
                          Symbs ).
 

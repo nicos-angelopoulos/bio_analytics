@@ -204,50 +204,50 @@ go_over_universe( go_exp, Org, ExpId, DEGids, NDEPrs, Univ ) :-
     go_over_universe_go_exp( Org, ExpId, DEGids, NDEPrs, Univ ).
 
 go_over_universe_genome( gallus, Univ ) :-
-    findall( Entz, map_cgnc_gallus_cgnc_entz(_Cgnc,Entz), Entzs ),
-    sort( Entzs, Univ ).
+    findall( Ncbi, cgnc_galg_cgnc_ncbi(_Cgnc,Ncbi), Ncbis ),
+    sort( Ncbis, Univ ).
 go_over_universe_genome( hs, Univ ) :-
-    findall( Entz, map_hgnc_symb_entz(_Symb,Entz), Entzs ),
-    sort( Entzs, Univ ).
+    findall( Ncbi, hgnc_homs_symb_ncbi(_Symb,Ncbi), Ncbis ),
+    sort( Ncbis, Univ ).
 go_over_universe_genome( mouse, Univ ) :-
-    findall( Mgim, map_mgim_mouse_mgim_symb(Mgim,_Symb), Mgims ),
+    findall( Mgim, mgim_musm_mgim_symb(Mgim,_Symb), Mgims ),
     sort( Mgims, Univ ).
 
 go_over_universe_go( gallus, Univ ) :-
-    findall( Entz, ( map_gont_gallus_symb_gont(Symb,_Rl,_Ev,_Go),
-                     map_cgnc_gallus_cgnc_symb(Cgnc,Symb),
-                     map_cgnc_gallus_cgnc_entz(Cgnc,Entz)
+    findall( Ncbi, ( gont_galg_symb_gont(Symb,_Rl,_Ev,_Go),
+                     cgnc_galg_cgnc_symb(Cgnc,Symb),
+                     cgnc_galg_cgnc_ncbi(Cgnc,Ncbi)
                    ),
-                    Entzs
+                    Ncbis
            ),
-    sort( Entzs, Univ ).
+    sort( Ncbis, Univ ).
 go_over_universe_go( hs, Univ ) :-
-    findall( Entz,   (   map_gont_gont_symb(_Go,_En,Symb),
-                         map_hgnc_symb_entz(Symb,Entz)
+    findall( Ncbi,   (   gont_homs_edge_symb(_Go,_En,Symb),
+                         hgnc_homs_symb_ncbi(Symb,Ncbi)
                      ),
-                         Entzs
+                         Ncbis
            ),
-    sort( Entzs, Univ ).
+    sort( Ncbis, Univ ).
 go_over_universe_go( mouse, Univ ) :-
-    findall( Mgim, map_gont_mouse_mgim_gont(Mgim,_E,_G), Mgims ),
+    findall( Mgim, gont_musm_mgim_gont(Mgim,_E,_G), Mgims ),
     sort( Mgims, Univ ).
 
 % fixme: give doc here, what is this for ?
 go_over_universe_exp( gallus, DeGids, NDEPrs, Univ ) :-
-    findall( Entz, ( member(Symb-NDEPrs),
-                     map_cgnc_gallus_cgnc_symb(Cgnc,Symb),
-                     map_cgnc_gallus_cgnc_entz(Cgnc,Entz)
-                   ), NDEEntzs ),
-    append( DeGids, NDEEntzs, Entzs ),
-    sort( Entzs, Univ ).
+    findall( Ncbi, ( member(Symb-NDEPrs),
+                     cgnc_galg_cgnc_symb(Cgnc,Symb),
+                     cgnc_galg_cgnc_ncbi(Cgnc,Ncbi)
+                   ), NDENcbis ),
+    append( DeGids, NDENcbis, Ncbis ),
+    sort( Ncbis, Univ ).
 go_over_universe_exp( hs, DeGids, NDEPrs, Univ ) :-
-    findall( Entz, (member(Symb-_,NDEPrs),map_hgnc_symb_entz(Symb,Entz)), NDEEntzs ),
-    % findall( Entz1, (member(Symb,DEGenes),map_hgnc_symb_entz(Symb,Entz1)), DEEntzs ),
+    findall( Ncbi, (member(Symb-_,NDEPrs),hgnc_homs_symb_ncbi(Symb,Ncbi)), NDENcbis ),
+    % findall( Entz1, (member(Symb,DEGenes),hgnc_homs_symb_entz(Symb,Entz1)), DEEntzs ),
     % append( DEEntzs, NDEEntzs, Entzs ),
-    append( DeGids, NDEEntzs, Entzs ),
-    sort( Entzs, Univ ).
+    append( DeGids, NDENcbis, Ncbis ),
+    sort( Ncbis, Univ ).
 go_over_universe_exp( mouse, DeGids, NDEPrs, Univ ) :-
-    findall( Mgim, (member(Symb-_,NDEPrs),map_mgim_mouse_mgim_symb(Mgim,Symb)), NDEMgims ),
+    findall( Mgim, (member(Symb-_,NDEPrs),mgim_musm_mgim_symb(Mgim,Symb)), NDEMgims ),
     append( DeGids, NDEMgims, Mgims ),
     sort( Mgims, Univ ).
 
@@ -275,9 +275,9 @@ go_over_universe_go_exp( gallus, ExpId, DEGids, NDEPrs, Univ ) :-
     org_go_over_std_gene_ids_gallus( ExpId, Ids, NDGids ),
     append( DEGids, NDGids, ExpGids ),
     findall( ExpGid,( member(ExpGid,ExpGids),   % these are std form, here NCBI Gene ids
-                      map_cgnc_gallus_cgnc_entz(Cgnc,ExpGid),
-                      map_cgnc_gallus_cgnc_symb(Cgnc,Symb),
-                      once(map_gont_gallus_symb_gont(Symb,_,_,_))
+                      cgnc_galg_cgnc_ncbi(Cgnc,ExpGid),
+                      cgnc_galg_cgnc_symb(Cgnc,Symb),
+                      once(gont_galg_symb_gont(Symb,_,_,_))
                     ),
                          List ),
     bio_list_sort_ne( List, Univ ).
@@ -285,9 +285,9 @@ go_over_universe_go_exp( hs, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
     findall( Id, member(Id-_,NDEPrs), Ids ),
     org_go_over_std_gene_ids_hs( ExpIdTkn, Ids, NDGids ),
     append( DEGids, NDGids, ExpGids ),
-    findall( Entz,  ( member(Entz,ExpGids),
-                      map_hgnc_symb_entz(Symb,Entz),
-                      once(map_gont_symb(_,_,Symb))
+    findall( Ncbi,  ( member(Ncbi,ExpGids),
+                      hgnc_homs_symb_ncbi(Symb,Ncbi),
+                      once(gont_homs_edge_symb(_,_,Symb))
                     ),
                          List ),
     bio_list_sort_ne( List, Univ ).
@@ -296,8 +296,8 @@ go_over_universe_go_exp( mouse, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
     org_go_over_std_gene_ids_hs( ExpIdTkn, Ids, NDGids ),
     append( DEGids, NDGids, ExpGids ),
     findall( Mgim,  ( member(Mgim,ExpGids),
-                      map_mgim_mouse_mgim_symb(Mgim,Symb),
-                      once(map_gont_mouse_gont_symb(_,_,Symb))
+                      mgim_musm_mgim_symb(Mgim,Symb),
+                      once(gont_musm_gont_symb(_,_,Symb))
                     ), 
                          List ),
     bio_list_sort_ne( List, Univ ).
@@ -311,37 +311,37 @@ org_go_over_std_gene_ids( Org, Gtyp, Set, Gids ) :-
      ).
 
 % it should for ensg and symb
-org_go_over_std_gene_ids_gallus( entz, Set, Gids ) :-
+org_go_over_std_gene_ids_gallus( ncbi, Set, Gids ) :-
      !,  % not really needes as it called from an if() above
      Set = Gids.
 org_go_over_std_gene_ids_gallus( cgnc, Set, Gids ) :-
      !,
-    findall( Entz,  (member(Cgnc,Set),map_cgnc_gallus_cgnc_entz(Cgnc,Entz)), Entzs ),
-    sort( Entzs, Gids ).
+    findall( Ncbi,  (member(Cgnc,Set),cgnc_galg_cgnc_ncbi(Cgnc,Ncbi)), Ncbis ),
+    sort( Ncbis, Gids ).
 org_go_over_std_gene_ids_gallus( SrcT, Set, Gids ) :-
-    atom_concat( map_cgnc_gallus_cgnc_, SrcT, SrcNm ),
-    findall( Entz,  (member(SrcG,Set),call(SrcNm,Cgnc,SrcG),map_cgnc_gallus_cgnc_entz(Cgnc,Entz)), Entzs ),
-    sort( Entzs, Gids ).
+    atom_concat( cgnc_galg_cgnc_, SrcT, SrcNm ),
+    findall( Ncbi,  (member(SrcG,Set),call(SrcNm,Cgnc,SrcG),cgnc_galg_cgnc_ncbi(Cgnc,Ncbi)), Ncbis ),
+    sort( Ncbis, Gids ).
 % fixme: add more rules... for hs and mouse
-org_go_over_std_gene_ids_hs( entz, Set, Gids ) :-
+org_go_over_std_gene_ids_hs( ncbi, Set, Gids ) :-
     sort( Set, Gids ).
 org_go_over_std_gene_ids_hs( symb, Set, Gids ) :-
-    findall( Entz,  (member(Symb,Set),map_hgnc_symb_entz(Symb,Entz)), Entzs ),
-    sort( Entzs, Gids ).
-org_go_over_std_gene_ids_mouse( entz, Set, Gids ) :-
-    findall( Mgim,  (member(Entz,Set),map_mgim_mouse_mgim_entz(Mgim,Entz)), Mgims ),
+    findall( Ncbi,  (member(Symb,Set),hgnc_homs_symb_ncbi(Symb,Ncbi)), Ncbis ),
+    sort( Ncbis, Gids ).
+org_go_over_std_gene_ids_mouse( ncbi, Set, Gids ) :-
+    findall( Mgim,  (member(Ncbi,Set),mgim_musm_mgim_ncbi(Mgim,Ncbi)), Mgims ),
     sort( Mgims, Gids ).
 org_go_over_std_gene_ids_mouse( symb, Set, Gids ) :-
-    findall( Mgim,  (member(Symb,Set),map_mgim_mouse_mgim_symb(Mgim,Symb)), Mgims ),
+    findall( Mgim,  (member(Symb,Set),mgim_musm_mgim_symb(Mgim,Symb)), Mgims ),
     sort( Mgims, Gids ).
 
 go_over_frame( gallus, GoFra, GofOrg ) :-
      !, 
-     findall( row(Gid,E,Entz), (
-                                     map_gont_gallus_symb_gont(Symb,_,E,G),
+     findall( row(Gid,E,Ncbi), (
+                                     gont_galg_symb_gont(Symb,_,E,G),
                                      go_id(Gid,G),
-                                     map_cgnc_gallus_cgnc_symb(Cgnc,Symb),
-                                     map_cgnc_gallus_cgnc_entz(Cgnc,Entz)
+                                     cgnc_galg_cgnc_symb(Cgnc,Symb),
+                                     cgnc_galg_cgnc_ncbi(Cgnc,Ncbi)
                                ),
                               Rows
             ),
@@ -349,10 +349,10 @@ go_over_frame( gallus, GoFra, GofOrg ) :-
     GofOrg = "Gallus gallus".
 go_over_frame( hs, GoFra, GofOrg ) :-
     !,
-    findall( row(Gid,E,Entz), 
-            ( map_gont_gont_symb(G,E,S),
+    findall( row(Gid,E,Ncbi), 
+            ( gont_homs_edge_symb(G,E,S),
               go_id(Gid,G),
-              map_hgnc_symb_entz(S,Entz)
+              hgnc_homs_symb_ncbi(S,Ncbi)
             ),
                 Rows ),
     go_mtx_df( [row(go_id,'Evidence',gene_id)|Rows], GoFra, [] ),
@@ -360,7 +360,7 @@ go_over_frame( hs, GoFra, GofOrg ) :-
 go_over_frame( mouse, GoFra, GofOrg ) :-
     !,
     findall( row(Gid,E,M), 
-            ( map_gont_mouse_mgim_gont(M,E,G),
+            ( gont_musm_mgim_gont(M,E,G),
               go_id(Gid,G)
             ),
                 Rows ),

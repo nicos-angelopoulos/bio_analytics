@@ -64,7 +64,7 @@ gene_family( GoTerm, Org, Symbols ) :-
 gene_family( Family, Org, Symbols ) :-
 	is_list( Family ),
     maplist( is_symbol(Org), Family ),
-	% maplist( map_hgnc_hgnc_symb, _, Family ),
+	% maplist( hgnc_homs_hgnc_symb, _, Family ),
 	!,
 	Symbols = Family,
 	debug( gene_family, 'Assertained input as list of symbols- passing it through.', [] ).
@@ -86,9 +86,9 @@ gene_family( Family, Org, _Symbols ) :-
 gene_family_org_go_term( hs, GoInt, Symbols ) :-
     gene_family_org_go_term( human, GoInt, Symbols ).
 gene_family_org_go_term( human, GoInt, Symbols ) :-
-	findall( Symb, map_gont_gont_symb(GoInt,_Evid,Symb), Symbols ).
+	findall( Symb, gont_homs_gont_symb(GoInt,_Evid,Symb), Symbols ).
 gene_family_org_go_term( mouse, GoInt, Symbols ) :-
-	findall( Symb, map_gont_mouse_gont_symb(GoInt,_Evid,Symb), Symbols ).
+	findall( Symb, gont_musm_gont_symb(GoInt,_Evid,Symb), Symbols ).
     */
 
 gene_family_known( autophagy, hs, Auto ) :-

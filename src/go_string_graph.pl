@@ -94,7 +94,7 @@ go_string_graph_stem( go_name, GoTermIn, Stem ) :-
         % atom_concat('GO:',GoTermIn,GoTerm)
     ),
     ( atom(GoBasename) -> atom_number(GoBasename,GoNum); GoNum = GoBasename ),
-	( map_gont_gont_gonm( GoNum, GoName ) -> true ; atom_concat(go,GoBasename,GoName) ),
+	( gont_homs_gont_gonm( GoNum, GoName ) -> true ; atom_concat(go,GoBasename,GoName) ),
 	% atom_codes( GoName, GoNameCs ),
 	% codes_replace( GoNameCs, 0' , 0'_, GoUnderCs ),
 	% atom_codes( GoUnder, GoUnderCs ),
