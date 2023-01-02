@@ -4,7 +4,8 @@
 TBD
       20.09.06    EXAMPLES: mouse examples
 
-0.5 
+
+0.5               @ 22.01.02
       23.01.02    IFACE:    change bio_db map_ predicate names
       22.12.21    CHANGED:  remove '' from DE lists in exp_go_over/3 
                   FIXED:    properly propagate id modifiers in unversse of exp_go_over/3

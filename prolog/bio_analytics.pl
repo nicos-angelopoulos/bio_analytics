@@ -36,6 +36,7 @@ is used in the example files in directory examples/ .
 @version  0.2 2019/5/08
 @version  0.3 2019/5/11
 @version  0.4 2020/9/18
+@version  0.5 2023/1/2
 @license  MIT
 
 */
@@ -46,12 +47,12 @@ Version and release date.
 
 ==
 ?- bio_analytics_version(V,D).
-V = 0:4:0,
-D = date(2020,9,18).
+V = 0:5:0,
+D = date(2023,1,2).
 ==
 
 */
-bio_analytics_version( 0:4:0, date(2019,9,18) ).
+bio_analytics_version( 0:5:0, date(2023,1,2) ).
 
 :- use_module(library(lists)).
 :- use_module(library(apply)).
