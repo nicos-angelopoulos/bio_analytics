@@ -106,6 +106,7 @@ Examples, fixme: use iris dataset.
 */
 bio_volcano_plot( Mtx, Args ) :-
      Self = bio_volcano_plot,
+     <- library("ggplot2"),
      options_append( Self, Args, Opts ),
      % get the up-down regulated row indices
      bio_diffex( Mtx, _, _, [which(dx(Up,Dw))|Opts] ),
