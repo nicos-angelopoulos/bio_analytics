@@ -460,7 +460,7 @@ go_over_frame_pig( bio_db, GoFra, GofOrg ) :-
     GofOrg = "Sus scrofa".
 go_over_frame_pig( lib_org, GoFra, GofOrg ) :-
     lib( bioc("org.Ss.eg.db") ),
-    ssframe <- toTable('org.Hs.egGO'),
+    ssframe <- toTable('org.Ss.egGO'),
     GoFra <- 'data.frame'(ssframe$go_id, ssframe$'Evidence', ssframe$gene_id),
     GofOrg = "Sus scrofa".
 
