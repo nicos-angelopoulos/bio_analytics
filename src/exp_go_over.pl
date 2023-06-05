@@ -412,7 +412,7 @@ go_over_frame_chicken( bio_db, GoFra, GofOrg ) :-
     go_mtx_df( [row(go_id,evidence,gene_id)|Rows], GoFra, [] ),
     GofOrg = "Gallus gallus".
 go_over_frame_chicken( lib_org, GoFra, GofOrg ) :-
-    <- library("org.Gg.eg.db"),
+    lib(bioc("org.Gg.eg.db")),
     ggframe <- toTable('org.Gg.egGO'),
     GoFra <- 'data.frame'(ggframe$go_id, ggframe$'Evidence', ggframe$gene_id),
     GofOrg = "Gallus gallus".
@@ -428,7 +428,7 @@ go_over_frame_human( bio_db, GoFra, GofOrg ) :-
     go_mtx_df( [row(go_id,'Evidence',gene_id)|Rows], GoFra, [] ),
     GofOrg = "Homo sapiens".
 go_over_frame_human( lib_org, GoFra, GofOrg ) :-
-    <- library("org.Hs.eg.db"),
+    lib(bioc("org.Hs.eg.db")),
     hsframe <- toTable('org.Hs.egGO'),
     GoFra <- 'data.frame'(hsframe$go_id, hsframe$'Evidence', hsframe$gene_id),
     GofOrg = "Homo sapiens".
@@ -443,7 +443,7 @@ go_over_frame_mouse( bio_db, GoFra, GofOrg ) :-
     go_mtx_df( [row(go_id,evidence,gene_id)|Rows], GoFra, [] ),
     GofOrg = "Mus musculus".
 go_over_frame_mouse( lib_org, GoFra, GofOrg ) :-
-    <- library("org.Mm.eg.db"),
+    lib(bioc("org.Mm.eg.db")),
     mmframe <- toTable('org.Mm.egGO'),
     GoFra  <- 'data.frame'(mmframe$go_id, mmframe$'Evidence', mmframe$gene_id),
     GofOrg =  "Mus musculus".
@@ -459,7 +459,7 @@ go_over_frame_pig( bio_db, GoFra, GofOrg ) :-
     go_mtx_df( [row(go_id,evidence,gene_id)|Rows], GoFra, [] ),
     GofOrg = "Sus scrofa".
 go_over_frame_pig( lib_org, GoFra, GofOrg ) :-
-    <- library("org.Ss.eg.db"),
+    lib( bioc("org.Ss.eg.db") ),
     ssframe <- toTable("org.Hs.egGO"),
     GoFra <- 'data.frame'(ssframe$go_id, ssframe$'Evidence', ssframe$gene_id),
     GofOrg = "Sus scrofa".
