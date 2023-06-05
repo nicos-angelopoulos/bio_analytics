@@ -17,6 +17,7 @@ exp_go_exp_id_default( pig, ensg ).
 exp_go_over_defaults( Args, Defs ) :-
     Defs = [
                 go('BP'),
+                go_frame(lib_org),
                 go_over_pv_cut(0.05),
                 org(hs),
                 org_exp_id(ExpId),
@@ -41,6 +42,10 @@ assumed to be the ground value of GoOVer.
 Opts
   * go(GoSec='BP')
     gene ontology section, in: =|[BP,MF,CC]|=
+  * go_frame(GoFrame=lib_org)
+    which go frame of GoTerms, Evidence and Gid to use. 
+    Default, lib_org, uses r_lib(org.<Org>.eg.db) frames, alternative bio_db uses bio_db tables, 
+    before the intro of the option this was the way, so use this for backward compatibility
   * go_over_pv_cut(PvCut=0.05)
     p value filter for the results
   * org(Org=hs)
@@ -105,6 +110,7 @@ OverF = '.../swipl/pack/bio_analytics/data/silac/bt_gontBP_p0.05_univExp.csv'.
 @author nicos angelopoulos
 @version  0.1 2019/5/2
 @version  0.2 2022/12/20,   =|Univ=go|= and =|Org=gallus|=
+@version  0.3 2023/6/5,   option go_frame(GoFrame)
 @see go_over_universe/5
 
 */
@@ -124,7 +130,8 @@ exp_go_over( CsvF, GoOver, Args ) :-
     options( org_exp_id(ExpId), Opts ),
     org_go_over_std_gene_ids( Org, ExpId, DEGenesSet, Gids ),
     debug_call( exp_go_over, length, gids/Gids ),
-    go_over_frame( Org, goFrameData, GofOrg ),
+    options( go_frame(GfOpt), Opts ), 
+    go_over_frame( Org, GfOpt, goFrameData, GofOrg ),
     goFrame <- 'GOFrame'(goFrameData, organism= +GofOrg),
     goAllFrame <- 'GOAllFrame'(goFrame),
     gsc <- 'GeneSetCollection'(goAllFrame, setType = 'GOCollection'() ),
@@ -383,7 +390,16 @@ org_go_over_std_gene_ids_pig_ensg_ncbi( EnsG, Ncbi ) :-
 % org_go_over_std_gene_ids_pig_ensg_ncbi( EnsG, Ncbi ) :-
 % fixme: there might be other ways? although ense seems to pick up symbols from ense
 
-go_over_frame( gallus, GoFra, GofOrg ) :-
+go_over_frame( gallus, GfOpt, GoFra, GofOrg ) :-
+     go_over_frame_chicken( GfOpt, GoFra, GofOrg ).
+go_over_frame( hs, GfOpt, GoFra, GofOrg ) :-
+     go_over_frame_human( GfOpt, GoFra, GofOrg ).
+go_over_frame( mouse, GfOpt, GoFra, GofOrg ) :-
+     go_over_frame_mouse( GfOpt, GoFra, GofOrg ).
+go_over_frame( pig, GfOpt, GoFra, GofOrg ) :-
+     go_over_frame_pig( GfOpt, GoFra, GofOrg ).
+
+go_over_frame_chicken( bio_db, GoFra, GofOrg ) :-
      !, 
      findall( row(Gid,E,Ncbi), (
                                      gont_galg_symb_gont(Symb,_,E,G),
@@ -395,7 +411,13 @@ go_over_frame( gallus, GoFra, GofOrg ) :-
             ),
     go_mtx_df( [row(go_id,evidence,gene_id)|Rows], GoFra, [] ),
     GofOrg = "Gallus gallus".
-go_over_frame( hs, GoFra, GofOrg ) :-
+go_over_frame_chicken( lib_org, GoFra, GofOrg ) :-
+    <- library("org.Gg.eg.db"),
+    ggframe <- toTable('org.Gg.egGO'),
+    GoFra <- 'data.frame'(ggframe$go_id, ggframe$'Evidence', ggframe$gene_id),
+    GofOrg = "Gallus gallus".
+
+go_over_frame_human( bio_db, GoFra, GofOrg ) :-
     !,
     findall( row(Gid,E,Ncbi), 
             ( gont_homs_edge_symb(G,E,S),
@@ -405,7 +427,13 @@ go_over_frame( hs, GoFra, GofOrg ) :-
                 Rows ),
     go_mtx_df( [row(go_id,'Evidence',gene_id)|Rows], GoFra, [] ),
     GofOrg = "Homo sapiens".
-go_over_frame( mouse, GoFra, GofOrg ) :-
+go_over_frame_human( lib_org, GoFra, GofOrg ) :-
+    <- library("org.Hs.eg.db"),
+    hsframe <- toTable('org.Hs.egGO'),
+    GoFra <- 'data.frame'(hsframe$go_id, hsframe$'Evidence', hsframe$gene_id),
+    GofOrg = "Homo sapiens".
+
+go_over_frame_mouse( bio_db, GoFra, GofOrg ) :-
     !,
     findall( row(Gid,E,M), 
             ( gont_musm_mgim_gont(M,E,G),
@@ -414,7 +442,13 @@ go_over_frame( mouse, GoFra, GofOrg ) :-
                 Rows ),
     go_mtx_df( [row(go_id,evidence,gene_id)|Rows], GoFra, [] ),
     GofOrg = "Mus musculus".
-go_over_frame( pig, GoFra, GofOrg ) :-
+go_over_frame_mouse( lib_org, GoFra, GofOrg ) :-
+    <- library("org.Mm.eg.db"),
+    mmframe <- toTable('org.Mm.egGO'),
+    GoFra  <- 'data.frame'(mmframe$go_id, mmframe$'Evidence', mmframe$gene_id),
+    GofOrg =  "Mus musculus".
+
+go_over_frame_pig( bio_db, GoFra, GofOrg ) :-
     !,
     findall( row(Gid,Evi,Ncbi), (  gont_suss_symb_gont(Symb,_,Evi,G), 
                                     go_id(Gid,G),
@@ -423,6 +457,11 @@ go_over_frame( pig, GoFra, GofOrg ) :-
                                  ), 
                                        Rows ),
     go_mtx_df( [row(go_id,evidence,gene_id)|Rows], GoFra, [] ),
+    GofOrg = "Sus scrofa".
+go_over_frame_pig( lib_org, GoFra, GofOrg ) :-
+    <- library("org.Ss.eg.db"),
+    ssframe <- toTable("org.Hs.egGO"),
+    GoFra <- 'data.frame'(ssframe$go_id, ssframe$'Evidence', ssframe$gene_id),
     GofOrg = "Sus scrofa".
 
 capit( Atom, Capit ) :-
