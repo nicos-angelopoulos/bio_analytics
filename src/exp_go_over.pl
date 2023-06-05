@@ -12,6 +12,7 @@ exp_go_over_bioc_deps_load :-
 exp_go_exp_id_default( hs, symb ).
 exp_go_exp_id_default( gallus, symb).
 exp_go_exp_id_default( mouse, symb ).
+exp_go_exp_id_default( pig, ensg ).
 
 exp_go_over_defaults( Args, Defs ) :-
     Defs = [
@@ -141,6 +142,7 @@ exp_go_over( CsvF, GoOver, Args ) :-
         ;
         true
     ),
+    % this is in r_lib('Category') 
     gGparams <- 'GSEAGOHyperGParams'(
                     name="bio_analytics_gont",
                     geneSetCollection=gsc,
@@ -212,6 +214,9 @@ go_over_universe_genome( hs, Univ ) :-
 go_over_universe_genome( mouse, Univ ) :-
     findall( Mgim, mgim_musm_mgim_symb(Mgim,_Symb), Mgims ),
     sort( Mgims, Univ ).
+go_over_universe_genome( pig, Univ ) :-
+     findall( Ncbi, ncbi_suss_ncbi_ensg(Ncbi,_), Ncbis ),
+     sort( Ncbis, Univ ).
 
 go_over_universe_go( gallus, Univ ) :-
     findall( Ncbi, ( gont_galg_symb_gont(Symb,_Rl,_Ev,_Go),
@@ -231,6 +236,9 @@ go_over_universe_go( hs, Univ ) :-
 go_over_universe_go( mouse, Univ ) :-
     findall( Mgim, gont_musm_mgim_gont(Mgim,_E,_G), Mgims ),
     sort( Mgims, Univ ).
+go_over_universe_go( pig, Univ ) :-
+     findall( Ncbi, (gont_suss_symb_gont(Symb,_,_,_),ense_suss_ensg_symb(EnsG,Symb),ncbi_suss_ensg_ncbi(EnsG,Ncbi)), Ncbis ),
+     sort( Ncbis, Univ ).
 
 % fixme: give doc here, what is this for ?
 go_over_universe_exp( gallus, DeGids, NDEPrs, Univ ) :-
@@ -269,6 +277,12 @@ go_over_universe_exp( mouse, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
     append( DEGids, NDGids, ExpGids ),
     % fixme: we can add tests here, that the ids exist in some table ? 
     bio_list_sort_ne( ExpGids, Univ ).
+go_over_universe_exp( pig, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
+    findall( Id, member(Id-_,NDEPrs), Ids ),
+    org_go_over_std_gene_ids_pig( ExpIdTkn, Ids, NDGids ),
+    append( DEGids, NDGids, ExpGids ),
+    % fixme: we can add tests here, that the ids exist in some table ? 
+    bio_list_sort_ne( ExpGids, Univ ).
 
 go_over_universe_go_exp( gallus, ExpId, DEGids, NDEPrs, Univ ) :-
     findall( Id, member(Id-_,NDEPrs), Ids ),
@@ -301,6 +315,19 @@ go_over_universe_go_exp( mouse, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
                     ), 
                          List ),
     bio_list_sort_ne( List, Univ ).
+go_over_universe_go_exp( pig, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
+    % fixme: we should be using go_exp probably, because it only comes gont only comes with symbs and unlikely to have a good coverage.
+    findall( Id, member(Id-_,NDEPrs), Ids ),
+    org_go_over_std_gene_ids_pig( ExpIdTkn, Ids, NDGids ),
+    append( DEGids, NDGids, ExpGids ),
+    findall( Ncbi, ( member(Ncbi,ExpGids), 
+                     ncbi_suss_ncbi_ensg(Ncbi,EnsG),
+                     ense_suss_ensg_symb(EnsG,Symb),
+                     gont_suss_symb_gont(Symb,_,_,_)
+                    ),
+                        Ncbis 
+           ),
+    bio_list_sort_ne( Ncbis, Univ ).
 
 org_go_over_std_gene_ids( Org, Gtyp, Set, Gids ) :-
      at_con( [org_go_over_std_gene_ids,Org], '_', Pname ),
@@ -334,6 +361,27 @@ org_go_over_std_gene_ids_mouse( ncbi, Set, Gids ) :-
 org_go_over_std_gene_ids_mouse( symb, Set, Gids ) :-
     findall( Mgim,  (member(Symb,Set),mgim_musm_mgim_symb(Mgim,Symb)), Mgims ),
     sort( Mgims, Gids ).
+org_go_over_std_gene_ids_pig( ncbi, Set, Gids ) :-
+     !,
+     Set = Gids.
+org_go_over_std_gene_ids_pig( ensg, Set, Gids ) :-
+     !,
+     findall( Ncbi, (member(EnsG,Set), org_go_over_std_gene_ids_pig_ensg_ncbi(EnsG,Ncbi)), Ncbis ),
+     sort( Ncbis, Gids ).
+org_go_over_std_gene_ids_pig( symb, Set, Gids ) :-
+     !,
+     findall( Ncbi, ( member(Symb,Set), 
+                      ense_suss_ensg_symb(EnsG,Symb),
+                      org_go_over_std_gene_ids_pig_ensg_ncbi(EnsG,Ncbi)
+                    ), 
+                                             Ncbis ),
+     sort( Ncbis, Gids ).
+
+org_go_over_std_gene_ids_pig_ensg_ncbi( EnsG, Ncbi ) :-
+     ncbi_suss_ensg_ncbi( EnsG, Ncbi ),
+     !.
+% org_go_over_std_gene_ids_pig_ensg_ncbi( EnsG, Ncbi ) :-
+% fixme: there might be other ways? although ense seems to pick up symbols from ense
 
 go_over_frame( gallus, GoFra, GofOrg ) :-
      !, 
@@ -366,6 +414,16 @@ go_over_frame( mouse, GoFra, GofOrg ) :-
                 Rows ),
     go_mtx_df( [row(go_id,evidence,gene_id)|Rows], GoFra, [] ),
     GofOrg = "Mus musculus".
+go_over_frame( pig, GoFra, GofOrg ) :-
+    !,
+    findall( row(Gid,Evi,Ncbi), (  gont_suss_symb_gont(Symb,_,Evi,G), 
+                                    go_id(Gid,G),
+                                    ense_suss_ensg_symb(EnsG,Symb),
+                                    ncbi_suss_ensg_ncbi(EnsG,Ncbi)
+                                 ), 
+                                       Rows ),
+    go_mtx_df( [row(go_id,evidence,gene_id)|Rows], GoFra, [] ),
+    GofOrg = "Sus scrofa".
 
 capit( Atom, Capit ) :-
     atom_codes( Atom, [A,B,C|_] ),
