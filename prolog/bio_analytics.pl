@@ -23,7 +23,8 @@ empowering downstream analyses of user's experimental data.
 
 Installation and loading: 
 ==
-?- pack_install(bio_analytics).  % also installs pack(lib). other dependencies are at load time via lib
+?- pack_install(bio_analytics).  
+        % also installs pack(lib). other dependencies are installed at load time via lib
 ?- use_module(library(lib)).
 ?- lib(bio_analytics).
 ==
@@ -37,6 +38,7 @@ is used in the example files in directory examples/ .
 @version  0.3 2019/5/11
 @version  0.4 2020/9/18
 @version  0.5 2023/1/2
+@version  0.6 2023/6/6
 @license  MIT
 
 */
@@ -47,12 +49,12 @@ Version and release date.
 
 ==
 ?- bio_analytics_version(V,D).
-V = 0:5:0,
-D = date(2023,1,2).
+V = 0:6:0,
+D = date(2023,6,6).
 ==
 
 */
-bio_analytics_version( 0:5:0, date(2023,1,2) ).
+bio_analytics_version( 0:6:0, date(2023,6,6) ).
 
 :- use_module(library(lists)).
 :- use_module(library(apply)).
