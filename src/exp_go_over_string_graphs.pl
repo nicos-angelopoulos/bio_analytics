@@ -10,7 +10,7 @@ exp_go_over_string_graphs_defaults( Defs ) :-
 
 Create string graphs for all the over-represented terms in GoOver.
 
-When GoOver is a variable expr_go_over/3 is called to generate it.
+When GoOver is a variable exp_go_over/3 is called to generate it.
 
 Opts
   * dir_postfix(Psfx=go_strings)
@@ -23,7 +23,7 @@ Opts
     similar to go_string_graph/3, but different default, others: =|go_name, go_id|=.
     Here the length of GO terms (Len) is added to form go_pair_ord(I,Len) for forwarding
   * viz_de_opts(VizOpts = [])
-    options for restricting genes to visualise via exp_diff/4.
+    options for restricting genes to visualise via bio_diffex/4.
     Default does not restrict what genes are visualised. =|diffex_only = VizOpts|= restricts genes to significants only.
   * wgraph_plot_opts(WgOpts=WgOpts)
     defaults to =|[vjust = -1, node_size(3), format(svg)]|=.
