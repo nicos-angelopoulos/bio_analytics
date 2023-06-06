@@ -37,7 +37,8 @@ Options are passed to exp_gene_family_string_graph/4.
 ?- absolute_file_name( pack('bio_analytics/data/silac/bt.csv'), Exp ),
    exp_go_over_string_graphs( Exp, Gov, Dir, [] ).
 
-% Sending to R: pltv <- ggnet2(lp_adj,vjexp_go_over_mtxust = -1,size = 3,label = pl_v_1,color = pl_v_2,edge.size = pl_v_3,edge.color = "#BEAED4")
+% Sending to R: pltv <- ggnet2(lp_adj,vjexp_go_over_mtxust = -1,size = 3,
+...    label = pl_v_1,color = pl_v_2,edge.size = pl_v_3,edge.color = "#BEAED4")
 
 ==
 
