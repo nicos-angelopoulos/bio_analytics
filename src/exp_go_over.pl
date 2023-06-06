@@ -51,12 +51,11 @@ Opts
   * org(Org=hs)
     one of bio_db_organism/2 first argument values (hs, gallus and mouse for now)
   * org_exp_id(OrgExpId)
-    the type of the experimental gene ids for the organism. default depends on Org, but currently all map to symb
+    the type of the experimental gene ids for the organism. The default depends on Org, but currently all map to symb.
   * stem(Stem=false)
-    stem for output csv file. when false use basename of CsvF 
+    stem for output csv file. When false, use basename of CsvF.
   * to_file(ToF=false)
-    when GoOver is unbound, this controls whether the output
-    goes to a file or a values list 
+    when GoOver is unbound, this controls whether the output goes to a file or a values list 
   * universe(Univ=go_exp)
     Univ in : =|[genome,go,go_exp,experiment]|=
     * genome(Gen)
@@ -98,11 +97,15 @@ CsvF = '.../swipl/pack/bio_analytics/data/silac/bt.csv',
 183 here_gontBP_p0.05_univExp.csv
 true.
 
-?- absolute_file_name( pack('bio_analytics/data/silac/bt.csv'), CsvF ),                                                  exp_go_over( CsvF, OverF, [to_file(true)] ).
+?- absolute_file_name( pack('bio_analytics/data/silac/bt.csv'), CsvF ),
+   exp_go_over( CsvF, OverF, [to_file(true)] ).
+
 CsvF = '.../swipl/pack/bio_analytics/data/silac/bt.csv',
 OverF = go_over_gontBP_p0.05_univExp.csv.
 
-?- absolute_file_name( pack('bio_analytics/data/silac/bt.csv'), CsvF ),                                                  exp_go_over( CsvF, OverF, [to_file(true),stem(false)] ).
+?- absolute_file_name( pack('bio_analytics/data/silac/bt.csv'), CsvF ),
+   exp_go_over( CsvF, OverF, [to_file(true),stem(false)] ).
+
 CsvF = '.../swipl/pack/bio_analytics/data/silac/bt.csv',
 OverF = '.../swipl/pack/bio_analytics/data/silac/bt_gontBP_p0.05_univExp.csv'.
 ==
@@ -111,7 +114,7 @@ OverF = '.../swipl/pack/bio_analytics/data/silac/bt_gontBP_p0.05_univExp.csv'.
 @version  0.1 2019/5/2
 @version  0.2 2022/12/20,   =|Univ=go|= and =|Org=gallus|=
 @version  0.3 2023/6/5,   option go_frame(GoFrame)
-@see go_over_universe/5
+@see go_over_universe/6
 
 */
 exp_go_over( CsvF, GoOver, Args ) :-
