@@ -92,7 +92,7 @@ gene_family( Family, _Org, _Symbols, _Opts ) :-
      !,
      length( Family, Len ),
      throw( gene_family(family_inpput_not_symbols_or_entrez_ids(length(Len))) ).
-gene_family( Family, Org, _Symbols, Opts ) :-
+gene_family( Family, Org, _Symbols, _Opts ) :-
      findall( Fam, gene_family_known(Fam,Org,_), Families ),
      throw( gene_family(cannot_find_input_family_in_the_known_ones(Family,Org,Families)) ).
 

@@ -399,7 +399,7 @@ go_over_frame( bioc_ann_dbi, Org, GoFra, DbiOrg ) :-
     string_concat( DbiLibPfx, ".eg.db", DbiLib ),
     lib(bioc(DbiLib)),
     atom_string( DbiTknAtm, DbiTkn ),
-    atomic_list_concat( [org,DbiTkn,'egGO'], '.', EgGO ),
+    atomic_list_concat( [org,DbiTknAtm,'egGO'], '.', EgGO ),
     ggframe <- toTable(EgGO),
     GoFra <- 'data.frame'(ggframe$go_id, ggframe$'Evidence', ggframe$gene_id),
     !.
@@ -445,7 +445,7 @@ go_over_frame_bio_db( mouse, GoFra, DbiOrg ) :-
                                  ), 
                                        Rows ),
     go_mtx_df( [row(go_id,evidence,gene_id)|Rows], GoFra, [] ),
-    GofOrg = "Sus scrofa".
+    DbiOrg = "Sus scrofa".
 
 capit( Atom, Capit ) :-
     atom_codes( Atom, [A,B,C|_] ),
