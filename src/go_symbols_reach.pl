@@ -77,7 +77,8 @@ go_symbols_reach_1( bioc_ann_dbi, GoIn, Org, Symbs, _Opts ) :-
      bio_conductor_annot_dbi_org_lib( DbiTkn, true, DbiLib ),
      tmp1 <- 'AnnotationDbi::select'(-DbiLib, keys=c(+GoAtm), columns = c("SYMBOL"), keytype = "GOALL"),
      % ex: "GO:0032943"
-     AnnSymbs <- tmp1$'SYMBOL',
+     AnnSymbS <- tmp1$'SYMBOL',
+     ( is_list(AnnSymbS) -> AnnSymbs = AnnSymbS; AnnSymbs = [AnnSymbS] ),
      sort( AnnSymbs, Symbs ),
      <- remove(tmp1).
 go_symbols_reach_1( bio_db, GO, Org, Symbs, Opts ) :-
