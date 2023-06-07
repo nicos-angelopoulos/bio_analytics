@@ -1,12 +1,15 @@
 
 go_symbols_reach_defaults( Defs ) :-
-	Defs = [ descent(true), 
-             org(hs),
+	Defs = [ 
+              org(hs),
+              go_frame(bioc_ann_dbi),
+              %
+              descent(true), 
 	         as_child_includes(true),
-		     as_child_consists_of(true),
-		     as_child_regulates(false),
-		     as_child_positively_regulates(false),
-		     as_child_negatively_regulates(false)
+		    as_child_consists_of(true),
+		    as_child_regulates(false),
+		    as_child_positively_regulates(false),
+		    as_child_negatively_regulates(false)
 		  ].
 
 /** go_symbols_reach( +GoT, -Symbols, +Opts ).
@@ -18,11 +21,10 @@ to pick up Symbols recursively.
 Opts 
   * org(Org=hs)
     should be recognised by 1st arg of bio_db_organism/2.
-  * go(GO=lib_org)
+  * go_frame(GO=bioc_ann_dbi)
     which implementation of GO to follow (v0.3 this changes default behaviour). 
-    Some of the options below are not functional with =|GO=lib_org|=.
+    Some of the options below are not functional with =|GO=bioc_ann_dbi|=.
     Alterantive: =\bio_db\= (which used to be the default, before the option was introduced).
-
   * descent(Desc=true)
     whether to collect symbols from descendant GO terms
   * as_child_includes(Inc=true)
@@ -58,25 +60,42 @@ Len = 293.
 @version  0.1 2015/7/26
 @version  0.2 2019/4/7,          added org, moved to new pack
 @version  0.3 2023/6/7,          added option go(GoImpl), which changes default behaviour in comparison to past
+@tbd re-establish the bio_db interface- it is not far off, and compare to bioc_ann_dbi, bio_db likely to be faster
 
 */
 go_symbols_reach( GO, Symbs, Args ) :-
 	options_append( go_symbols_reach, Args, Opts ),
+	options( org(OrgPrv), Opts ),
+     bio_db_organism( OrgPrv, Org ),
+     options( go_frame(GofTkn), Opts ),
+     go_symbols_reach_1( GofTkn, GO, Org, Symbs, Opts ).
+
+go_symbols_reach_1( bioc_ann_dbi, GoIn, Org, Symbs, _Opts ) :-
+     % go_over_frame( bioc_ann_dbi, Org, goFrameData, _DbiOrg ),
+     go_id( GoIn, GoAtm, _GoId ),
+     bio_conductor_annot_dbi_org( Org, DbiTkn, _DbiOrg ), 
+     bio_conductor_annot_dbi_org_lib( DbiTkn, true, DbiLib ),
+     tmp1 <- 'AnnotationDbi::select'(-DbiLib, keys=c(+GoAtm), columns = c("SYMBOL"), keytype = "GOALL"),
+     % ex: "GO:0032943"
+     AnnSymbs <- tmp1$'SYMBOL',
+     sort( AnnSymbs, Symbs ),
+     <- remove(tmp1).
+go_symbols_reach_1( bio_db, GO, Org, Symbs, Opts ) :-
+     throw( fixme(go_symbols_reach(bio_db,_,_)) ),
 	options( descent(Desc), Opts ),
-	options( org(Org), Opts ),
 	go_symbs_descent_term( Desc, GoT, Child, Term, Opts ),
 	go_symbs( [GO], Org, GoT, Child, Term, [], [], Symbs ).
 
 go_symbs( [], _Org, _GoT, _Ch, _Term, _, Symbs, Symbs ).
 go_symbs( [GoIn|GOs], Org, GoT, ChGo, FTerm, GoSeen, Seen, Symbs ) :-
-    go_id( GoIn, _GoAtm, GoId ),
+     go_id( GoIn, _GoAtm, GoId ),
 	ord_add_element( GoSeen, GoId, NxGoSeen ),
 	% findall( GoSymb, gont_homs_gont_symb(GO,GoSymb), GoSymbs ),
 	findall( GoSymb, go_org_symbol(Org,GoId,GoSymb), GoSymbs ),
 	sort( GoSymbs, OSymbs ),
 	debug( go_symbols_reach, '~w, Symbols: ~w', [GoIn,OSymbs] ),
 	ord_union( OSymbs, Seen, NxSeen ),
-    Dbg = debug( go_symbols_reach, 'calling, ~w', [FTerm] ),
+     Dbg = debug( go_symbols_reach, 'calling, ~w', [FTerm] ),
 	findall( ChGo, (GoT=GoId,Dbg,FTerm), ChGos ),
 	sort( ChGos, ChGosOrd ),
 	debug( go_symbols_reach, '~w, Children: -~w', [GoIn,ChGosOrd] ),

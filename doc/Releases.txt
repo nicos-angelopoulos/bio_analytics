@@ -7,6 +7,7 @@ TBD
 
 0.7   23.06.07    OPTS:     added options to gene_family/3 (now passed to go_symbols/3)
                   IFACE:    bio_org/0 (doc) + bio_conductor_annot_dbi_org/3
+                  OPTS:     go_frame(Gf=bioc_ann_dbi) - which changes the default
 
 0.6               @ 23.06.06
       23.06.05    OPTS:     added go_frame() in exp_go_over/1, default behaviour changed

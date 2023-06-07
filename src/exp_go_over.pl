@@ -394,15 +394,13 @@ org_go_over_std_gene_ids_pig_ensg_ncbi( EnsG, Ncbi ) :-
 % fixme: there might be other ways? although ense seems to pick up symbols from ense
 
 go_over_frame( bioc_ann_dbi, Org, GoFra, DbiOrg ) :-
-    bio_conductor_annot_dbi_org( Org, DbiTkn, DbiOrg ),
-    string_concat( "org.", DbiTkn, DbiLibPfx ),
-    string_concat( DbiLibPfx, ".eg.db", DbiLib ),
-    lib(bioc(DbiLib)),
-    atom_string( DbiTknAtm, DbiTkn ),
-    atomic_list_concat( [org,DbiTknAtm,'egGO'], '.', EgGO ),
-    ggframe <- toTable(EgGO),
-    GoFra <- 'data.frame'(ggframe$go_id, ggframe$'Evidence', ggframe$gene_id),
-    !.
+     bio_conductor_annot_dbi_org( Org, DbiTkn, DbiOrg ),
+     bio_conductor_annot_dbi_org_lib( DbiTkn, true, _DbiLib ),
+     atom_string( DbiTknAtm, DbiTkn ),
+     atomic_list_concat( [org,DbiTknAtm,'egGO'], '.', EgGO ),
+     ggframe <- toTable(EgGO),
+     GoFra <- 'data.frame'(ggframe$go_id, ggframe$'Evidence', ggframe$gene_id),
+     !.
 go_over_frame( bio_db, Org, GoFra, DbiOrg ) :-
      go_over_frame_bio_db( Org, GoFra, DbiOrg ),
      !.

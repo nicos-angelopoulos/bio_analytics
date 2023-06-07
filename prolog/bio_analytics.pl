@@ -87,4 +87,5 @@ bio_analytics_version( 0:6:0, date(2023,6,6) ).
 :- lib(exp_go_over_string_graphs_multi/1).
 :- lib(bio_volcano_plot/2).
 :- lib(bio_symbols/3).
+:- lib(bio_org/0).
 :- lib(end(bio_analytics), homonyms(true)).
