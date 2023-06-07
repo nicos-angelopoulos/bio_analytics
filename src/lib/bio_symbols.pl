@@ -88,7 +88,10 @@ bio_symbols_map_mouse( ncbi, Values, Symbs ) :-
                       mgim_musm_mgim_symb(Cgnc,Symb)
                     ),
                          Symbs ).
-bio_symbols_map_pig( ensg, Values, Symbs ) :-
+bio_symbols_map_pig( ensg, EnsGs, Symbs ) :-
+     % fixme: check if there are alternatives+additionals ?
+     findall( Symb, (member(EnsG,EnsGs),ense_suss_ensg_symb(EnsG,Symb)), Symbs ).
+     
 
 bio_symbols_values( Ids, Ids, _Opts ) :-
      is_list( Ids ),
