@@ -54,7 +54,7 @@ gene_family( Family, OrgPrv, Symbols ) :-
 gene_family( GoTerm, Org, Symbols ) :-
      atomic( GoTerm ),
      ( integer(GoTerm) -> GoTerm = UpGoTerm; upcase_atom(GoTerm,UpGoTerm) ),
-    go_id( UpGoTerm, _GoAtom, GoInt ),
+     go_id( UpGoTerm, _GoAtom, GoInt ),
      % atom_concat( 'GO:', GoAtmInt, UpGOTerm ),
     % atom_number( GoAtmInt, GoInt ),
      !,
