@@ -75,24 +75,24 @@ gene_family( GoTerm, _Org, Symbols, Opts ) :-
      % gene_family_org_go_term( Org, GoInt, Symbols ),
      go_symbols_reach( GoInt, Symbols, Opts ),
      debug( gene_family, 'Located GO term as the family identifier.', [] ).
-gene_family( Family, Symbols, _Opts ) :-
+gene_family( Family, Org, Symbols, _Opts ) :-
      is_list( Family ),
      maplist( is_symbol(Org), Family ),
      % maplist( hgnc_homs_hgnc_symb, _, Family ),
      !,
      Symbols = Family,
      debug( gene_family, 'Ascertained input as list of symbols- passing it through.', [] ).
-gene_family( Family, Org, Symbols ) :-
+gene_family( Family, Org, Symbols, _Opts ) :-
      is_list( Family ),
      maplist( entz_symb(Org), Family, Symbols ),
      !,
      debug( gene_family, 'Converted input from Entrezes to Symbols.', [] ).
-gene_family( Family, _Org, _Symbols ) :-
+gene_family( Family, _Org, _Symbols, _Opts ) :-
      is_list( Family ),
      !,
      length( Family, Len ),
      throw( gene_family(family_inpput_not_symbols_or_entrez_ids(length(Len))) ).
-gene_family( Family, Org, _Symbols ) :-
+gene_family( Family, Org, _Symbols, Opts ) :-
      findall( Fam, gene_family_known(Fam,Org,_), Families ),
      throw( gene_family(cannot_find_input_family_in_the_known_ones(Family,Org,Families)) ).
 
