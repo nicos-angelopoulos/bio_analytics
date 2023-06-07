@@ -48,6 +48,8 @@ bio_symbols( Vect, Symbs, Args ) :-
           throw( bio_symbols(3,possible_exp_id_missing(Org,ExpId)) )
      ).
 
+% fixme: this should go to src/bio_org.pl 
+% 
 bio_symbols_map( _Org, symb, Values, Symbs ) :-
      !,
      Values = Symbs.
@@ -57,6 +59,8 @@ bio_symbols_map( hs, ExpId, Values, Symbs ) :-
      bio_symbols_map_hs( ExpId, Values, Symbs ).
 bio_symbols_map( mouse, ExpId, Values, Symbs ) :-
      bio_symbols_map_mouse( ExpId, Values, Symbs ).
+bio_symbols_map( pig, ExpId, Values, Symbs ) :-
+     bio_symbols_map_pig( ExpId, Values, Symbs ).
 
 bio_symbols_map_gallus( ncbi, Values, Symbs ) :-
      % fixme: additionals ?
@@ -84,6 +88,7 @@ bio_symbols_map_mouse( ncbi, Values, Symbs ) :-
                       mgim_musm_mgim_symb(Cgnc,Symb)
                     ),
                          Symbs ).
+bio_symbols_map_pig( ensg, Values, Symbs ) :-
 
 bio_symbols_values( Ids, Ids, _Opts ) :-
      is_list( Ids ),

@@ -407,6 +407,8 @@ go_over_frame( bio_db, Org, GoFra, DbiOrg ) :-
 go_over_frame( GFopt, OrgOpt, _GoFra, _DbiOrg ) :-
      throw( cannot_coordinate_exp_go_over_options(go_frame(GFopt),org(OrgOpt)) ).
 
+% fixme: these should go to src/bio_org.pl 
+%
 go_over_frame_bio_db( chicken, GoFra, DbiOrg ) :-
      findall( row(Gid,E,Ncbi), (
                                      gont_galg_symb_gont(Symb,_,E,G),
@@ -435,7 +437,7 @@ go_over_frame_bio_db( mouse, GoFra, DbiOrg ) :-
                 Rows ),
     go_mtx_df( [row(go_id,evidence,gene_id)|Rows], GoFra, [] ),
     DbiOrg = "Mus musculus".
-go_over_frame_bio_db( mouse, GoFra, DbiOrg ) :-
+go_over_frame_bio_db( pig, GoFra, DbiOrg ) :-
     findall( row(Gid,Evi,Ncbi), (  gont_suss_symb_gont(Symb,_,Evi,G), 
                                     go_id(Gid,G),
                                     ense_suss_ensg_symb(EnsG,Symb),
