@@ -17,7 +17,12 @@ to pick up Symbols recursively.
 
 Opts 
   * org(Org=hs)
-    also known is: mouse. Note that human, also resolves to hs
+    should be recognised by 1st arg of bio_db_organism/2.
+  * go(GO=lib_org)
+    which implementation of GO to follow (v0.3 this changes default behaviour). 
+    Some of the options below are not functional with =|GO=lib_org|=.
+    Alterantive: =\bio_db\= (which used to be the default, before the option was introduced).
+
   * descent(Desc=true)
     whether to collect symbols from descendant GO terms
   * as_child_includes(Inc=true)
@@ -51,7 +56,8 @@ Len = 293.
 
 @author nicos angelopoulos
 @version  0.1 2015/7/26
-@version  0.2 2019/4/7           added org, moved to new pack
+@version  0.2 2019/4/7,          added org, moved to new pack
+@version  0.3 2023/6/7,          added option go(GoImpl), which changes default behaviour in comparison to past
 
 */
 go_symbols_reach( GO, Symbs, Args ) :-

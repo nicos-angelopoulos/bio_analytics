@@ -51,7 +51,7 @@ gene_family_defaults([org(hs)]).
 % @author nicos angelopoulos
 % @version  0:1 2019/3/5,  from old code
 % @version  0:2 2023/6/7,  added options
-% @see go_symbols_reach
+% @see go_symbols_reach/4
 % @tbd error reporting via print_message/2
 %
 gene_family( Family, Symbols, Args ) :-
