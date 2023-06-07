@@ -7,7 +7,7 @@
                 exp_go_over/3,                    % +Exp, NDEs, +Opts
                 exp_go_over_string_graphs/4,      % +Exp, ?GoOver, ?Dir, +Opts
                 exp_go_over_string_graphs_multi/1,% +Opts
-                gene_family/3,                    % +Alias, +Org, +Symbols
+                gene_family/3,                    % +Alias, -Symbols, +Opts
                 go_org_symbol/3,                  % +Org, +GoT, -Symbol
                 go_org_symbols/3,                 % +Org, +GoT, -Symbols
                 go_string_graph/3,                % +GoT, -Graph, +Opts

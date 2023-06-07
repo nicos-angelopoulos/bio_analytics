@@ -92,7 +92,7 @@ exp_gene_family_string_graph( Exp, Fam, DEPrs, NonDEPrs, StGraph, Args ) :-
         true
     ),
     options( org(Org), Opts ),
-    gene_family( Fam, Org, Fymbs ),
+    gene_family( Fam, Fymbs, org(Org) ),
     %
     sort( Fymbs, Oymbs ),
     options( exp_ev_log(EvLog), Opts ),
