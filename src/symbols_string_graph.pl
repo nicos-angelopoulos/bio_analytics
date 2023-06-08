@@ -88,7 +88,6 @@ symbols_string_graph( Symbols, Graph, Args ) :-
                                MinW =< W
                              ),
                                    Pgraph ),
-    write( pgraph(Pgraph) ), nl,
     options( cohese(Coh), Opts ),
     symbols_string_graph_cohese( Coh, Pgraph, Wgraph ),
     options( include_orphans(IncO), Opts ),
