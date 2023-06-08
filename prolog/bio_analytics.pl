@@ -68,7 +68,7 @@ bio_analytics_version( 0:6:0, date(2023,6,6) ).
 :- lib(os_lib).
 :- lib(options).
 :- lib(debug_call).
-:- lib(promise(wgaph_plot/2,lib(wgraph))).
+:- lib(promise(wgraph_plot/2,lib(wgraph))).
 
 :- debug_call:debug(ba(info)).
 
