@@ -1,10 +1,10 @@
 
 go_string_graph_defaults( Defs ) :-
-	Defs = [    
-              organism(hs),
-		      plot(false),           % 
+     Defs = [    
+              org(hs),
+              plot(false),           % 
               save(false),           % see wgraph_plot/2.
-		      stem_type(go_name)
+              stem_type(go_name)
             ].
 
 /** go_string_graph( +GoTerm, -Graph, +Opts ).
@@ -48,18 +48,18 @@ true.
 */
 
 go_string_graph( Got, Graph, Args ) :-
-	options_append( go_string_graph, Args, Opts ),
-	% go_term_symbols( GoTerm, Symbs, Opts ),
-    options( organism(Org), Opts ),
-    go_org_symbols( Got, Org, Symbs ),
-	symbols_string_graph( Symbs, Graph, Opts ),
-	options( plot(Plot), Opts ),
-	go_string_graph_plot( Plot, Graph, Got, Opts ).
+     options_append( go_string_graph, Args, Opts ),
+     % go_term_symbols( GoTerm, Symbs, Opts ),
+     options( org(Org), Opts ),
+     go_org_symbols( Got, Org, Symbs ),
+     symbols_string_graph( Symbs, Graph, Opts ),
+     options( plot(Plot), Opts ),
+     go_string_graph_plot( Plot, Graph, Got, Opts ).
 
 go_string_graph_plot( true, Graph, GoTerm, Opts ) :-
-	options( stem_type(Stype), Opts ),
-	go_string_graph_stem( Stype, GoTerm, Stem ),
-	wgraph_plot( Graph, [stem(Stem)|Opts] ).
+     options( stem_type(Stype), Opts ),
+     go_string_graph_stem( Stype, GoTerm, Stem ),
+     wgraph_plot( Graph, [stem(Stem)|Opts] ).
 go_string_graph_plot( false, _Graph, _GoTerm, _Opts ).
 
 % go_string_graph_stem( null, _GoTerm, ). % fixme: breaks backward compatibility
@@ -94,20 +94,20 @@ go_string_graph_stem( go_name, GoTermIn, Stem ) :-
         % atom_concat('GO:',GoTermIn,GoTerm)
     ),
     ( atom(GoBasename) -> atom_number(GoBasename,GoNum); GoNum = GoBasename ),
-	( gont_homs_gont_gonm( GoNum, GoName ) -> true ; atom_concat(go,GoBasename,GoName) ),
-	% atom_codes( GoName, GoNameCs ),
-	% codes_replace( GoNameCs, 0' , 0'_, GoUnderCs ),
-	% atom_codes( GoUnder, GoUnderCs ),
-	% atomic_list_concat( [go,GoUnder], '_', Stem ).
+     ( gont_homs_gont_gonm( GoNum, GoName ) -> true ; atom_concat(go,GoBasename,GoName) ),
+     % atom_codes( GoName, GoNameCs ),
+     % codes_replace( GoNameCs, 0' , 0'_, GoUnderCs ),
+     % atom_codes( GoUnder, GoUnderCs ),
+     % atomic_list_concat( [go,GoUnder], '_', Stem ).
     atomic_list_concat( PartsA, '/', GoName ),
     atomic_list_concat( PartsA, '_OR_', OredGoName ),
     atomic_list_concat( PartsB, ' ', OredGoName ),
     atomic_list_concat( PartsB, '_', Stem ).  % removing go_ prefix
 
-	
+     
 codes_replace( [], _C, _W, [] ).
 codes_replace( [C|T], C, W, [W|R] ) :-
-	!,
-	codes_replace( T, C, W, R ).
+     !,
+     codes_replace( T, C, W, R ).
 codes_replace( [H|T], C, W, [H|R] ) :-
-	codes_replace( T, C, W, R ).
+     codes_replace( T, C, W, R ).
