@@ -90,7 +90,11 @@ bio_symbols_map_mouse( ncbi, Values, Symbs ) :-
                          Symbs ).
 bio_symbols_map_pig( ensg, EnsGs, Symbs ) :-
      % fixme: check if there are alternatives+additionals ?
-     findall( Symb, (member(EnsG,EnsGs),ense_suss_ensg_symb(EnsG,Symb)), Symbs ).
+     % fixme: can we remove the -KV malarky from all 4 organisms- see upstream ?
+     findall( SymbTerm, ( member(Valu,EnsGs),
+                          (Valu = EnsG-V -> SymbTerm=Symb-V; Valu=Ens, SymbTerm=Symb ),
+                          ense_suss_ensg_symb(EnsG,Symb)
+                        ), Symbs ).
      
 
 bio_symbols_values( Ids, Ids, _Opts ) :-
