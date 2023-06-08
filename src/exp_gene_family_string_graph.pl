@@ -118,11 +118,11 @@ exp_wgraph_plot( [], Fam, _WGOpts ) :-
     !,
     debug( ba(info), 'Empty string graph removed, for family: ~w', [Fam] ).
 % exp_wgraph_plot( [Node], Fam, _WGOpts ) :-
-    % atomic(Node),
-    % !,
-    % debug( exp_gene_family_string_graph, 'Single node graph removed, for family: ~w', [Fam] ).
+     % atomic(Node),
+     % !,
+     % debug( exp_gene_family_string_graph, 'Single node graph removed, for family: ~w', [Fam] ).
 exp_wgraph_plot( Graph, _Fam, Opts ) :-
-    wgraph_plot( Graph, Opts ).
+     wgraph_plot( Graph, Opts ).
 
 string_graph_single_edge_weight_adjusted( Graph, Adjusted ) :-
     findall( W, member(_X-_Y:W,Graph), AllWs ),

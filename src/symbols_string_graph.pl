@@ -2,14 +2,14 @@
 :- lib(ordsets).
 
 symbols_string_graph_defaults( Defs ) :-
-	Defs = [
+     Defs = [
                 cohese(max),
-				include_orphans(true),
+                    include_orphans(true),
                 org(hs),
-				minw(500),
-				sort_pairs(true),
-				sort_graph(true)
-	].
+                    minw(500),
+                    sort_pairs(true),
+                    sort_graph(true)
+     ].
 
 /** symbols_string_graph( +Symbols, -Graph, +Opts ).
 
@@ -73,29 +73,30 @@ GraphLen = 117.
 
 */
 symbols_string_graph( Symbols, Graph, Args ) :-
-    Self = symbols_string_graph,
-	options_append( symbols_string_graph, Args, Opts ),
-	options( org(OrgIn), Opts ),
+     Self = symbols_string_graph,
+     options_append( symbols_string_graph, Args, Opts ),
+     options( org(OrgIn), Opts ),
      bio_db_organism( OrgIn, Org ),
-	options( minw(MinW), Opts ),
-	options( sort_pairs(Sprs), Opts ),
-	findall( SymbA-SymbB:W, ( member(Symb1,Symbols),
-						 member(Symb2,Symbols),
-						 Symb1 @< Symb2,
-						 % Symb1 \== Symb2,
-						 symbols_string_graph_pair(Sprs,Symb1,Symb2,SymbA,SymbB),
+     options( minw(MinW), Opts ),
+     options( sort_pairs(Sprs), Opts ),
+     write( symbols(Symbols) ), nl,
+     findall( SymbA-SymbB:W, ( member(Symb1,Symbols),
+                               member(Symb2,Symbols),
+                               Symb1 @< Symb2,
+                               % Symb1 \== Symb2,
+                               symbols_string_graph_pair(Sprs,Symb1,Symb2,SymbA,SymbB),
                                bio_db:org_edge_strg_symb_ord(Org,Symb1,Symb2,W),
-						 MinW =< W
-					    ),
-					    		Pgraph ),
+                               MinW =< W
+                             ),
+                                   Pgraph ),
+    write( pgraph(Pgraph) ), nl,
     options( cohese(Coh), Opts ),
     symbols_string_graph_cohese( Coh, Pgraph, Wgraph ),
-	options( include_orphans(IncO), Opts ),
-	symbols_string_graph_orphans( IncO, Wgraph, Symbols, Ograph ),
+    options( include_orphans(IncO), Opts ),
+    symbols_string_graph_orphans( IncO, Wgraph, Symbols, Ograph ),
     debuc( Self, length, [string_edges_found,edges_cohesed,w_orphans]/[Pgraph,Wgraph,Ograph] ),
-    % ( (Wgraph==[],Ograph=[_]) -> trace; true ),
-	options( sort_graph(Sgra), Opts ),
-	symbols_string_graph_sort( Sgra, Ograph, Graph ).
+    options( sort_graph(Sgra), Opts ),
+    symbols_string_graph_sort( Sgra, Ograph, Graph ).
 
 symbols_string_graph_cohese( false, Vgraph, Wgraph ) :-
     Vgraph = Wgraph.
@@ -108,15 +109,15 @@ symbols_string_graph_cohese( max, Vgraph, Wgraph ) :-
         Vgraph = Wgraph
     ).
 symbols_string_graph_cohese( min, Vgraph, Wgraph ) :-
-    throw( unimplemented_cohesion_method(min) ),
-    sort( Vgraph, Ograph ),
-    symbols_string_graph_cohese_min( Ograph, Wgraph ).
+     throw( unimplemented_cohesion_method(min) ),
+     sort( Vgraph, Ograph ),
+     symbols_string_graph_cohese_min( Ograph, Wgraph ).
 symbols_string_graph_cohese( umax, Vgraph, Wgraph ) :-
-    throw( unimplemented_cohesion_method(umax) ),
-    symbols_string_graph_cohese_umax( Vgraph, Wgraph ).
+     throw( unimplemented_cohesion_method(umax) ),
+     symbols_string_graph_cohese_umax( Vgraph, Wgraph ).
 symbols_string_graph_cohese( umin, Vgraph, Wgraph ) :-
-    throw( unimplemented_cohesion_method(umin) ),
-    symbols_string_graph_cohese_umin( Vgraph, Wgraph ).
+     throw( unimplemented_cohesion_method(umin) ),
+     symbols_string_graph_cohese_umin( Vgraph, Wgraph ).
 
 symbols_string_graph_cohese_max( [], Csa, Csb, Cwe, [Csa-Csb:Cwe] ).
 symbols_string_graph_cohese_max( [Hsa-Hsb:Hwe|T], Csa, Csb, Cwe, Wgraph ) :-
@@ -137,33 +138,33 @@ symbols_string_graph_cohese_max( [Hsa-Hsb:Hwe|T], Csa, Csb, Cwe, Wgraph ) :-
     symbols_string_graph_cohese_max( T, Nsa, Nsb, Nwe, Tgraph ).
 
 symbols_string_graph_pair( true, Symb1, Symb2, SymbA, SymbB ) :-
-	sort( [Symb1,Symb2], [SymbA,SymbB] ).
+     sort( [Symb1,Symb2], [SymbA,SymbB] ).
 symbols_string_graph_pair( false, Symb1, Symb2, Symb1, Symb2 ).
 
 symbols_string_graph_sort( true, Ograph, Graph ) :-
-	sort( Ograph, Graph ).
+     sort( Ograph, Graph ).
 symbols_string_graph_sort( false, Graph, Graph ).
 
 symbols_string_graph_orphans( true, Wgraph, Symbols, Ograph ) :-
-	string_add_vertices_1( Symbols, Wgraph, Ograph ).
+     string_add_vertices_1( Symbols, Wgraph, Ograph ).
 symbols_string_graph_orphans( false, Wgraph, _Symbols, Wgraph ).
 
 string_add_vertices_1( [], New, New ).
 string_add_vertices_1( [V|Vs], G, New ) :-
-	atomic( V ),
-	string_has_vertex( G, V ),
-	!,
-	string_add_vertices_1( Vs, G, New ).
+     atomic( V ),
+     string_has_vertex( G, V ),
+     !,
+     string_add_vertices_1( Vs, G, New ).
 string_add_vertices_1( [V|Vs], G, New ) :-
-	atomic( V ),
-	ord_add_element( G, V, G1 ),
-	string_add_vertices_1( Vs, G1, New ).
+     atomic( V ),
+     ord_add_element( G, V, G1 ),
+     string_add_vertices_1( Vs, G1, New ).
 
 string_has_vertex( [E|_Es], V ) :-
-	string_edge_has_vertex( E, V ),
-	!.
+     string_edge_has_vertex( E, V ),
+     !.
 string_has_vertex( [_E|Es], V ) :-
-	string_has_vertex( Es, V ).
+     string_has_vertex( Es, V ).
 
 string_edge_has_vertex( V, V ).
 string_edge_has_vertex( V-_:_, V ).
