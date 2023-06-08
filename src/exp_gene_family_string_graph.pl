@@ -56,7 +56,7 @@ Opts
   * wgraph_plot_defs(WgDefs=[])
     options for wgraph_plot/2 (added to the end, after any defaults from Self)
 
-These Options are passed to a number of other pack predicates.
+These Options are passed to a number of other pack predicates: bio_diffex/4, bio_symbols/3, symbols_string_graph/3 and, selectively, wgraph_plot/2.
 
 See [pack('bio_analytics/examples/bt.pl')].
 
@@ -75,10 +75,9 @@ Produces file: bt.svg
 
 @author nicos angelopoulos
 @version  0.1 2019/4/15
-@see bio_diffex/4
+@see bio_diffex/4, bio_symbols/3, symbols_string_graph/3
 @see gene_family/3
 @see wgraph_plot/2
-@see bio_symbols/3
 
 */
 exp_gene_family_string_graph( Exp, Fam, StGraph, Args ) :-
