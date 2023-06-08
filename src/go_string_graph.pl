@@ -13,11 +13,11 @@ Plot the STRING graph of all the Symbols in a GO term.
 
 The Graph can be saved via options to wgraph_plot/2.
 
-Opts are passed to symbols_string_graph/3, go_term_symbols/3 and wgraph_plot/2.
+Opts are passed to symbols_string_graph/3 and wgraph_plot/2.
 
 Opts 
 
-  * organism(Org=hs)
+  * org(Org=hs)
     organism for the operation
   * plot(Plot=false)
     whether to plot the graph
