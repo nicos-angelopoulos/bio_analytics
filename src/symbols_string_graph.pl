@@ -79,7 +79,6 @@ symbols_string_graph( Symbols, Graph, Args ) :-
      bio_db_organism( OrgIn, Org ),
      options( minw(MinW), Opts ),
      options( sort_pairs(Sprs), Opts ),
-     write( symbols(Symbols) ), nl,
      findall( SymbA-SymbB:W, ( member(Symb1,Symbols),
                                member(Symb2,Symbols),
                                Symb1 @< Symb2,
