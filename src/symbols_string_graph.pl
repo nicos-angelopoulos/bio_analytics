@@ -37,8 +37,15 @@ Opts
     set to false for not sorting the results
 
 ==
-?- Got = 'GO:0043552', gene_family( Got, hs, Symbs ), length( Symbs, SymbsLen ),
+?- Got = 'GO:0043552', gene_family( Got, Symbs, true ), length( Symbs, SymbsLen ),
    symbols_string_graph(Symbs, Graph, true ), length( Graph, GraphLen ).
+
+Got = 'GO:0043552',
+Symbs = ['AGAP2', 'AMBRA1', 'ATG14', 'CCL19', 'CCL21', 'CCR7', 'CD19', 'CDC42', 'EPHA8'|...],
+SymbsLen = 32,
+Graph = ['AGAP2', 'CDC42', 'EPHA8', 'NOD2', 'P2RY12', 'TNFAIP8L3', 'AMBRA1'-'ATG14':995, ... - ... : 994, ... : ...|...],
+GraphLen = 94.
+
 
 Got = 'GO:0043552',
 Symbs = ['AMBRA1', 'ATG14', 'CCL19', 'CCL21', 'CCR7'|...],
