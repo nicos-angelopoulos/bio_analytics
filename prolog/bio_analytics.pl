@@ -75,7 +75,6 @@ bio_analytics_version( 0:6:0, date(2023,6,6) ).
 :- lib(source(bio_analytics), homonyms(true)).
 
 :- lib(gene_family/3).
-:- lib(go_org_symbol/3).
 :- lib(go_org_symbols/3).
 :- lib(go_symbols_reach/3).
 :- lib(go_string_graph/3).
