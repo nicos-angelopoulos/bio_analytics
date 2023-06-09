@@ -72,7 +72,7 @@ bio_symbol_map_chicken( ncbi, Ncbi, Symb ) :-
      cgnc_galg_cgnc_symb( Cgnc, Symb ).
 
 bio_symbol_map_human( ncbi, Ncbi, Symb ) :-
-     % fixme: additionals ?
+     % fixme: check against going via HGNC id, also any alts ?
      hgnc_homs_ncbi_symb( Ncbi, Symb ).
 bio_symbol_map_human( hgnc, Hgnc, Symb ) :-
      hgnc_homs_hgnc_ncbi( Hgnc, Symb ).
