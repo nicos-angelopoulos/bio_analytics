@@ -5,8 +5,8 @@ Gets the symbols belonging to a GO term.
 
 ==
 ?- go_org_symbols( 'GO:0000375', human, Symbs ), length( Symbs, Len ).
-Symbs = ['BCAS2', 'DBR1', 'DDX23', 'GEMIN2', 'KHSRP'|...],
-Len = 26.
+Symbs = ['SCAF11', 'SLU7', 'SRSF10', 'WDR83', 'DBR1', 'MPHOSPH10', 'PRPF4', 'PRPF6', 'SF3B1'|...],
+Len = 25.
 
 ?- go_org_symbols( 'GO:0000375', mouse, Symbs ), length( Symbs, Len ).
 Symbs = ['Dbr1', 'Rbm17', 'Rnu4atac', 'Rnu6atac', 'Scaf11', 'Sf3a2', 'Slu7', 'Srrm1', 'Srsf10'|...],
