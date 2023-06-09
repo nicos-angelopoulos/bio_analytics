@@ -9,12 +9,14 @@ Symbs = ['SCAF11', 'SLU7', 'SRSF10', 'WDR83', 'DBR1', 'MPHOSPH10', 'PRPF4', 'PRP
 Len = 25.
 
 ?- go_org_symbols( 'GO:0000375', mouse, Symbs ), length( Symbs, Len ).
-Symbs = ['Dbr1', 'Rbm17', 'Rnu4atac', 'Rnu6atac', 'Scaf11', 'Sf3a2', 'Slu7', 'Srrm1', 'Srsf10'|...],
-Len = 10.
+Symbs = ['Rnu4atac', 'Rnu6atac', 'Srrm1', 'Sf3a2', 'Srsf10', 'Dbr1', 'Scaf11', 'Slu7', 'Srsf10'|...],
+Len = 11.
 
 ?- go_org_symbols( 375, human, Symbs ), length( Symbs, Len ).
-Symbs = ['BCAS2', 'DBR1', 'DDX23', 'GEMIN2', 'KHSRP', 'LSM1', 'MPHOSPH10', 'PRPF3', 'PRPF4'|...],
-Len = 26.
+Symbs = ['SCAF11', 'SLU7', 'SRSF10', 'WDR83', 'DBR1', 'MPHOSPH10', 'PRPF4', 'PRPF6', 'SF3B1'|...],
+Len = 25.
+
+?- go_org_symbols( 375, chicken, Symbs ), length( Symbs, Len ).
 ==
 
 @author nicos angelopoulos

@@ -263,7 +263,7 @@ go_org_symbol( Alias, Go, Symb ) :-
     go_id( Go, _, Gi ),
     go_org_symbol_1( Org, Gi, Symb ).
     
-go_org_symbol_1( gallus, Gi, Symb ) :-
+go_org_symbol_1( chicken,Gi, Symb ) :-
     gont_galg_gont_symb( Gi, _Rel, _Evid, Symb ).
 go_org_symbol_1(  human, Gi, Symb ) :-
     gont_homs_gont_symb( Gi, _Evid, Symb ).
