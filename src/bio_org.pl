@@ -29,6 +29,9 @@ bio_org.
 Convert Org-anism specific values of IdTkn ids to Symbols.
 
 ==
+?- bio_symbols_map(human, ensg, [114783], Hymbs).
+
+
 ?- bio_symbols_map(pig, ensg, [], Pymbs).
 
 ?- bio_symbols_map(mouse, symb, [], Mymbs).
