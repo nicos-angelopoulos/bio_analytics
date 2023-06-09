@@ -42,7 +42,7 @@ bio_conductor_annot_dbi_org(  human, "Hs", "Homo sapiens").
 bio_conductor_annot_dbi_org(  mouse, "Mm", "Mus musculus").
 bio_conductor_annot_dbi_org(    pig, "Ss", "Sus scrofa").
 
-% maybe we should move the pred bewo to a bio_conductor_annot_dbi.pl source file ?
+% maybe we should move the pred below to a bio_conductor_annot_dbi.pl source file ?
 
 /** bio_conductor_annot_dbi_org_lib(+DbiToken, +EnsLoaded, -Lib).
 
@@ -53,6 +53,10 @@ When EnsLoaded is grounded to =|true\= the library is loaded.
 ==
 ?- bio_conductor_annot_dbi_org(pig, PigTkn, PigOrg), 
    bio_conductor_annot_dbi_org_lib(PigTkn, false, PigDbiLib ).
+      
+PigTkn = "Ss",
+PigOrg = "Sus scrofa",
+PigDbiLib = "org.Ss.eg.db".
 ==
 
 @author nicos angelopoulos
@@ -69,3 +73,5 @@ bio_conductor_annot_dbi_org_lib( DbiTkn, Load, DbiLib ) :-
                ;
                true
      ).
+
+
