@@ -46,7 +46,7 @@ bio_conductor_annot_dbi_org(    pig, "Ss", "Sus scrofa").
 
 /** bio_conductor_annot_dbi_org_lib(+DbiToken, +EnsLoaded, -Lib).
 
-From a annotation dbi, organism token, construct Dbi library and possibly load it.
+From an annotation dbi organism token, construct Dbi library string and possibly load it.
 
 When EnsLoaded is grounded to =|true\= the library is loaded. 
 
