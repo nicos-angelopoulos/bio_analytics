@@ -51,8 +51,8 @@ bio_symbols_map( gallus, IdTkn, Values, Symbs ) :-
           ;
           maplist( bio_symbol_chicken(IdTkn), Values, Symbs )
      ).
-bio_symbols_map( hs, ExpId, Values, Symbs ) :-
-     bio_symbols_map_hs( ExpId, Values, Symbs ).
+bio_symbols_map( human, ExpId, Values, Symbs ) :-
+     bio_symbols_map_human( ExpId, Values, Symbs ).
 bio_symbols_map( mouse, ExpId, Values, Symbs ) :-
      bio_symbols_map_mouse( ExpId, Values, Symbs ).
 bio_symbols_map( pig, ExpId, Values, Symbs ) :-
