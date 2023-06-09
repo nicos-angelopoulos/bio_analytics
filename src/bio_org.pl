@@ -1,15 +1,20 @@
 
 /** bio_org.
 
-Bio analytics supports a number of organism specific predicates.
+Bio analytics supports a number of organism specific internal predicates.
 
-This is a doc predicate to provide access to them:
+This is a doc predicate listing them:
   * bio_conductor_annot_dbi_org/3
+  * bio_symbols_map/4
 
 Examples
 ==
 ?- bio_org.
 ==
+
+These predicates are collated in a single source file src/bio_org.pl so that 
+in future it is easier to add new organisms and more extensive support for 
+existing organisms.
 
 @author nicos angelopoulos
 @version  0.1 2023/06/07
@@ -19,8 +24,21 @@ Examples
 bio_org.
 
 
-% fixme: this should go to src/bio_org.pl 
-% 
+/** bio_symbols_map( +Org, +IdTkn, +Values, -Symbols ).
+
+Convert Org-anism specific values of IdTkn ids to Symbols.
+
+==
+?- bio_symbols_map(pig, ensg, [], Pymbs).
+
+?- bio_symbols_map(mouse, symb, [], Mymbs).
+==
+
+@author nicos angelopoulos
+@version  0:2 2023/06/09, added pig, moved to this file and added doc.
+@see bio_symbols/3
+
+*/
 bio_symbols_map( _Org, symb, Values, Symbs ) :-
      !,
      Values = Symbs.
