@@ -21,6 +21,8 @@ Symbs = ['DBR1'],
 Len = 1.
 
 ?- go_org_symbols( 375, pig, Symbs ), length( Symbs, Len ).
+Symbs = [],
+Len = 0.
 ==
 
 @author nicos angelopoulos
