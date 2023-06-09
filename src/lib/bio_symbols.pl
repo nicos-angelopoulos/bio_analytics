@@ -24,7 +24,7 @@ Opts
     the type of the experimental gene ids for the organism. default depends on Org, but currently all map to symb
 
 ==
-?- hgnc_homs_hgnc_ncbi( 19295, Ncbi ), bio_symbols( [Ncbi], Symbs, org_exp_id(Ncbi) ).
+?- hgnc_homs_hgnc_ncbi( 19295, Ncbi ), bio_symbols( [Ncbi], Symbs, org_exp_id(ncbi) ).
 Ncbi = 114783,
 Symbs = ['LMTK3'].
 ==

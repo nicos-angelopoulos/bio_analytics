@@ -45,8 +45,12 @@ Convert Org-anism specific values of IdTkn ids to Symbols.
 bio_symbols_map( _Org, symb, Values, Symbs ) :-
      !,
      Values = Symbs.
-bio_symbols_map( gallus, ExpId, Values, Symbs ) :-
-     bio_symbols_map_gallus( ExpId, Values, Symbs ).
+bio_symbols_map( gallus, IdTkn, Values, Symbs ) :-
+     ( Values = [_-_|_] -> 
+          maplist( bio_symbol_paired_chicken(IdTkn), Values, Symbs )
+          ;
+          maplist( bio_symbol_chicken(IdTkn), Values, Symbs )
+     ).
 bio_symbols_map( hs, ExpId, Values, Symbs ) :-
      bio_symbols_map_hs( ExpId, Values, Symbs ).
 bio_symbols_map( mouse, ExpId, Values, Symbs ) :-
@@ -54,39 +58,34 @@ bio_symbols_map( mouse, ExpId, Values, Symbs ) :-
 bio_symbols_map( pig, ExpId, Values, Symbs ) :-
      bio_symbols_map_pig( ExpId, Values, Symbs ).
 
-bio_symbols_map_gallus( ncbi, Values, Symbs ) :-
-     % fixme: additionals ?
-     findall( SymbTerm, ( 
-                      member(Valu,Values),
-                      ( Valu = Ncbi-V -> SymbTerm=Symb-V; Valu = Ncbi, SymbTerm=Symb ),
-                      cgnc_galg_cgnc_ncbi(Cgnc,Ncbi),
-                      cgnc_galg_cgnc_symb(Cgnc,Symb)
-                    ),
-                         Symbs ).
+bio_symbol_paired_chicken( FromId, Id-Val, Symb-Val ) :-
+     bio_symbol_map_chicken( FromId, Id, Symb ).
+bio_symbol_paired_human( FromId, Id-Val, Symb-Val ) :-
+     bio_symbol_map_human( FromId, Id, Symb ).
+bio_symbol_paired_mouse( FromId, Id-Val, Symb-Val ) :-
+     bio_symbol_map_mouse( FromId, Id, Symb ).
+bio_symbol_paired_pig( FromId, Id-Val, Symb-Val ) :-
+     bio_symbol_map_pig( FromId, Id, Symb ).
 
-bio_symbols_map_hs( ncbi, Values, Symbs ) :-
+bio_symbol_map_chicken( ncbi, Ncbi, Symb ) :-
+     cgnc_galg_cgnc_ncbi( Cgnc, Ncbi ),
+     cgnc_galg_cgnc_symb( Cgnc, Symb ).
+
+bio_symbol_map_human( ncbi, Ncbi, Symb ) :-
      % fixme: additionals ?
-     findall( SymbTerm, ( member(Valu,Values),
-                      ( Valu = Ncbi-V -> SymbTerm=Symb-V; Valu = Ncbi, SymbTerm=Symb ),
-                      hgnc_homs_hgnc_ncbi(Cgnc,Ncbi),
-                      hgnc_homs_hgnc_symb(Cgnc,Symb)
-                    ),
-                         Symbs ).
-bio_symbols_map_mouse( ncbi, Values, Symbs ) :-
+     hgnc_homs_hgnc_ncbi( Hgnc, Ncbi ),
+     hgnc_homs_hgnc_symb( Hgnc, Symb ).
+bio_symbol_map_human( hgnc, Hgnc, Symb ) :-
+     hgnc_homs_hgnc_ncbi( Hgnc, Symb ).
+
+bio_symbols_map_mouse( ncbi, Ncbi, Symb ) :-
      % fixme: additionals ?
-     findall( SymbTerm, ( member(Valu,Values),
-                      ( Valu = Ncbi-V -> SymbTerm=Symb-V; Valu = Ncbi, SymbTerm=Symb ),
-                      mgim_musm_mgim_ncbi(Cgnc,Ncbi),
-                      mgim_musm_mgim_symb(Cgnc,Symb)
-                    ),
-                         Symbs ).
-bio_symbols_map_pig( ensg, EnsGs, Symbs ) :-
+     mgim_musm_mgim_ncbi( Mgim, Ncbi ),
+     mgim_musm_mgim_symb( Mgim, Symb ).
+
+bio_symbols_map_pig( ensg, EnsG, Symb ) :-
      % fixme: check if there are alternatives+additionals ?
-     % fixme: can we remove the -KV malarky from all 4 organisms- see upstream ?
-     findall( SymbTerm, ( member(Valu,EnsGs),
-                          (Valu = EnsG-V -> SymbTerm=Symb-V; Valu=EnsG, SymbTerm=Symb ),
-                          ense_suss_ensg_symb(EnsG,Symb)
-                        ), Symbs ).
+     ense_suss_ensg_symb( EnsG, Symb ).
  
 
 /** bio_conductor_annot_dbi_org(+Org, -DbiToken, -DbiOrg).
