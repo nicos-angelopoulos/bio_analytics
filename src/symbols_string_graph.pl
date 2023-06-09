@@ -4,11 +4,11 @@
 symbols_string_graph_defaults( Defs ) :-
      Defs = [
                 cohese(max),
-                    include_orphans(true),
+                include_orphans(true),
                 org(hs),
-                    minw(500),
-                    sort_pairs(true),
-                    sort_graph(true)
+                minw(500),
+                sort_pairs(true),
+                sort_graph(true)
      ].
 
 /** symbols_string_graph( +Symbols, -Graph, +Opts ).
@@ -25,7 +25,7 @@ Opts
     set to false to exclude orphans from Graph
 
   * org(Org=hs)
-    which organism do the gene symbols come from
+    which organism do the gene symbols come from, via bio_db_organism/2
 
   * minw(500)
     minimum weight (0 =< x =< 999) - not checked
