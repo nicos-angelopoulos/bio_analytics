@@ -45,7 +45,7 @@ bio_symbols( Vect, Symbs, Args ) :-
      ( bio_symbols_map( Org, ExpId, Vals, Symbs ) ->
           true
           ;
-          throw( bio_symbols(3,possible_exp_id_missing(Org,ExpId)) )
+          throw( bio_symbols(3,exp_id_missing_for_org(ExpId,Org)) )
      ).
 
 % fixme: this should go to src/bio_org.pl 
