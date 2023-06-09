@@ -73,8 +73,7 @@ bio_symbol_map_chicken( ncbi, Ncbi, Symb ) :-
 
 bio_symbol_map_human( ncbi, Ncbi, Symb ) :-
      % fixme: additionals ?
-     hgnc_homs_hgnc_ncbi( Hgnc, Ncbi ),
-     hgnc_homs_hgnc_symb( Hgnc, Symb ).
+     hgnc_homs_ncbi_symb( Ncbi, Symb ).
 bio_symbol_map_human( hgnc, Hgnc, Symb ) :-
      hgnc_homs_hgnc_ncbi( Hgnc, Symb ).
 
