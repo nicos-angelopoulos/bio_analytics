@@ -48,55 +48,6 @@ bio_symbols( Vect, Symbs, Args ) :-
           throw( bio_symbols(3,exp_id_missing_for_org(ExpId,Org)) )
      ).
 
-% fixme: this should go to src/bio_org.pl 
-% 
-bio_symbols_map( _Org, symb, Values, Symbs ) :-
-     !,
-     Values = Symbs.
-bio_symbols_map( gallus, ExpId, Values, Symbs ) :-
-     bio_symbols_map_gallus( ExpId, Values, Symbs ).
-bio_symbols_map( hs, ExpId, Values, Symbs ) :-
-     bio_symbols_map_hs( ExpId, Values, Symbs ).
-bio_symbols_map( mouse, ExpId, Values, Symbs ) :-
-     bio_symbols_map_mouse( ExpId, Values, Symbs ).
-bio_symbols_map( pig, ExpId, Values, Symbs ) :-
-     bio_symbols_map_pig( ExpId, Values, Symbs ).
-
-bio_symbols_map_gallus( ncbi, Values, Symbs ) :-
-     % fixme: additionals ?
-     findall( SymbTerm, ( 
-                      member(Valu,Values),
-                      ( Valu = Ncbi-V -> SymbTerm=Symb-V; Valu = Ncbi, SymbTerm=Symb ),
-                      cgnc_galg_cgnc_ncbi(Cgnc,Ncbi),
-                      cgnc_galg_cgnc_symb(Cgnc,Symb)
-                    ),
-                         Symbs ).
-
-bio_symbols_map_hs( ncbi, Values, Symbs ) :-
-     % fixme: additionals ?
-     findall( SymbTerm, ( member(Valu,Values),
-                      ( Valu = Ncbi-V -> SymbTerm=Symb-V; Valu = Ncbi, SymbTerm=Symb ),
-                      hgnc_homs_hgnc_ncbi(Cgnc,Ncbi),
-                      hgnc_homs_hgnc_symb(Cgnc,Symb)
-                    ),
-                         Symbs ).
-bio_symbols_map_mouse( ncbi, Values, Symbs ) :-
-     % fixme: additionals ?
-     findall( SymbTerm, ( member(Valu,Values),
-                      ( Valu = Ncbi-V -> SymbTerm=Symb-V; Valu = Ncbi, SymbTerm=Symb ),
-                      mgim_musm_mgim_ncbi(Cgnc,Ncbi),
-                      mgim_musm_mgim_symb(Cgnc,Symb)
-                    ),
-                         Symbs ).
-bio_symbols_map_pig( ensg, EnsGs, Symbs ) :-
-     % fixme: check if there are alternatives+additionals ?
-     % fixme: can we remove the -KV malarky from all 4 organisms- see upstream ?
-     findall( SymbTerm, ( member(Valu,EnsGs),
-                          (Valu = EnsG-V -> SymbTerm=Symb-V; Valu=EnsG, SymbTerm=Symb ),
-                          ense_suss_ensg_symb(EnsG,Symb)
-                        ), Symbs ).
-     
-
 bio_symbols_values( Ids, Ids, _Opts ) :-
      is_list( Ids ),
      !.
