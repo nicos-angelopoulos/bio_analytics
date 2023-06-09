@@ -25,7 +25,7 @@ existing organisms.
 bio_org.
 
 
-/** bio_symbols_map( +Org, +FromID, +Values, -Symbols ).
+/** bio_symbols_map(+Org, +FromID, +Values, -Symbols).
 
 Convert Org-anism specific values of FromID ids to Symbols.
 
@@ -137,13 +137,15 @@ OnlyinNcbi = 235.
 ?- findall( Symb1-Symb2, (ncbi_homs_ensg_ncbi(EnsG,Ncbi), bio_analytics:bio_symbol_map_human(ensg, EnsG, Symb1),hgnc_homs_ncbi_symb(Ncbi,Symb2),Symb1 \== Symb2), Pairs ), length(Pairs,Diffs).
 Pairs = ['ST7'-'ST7-OT3', 'DUSP13B'-'DUSP13A', 'RHOXF1'-'LINC01402', 'SMIM8'-'LINC01590', 'PDE10A'-'LINC00473', 'USP9Y'-'TTTY15', 'ASB3'-'GPR75-ASB3', 'FAM98A'-'RASGRP3-AS1', ... - ...|...],
 Diffs = 61.
+*/
 
 bio_symbol_map_human( ncbi, Ncbi, Symb ) :-
      % prefer HGNC, there are some clashes...
      ( hgnc_homs_ncbi_symb(Ncbi,Symb) ->
           true
           ;
-
+          ncbi_homs_ensg_ncbi( EnsG, Ncbi ), 
+          bio_symbol_map_human( ensg, EnsG, Symb )
      ).
 bio_symbol_map_human( hgnc, Hgnc, Symb ) :-
      hgnc_homs_hgnc_ncbi( Hgnc, Symb ).
