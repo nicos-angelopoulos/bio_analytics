@@ -17,6 +17,10 @@ Symbs = ['SCAF11', 'SLU7', 'SRSF10', 'WDR83', 'DBR1', 'MPHOSPH10', 'PRPF4', 'PRP
 Len = 25.
 
 ?- go_org_symbols( 375, chicken, Symbs ), length( Symbs, Len ).
+Symbs = ['DBR1'],
+Len = 1.
+
+?- go_org_symbols( 375, pig, Symbs ), length( Symbs, Len ).
 ==
 
 @author nicos angelopoulos
