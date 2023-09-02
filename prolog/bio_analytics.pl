@@ -1,6 +1,7 @@
 :- module( bio_analytics, [
                 bio_analytics_version/2,          % -Vers, -Date
                 bio_diffex/4,                     % +Exp, -DEs -NDEs, +Opts
+                bio_p_adjust/3,                   % +Obj, +AdjObj, +Opts
                 bio_symbols/3,                    % +Vect, -Symbs, +Opts
                 bio_volcano_plot/2,               % +Mtx, Opts
                 exp_gene_family_string_graph/4,   % +Exp, +Fam, -Graph, +Opts
@@ -87,4 +88,5 @@ bio_analytics_version( 0:6:0, date(2023,6,6) ).
 :- lib(bio_volcano_plot/2).
 :- lib(bio_symbols/3).
 :- lib(bio_org/0).
+:- lib(bio_p_adjust/3).
 :- lib(end(bio_analytics), homonyms(true)).

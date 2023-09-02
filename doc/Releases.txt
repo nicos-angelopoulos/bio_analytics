@@ -4,8 +4,9 @@
 TBD
       20.09.06    EXAMPLES: mouse examples
 
-
-0.7   23.06.07    OPTS:     added options to gene_family/3 (now passed to go_symbols/3)
+0.7
+      23.09.02    IFACE:    bio_p_adjust/3
+      23.06.07    OPTS:     added options to gene_family/3 (now passed to go_symbols/3)
                   IFACE:    bio_org/0 (doc) + bio_conductor_annot_dbi_org/3
                   OPTS:     go_frame(Gf=bioc_ann_dbi) - which changes the default
 
