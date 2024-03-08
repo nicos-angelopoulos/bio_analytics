@@ -269,9 +269,11 @@ go_over_universe_exp( mouse, DeGids, NDEPrs, Univ ) :-
     append( DeGids, NDEMgims, Mgims ),
     sort( Mgims, Univ ).
 
+go_over_universe_exp( chicken, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
+     go_over_universe_exp( gallus, ExpIdTkn, DEGids, NDEPrs, Univ ).
 go_over_universe_exp( gallus, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
     findall( Id, member(Id-_,NDEPrs), Ids ),
-    org_go_over_std_gene_ids_gallus( ExpIdTkn, Ids, NDGids ),
+    org_go_over_std_gene_ids_chicken( ExpIdTkn, Ids, NDGids ),
     append( DEGids, NDGids, ExpGids ),
     % fixme: we can add tests here, that the ids exist in some table ? 
     bio_list_sort_ne( ExpGids, Univ ).
@@ -294,9 +296,9 @@ go_over_universe_exp( pig, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
     % fixme: we can add tests here, that the ids exist in some table ? 
     bio_list_sort_ne( ExpGids, Univ ).
 
-go_over_universe_go_exp( gallus, ExpId, DEGids, NDEPrs, Univ ) :-
+go_over_universe_go_exp( chicken, ExpId, DEGids, NDEPrs, Univ ) :-
     findall( Id, member(Id-_,NDEPrs), Ids ),
-    org_go_over_std_gene_ids_gallus( ExpId, Ids, NDGids ),
+    org_go_over_std_gene_ids_chicken( ExpId, Ids, NDGids ),
     append( DEGids, NDGids, ExpGids ),
     findall( ExpGid,( member(ExpGid,ExpGids),   % these are std form, here NCBI Gene ids
                       cgnc_galg_cgnc_ncbi(Cgnc,ExpGid),
@@ -348,14 +350,14 @@ org_go_over_std_gene_ids( Org, Gtyp, Set, Gids ) :-
      ).
 
 % it should for ensg and symb
-org_go_over_std_gene_ids_gallus( ncbi, Set, Gids ) :-
-     !,  % not really needes as it called from an if() above
+org_go_over_std_gene_ids_chicken( ncbi, Set, Gids ) :-
+     !,  % not really needed as it called from an if() above
      Set = Gids.
-org_go_over_std_gene_ids_gallus( cgnc, Set, Gids ) :-
+org_go_over_std_gene_ids_chicken( cgnc, Set, Gids ) :-
      !,
     findall( Ncbi,  (member(Cgnc,Set),cgnc_galg_cgnc_ncbi(Cgnc,Ncbi)), Ncbis ),
     sort( Ncbis, Gids ).
-org_go_over_std_gene_ids_gallus( SrcT, Set, Gids ) :-
+org_go_over_std_gene_ids_chicken( SrcT, Set, Gids ) :-
     atom_concat( cgnc_galg_cgnc_, SrcT, SrcNm ),
     findall( Ncbi,  (member(SrcG,Set),call(SrcNm,Cgnc,SrcG),cgnc_galg_cgnc_ncbi(Cgnc,Ncbi)), Ncbis ),
     sort( Ncbis, Gids ).
