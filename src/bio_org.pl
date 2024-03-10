@@ -83,8 +83,12 @@ bio_symbol_paired_pig( FromID, Id-Val, Symb-Val ) :-
      bio_symbol_map_pig( FromID, Id, Symb ).
 
 bio_symbol_map_chicken( ncbi, Ncbi, Symb ) :-
-     cgnc_galg_cgnc_ncbi( Cgnc, Ncbi ),
-     cgnc_galg_cgnc_symb( Cgnc, Symb ).
+     ( ( cgnc_galg_cgnc_ncbi(Cgnc,Ncbi),
+         cgnc_galg_cgnc_symb(Cgnc,Symb) ) ->
+                         true
+                         ;
+                         Symb = Ncbi
+     ).
 
 /*
 23.06.09

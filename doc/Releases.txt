@@ -6,6 +6,7 @@ TBD
 
 0.7
       24.03.10    ADDED:    chicken in bio_symbols_map/3, (gallus kept as an alias)
+                  ADDED:    ensure bio_symbol_map_chicken/3 does not fail
       24.03.08    FIXED:    org_go_over_std_gene_ids_gallus/3 -> _chicken/3
       23.09.02    IFACE:    bio_p_adjust/3
       23.06.07    OPTS:     added options to gene_family/3 (now passed to go_symbols/3)
