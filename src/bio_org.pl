@@ -47,6 +47,8 @@ bio_symbols_map( _Org, symb, Values, Symbs ) :-
      !,
      Values = Symbs.
 bio_symbols_map( gallus, FromID, Values, Symbs ) :-
+     bio_symbols_map( chicken, FromID, Values, Symbs ).
+bio_symbols_map( chicken, FromID, Values, Symbs ) :-
      ( Values = [_-_|_] -> 
           maplist( bio_symbol_paired_chicken(FromID), Values, Symbs )
           ;
