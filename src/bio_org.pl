@@ -155,7 +155,6 @@ bio_symbol_map_human( ncbi, Ncbi, Symb ) :-
      ).
 bio_symbol_map_human( hgnc, Hgnc, Symb ) :-
      hgnc_homs_hgnc_ncbi( Hgnc, Symb ).
-
 bio_symbols_map_mouse( ncbi, Ncbi, Symb ) :-
      % fixme: additionals ?
      mgim_musm_mgim_ncbi( Mgim, Ncbi ),
