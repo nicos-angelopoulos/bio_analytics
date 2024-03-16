@@ -125,8 +125,7 @@ exp_go_over( CsvF, GoOver, Args ) :-
     exp_go_over_bioc_deps,  % make sure deps are loaded
     debug_call( exp_go_over, options, Self/Opts ),
     bio_diffex( CsvF, DEPrs, NDEPrs, Opts ),
-    options( org(OrgPrv), Opts ),
-    bio_db_organism( OrgPrv, Org ),
+    bio_db_org_in_opts( Org, Opts ),
     kv_decompose( DEPrs, DEGenes, _ ),
     debug_call( exp_go_over, length, de_pairs/DEPrs ),
     bio_list_sort_ne( DEGenes, DEGenesSet ),
