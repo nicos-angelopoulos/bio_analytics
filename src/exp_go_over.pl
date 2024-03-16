@@ -67,7 +67,7 @@ Opts
     * experiment(Exp)
       all identifiers in the experiment
     * ontology(Onto)
-      not implemented yet. like OG above, but only include this Ontology branch
+      not implemented yet. like Go above, but only include this Ontology branch
 
 Options are also passed to bio_diffex/4.
 
