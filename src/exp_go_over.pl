@@ -61,7 +61,7 @@ Opts
     * genome(Gen)
       all gene identifiers in relevant map predicates
     * go(Go)
-      all gene identifies appearing in any ontology
+      all gene identifiers appearing in any ontology
     * go_exp(GoExp)
       gene ontology genes that appear in experiment
     * experiment(Exp)
