@@ -2,6 +2,7 @@
 :- lib(promise(exp_go_over_bioc_deps/0,call(exp_go_over_bioc_deps_load))).
 :- lib(stoics_lib:kv_decompose/3).
 
+:- lib(org_gid_map/3).
 :- lib(bio_list_sort_ne/2).
 
 exp_go_over_bioc_deps_load :-
@@ -11,10 +12,10 @@ exp_go_over_bioc_deps_load :-
      lib(suggests(bioc("Category"))),  % installed with GOstats
      assert(exp_go_over_bioc_deps).
 
-exp_go_exp_id_default(chicken, symb).
-exp_go_exp_id_default(  human, symb ).
-exp_go_exp_id_default(  mouse, symb).
-exp_go_exp_id_default(    pig, ensg).
+exp_go_gid_default(chicken, symb).
+exp_go_gid_default(  human, symb ).
+exp_go_gid_default(  mouse, symb).
+exp_go_gid_default(    pig, ensg).
 
 exp_go_over_defaults( Args, Defs ) :-
     Defs = [
@@ -22,14 +23,15 @@ exp_go_over_defaults( Args, Defs ) :-
                 go_frame(bioc_ann_dbi),
                 go_over_pv_cut(0.05),
                 org(hs),
-                org_exp_id(ExpId),
+                % org_exp_id(ExpId),
+                gid(Gid),
                 stem(go_over),
                 to_file(false),
                 universe(go_exp)
     ],
     ( (memberchk(org(InOrg),Args),ground(InOrg)) -> true; InOrg=hs ),
     bio_db_organism( InOrg, BdOrg ),
-    exp_go_exp_id_default( BdOrg, ExpId ).
+    exp_go_gid_default( BdOrg, Gid ).
 
 /** exp_go_over( +CsvF, -GoOver, +Opts ).
 
@@ -52,8 +54,9 @@ Opts
     p value filter for the results
   * org(Org=hs)
     one of bio_db_organism/2 first argument values
-  * org_exp_id(OrgExpId)
+  * gid(OrgExpId)
     the type of the experimental gene ids for the organism. The default depends on Org, but currently all map to symb.
+    (Caution, this used to be org_exp_id(OrgExpId).)
   * stem(Stem=false)
     stem for output csv file. When false, use basename of CsvF.
   * to_file(ToF=false)
@@ -131,8 +134,7 @@ exp_go_over( CsvF, GoOver, Args ) :-
     bio_list_sort_ne( DEGenes, DEGenesSet ),
     debug_call( exp_go_over, length, de_genes_set/DEGenesSet ),
     bio_list_sort_ne( DEGenes, DEGenesSet ),
-    options( org_exp_id(ExpId), Opts ),
-    org_go_over_std_gene_ids( Org, ExpId, DEGenesSet, Gids ),
+    org_gid_map( DEGenesSet, Gids, Opts ).
     debug_call( exp_go_over, length, gids/Gids ),
     options( go_frame(GfOpt), Opts ), 
     go_over_frame( GfOpt, Org, goFrameData, GofOrg ),
@@ -337,60 +339,6 @@ go_over_universe_go_exp( pig, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
                         Ncbis 
            ),
     bio_list_sort_ne( Ncbis, Univ ).
-
-org_go_over_std_gene_ids( Org, Gtyp, Set, Gids ) :-
-     at_con( [org_go_over_std_gene_ids,Org], '_', Pname ),
-     ( call(Pname,Gtyp,Set,Gids) ->
-          true
-          ;
-          throw( go_over(could_not_convert(org(Org),gene_id_type(Gtyp))) )
-     ).
-
-% it should for ensg and symb
-org_go_over_std_gene_ids_chicken( ncbi, Set, Gids ) :-
-     !,  % not really needed as it called from an if() above
-     Set = Gids.
-org_go_over_std_gene_ids_chicken( cgnc, Set, Gids ) :-
-     !,
-    findall( Ncbi,  (member(Cgnc,Set),cgnc_galg_cgnc_ncbi(Cgnc,Ncbi)), Ncbis ),
-    sort( Ncbis, Gids ).
-org_go_over_std_gene_ids_chicken( SrcT, Set, Gids ) :-
-    atom_concat( cgnc_galg_cgnc_, SrcT, SrcNm ),
-    findall( Ncbi,  (member(SrcG,Set),call(SrcNm,Cgnc,SrcG),cgnc_galg_cgnc_ncbi(Cgnc,Ncbi)), Ncbis ),
-    sort( Ncbis, Gids ).
-% fixme: add more rules... for hs and mouse
-org_go_over_std_gene_ids_hs( ncbi, Set, Gids ) :-
-    sort( Set, Gids ).
-org_go_over_std_gene_ids_hs( symb, Set, Gids ) :-
-    findall( Ncbi,  (member(Symb,Set),hgnc_homs_symb_ncbi(Symb,Ncbi)), Ncbis ),
-    sort( Ncbis, Gids ).
-org_go_over_std_gene_ids_mouse( ncbi, Set, Gids ) :-
-    findall( Mgim,  (member(Ncbi,Set),mgim_musm_mgim_ncbi(Mgim,Ncbi)), Mgims ),
-    sort( Mgims, Gids ).
-org_go_over_std_gene_ids_mouse( symb, Set, Gids ) :-
-    findall( Mgim,  (member(Symb,Set),mgim_musm_mgim_symb(Mgim,Symb)), Mgims ),
-    sort( Mgims, Gids ).
-org_go_over_std_gene_ids_pig( ncbi, Set, Gids ) :-
-     !,
-     Set = Gids.
-org_go_over_std_gene_ids_pig( ensg, Set, Gids ) :-
-     !,
-     findall( Ncbi, (member(EnsG,Set), org_go_over_std_gene_ids_pig_ensg_ncbi(EnsG,Ncbi)), Ncbis ),
-     sort( Ncbis, Gids ).
-org_go_over_std_gene_ids_pig( symb, Set, Gids ) :-
-     !,
-     findall( Ncbi, ( member(Symb,Set), 
-                      ense_suss_ensg_symb(EnsG,Symb),
-                      org_go_over_std_gene_ids_pig_ensg_ncbi(EnsG,Ncbi)
-                    ), 
-                                             Ncbis ),
-     sort( Ncbis, Gids ).
-
-org_go_over_std_gene_ids_pig_ensg_ncbi( EnsG, Ncbi ) :-
-     ncbi_suss_ensg_ncbi( EnsG, Ncbi ),
-     !.
-% org_go_over_std_gene_ids_pig_ensg_ncbi( EnsG, Ncbi ) :-
-% fixme: there might be other ways? although ense seems to pick up symbols from ense
 
 go_over_frame( bioc_ann_dbi, Org, GoFra, DbiOrg ) :-
      bio_conductor_annot_dbi_org( Org, DbiTkn, DbiOrg ),
