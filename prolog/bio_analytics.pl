@@ -69,6 +69,7 @@ bio_analytics_version( 0:6:0, date(2023,6,6) ).
 :- lib(os_lib).
 :- lib(options).
 :- lib(debug_call).
+:- lib(pack_errors).
 :- lib(promise(wgraph_plot/2,wgraph)).
 
 :- debug_call:debug(ba(info)).
@@ -90,3 +91,6 @@ bio_analytics_version( 0:6:0, date(2023,6,6) ).
 :- lib(bio_org/0).
 :- lib(bio_p_adjust/3).
 :- lib(end(bio_analytics), homonyms(true)).
+
+pack_errors:message( cannot_map_gids(Org,Gid,Gto) ) -->
+    ['Predicate org_gid_map/3 could not convert gids from: ~w to: ~w in organism: ~w.'-[Org,Gid,Gto]].
