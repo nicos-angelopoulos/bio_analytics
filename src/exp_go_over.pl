@@ -2,6 +2,8 @@
 :- lib(promise(exp_go_over_bioc_deps/0,call(exp_go_over_bioc_deps_load))).
 :- lib(stoics_lib:kv_decompose/3).
 
+:- lib(bio_list_sort_ne/2).
+
 exp_go_over_bioc_deps_load :-
      lib(suggests(bioc("GOstats"))),
      lib(suggests(bioc("GSEABase"))),  % installed with GOstats
@@ -169,10 +171,6 @@ exp_go_over( CsvF, GoOver, Args ) :-
     dfOver <- dfOver[*,c(1,2,8,3,4,5,6,7)],
     Use = use(Self,GoAspect,UnivOpt,PvCut),
     exp_go_over_return( GoOver, dfOver, CsvF, Use, Opts ).
-
-bio_list_sort_ne( List, SetNe ) :-
-    sort( List, Set ),
-    ( select('',Set,SetNe) -> true; Set = SetNe ).
 
 exp_go_over_return( GoOver, DfOveR, _CsvF, _Use, Opts ) :-
     var( GoOver ),
