@@ -51,7 +51,7 @@ Opts
   * go_over_pv_cut(PvCut=0.05)
     p value filter for the results
   * org(Org=hs)
-    one of bio_db_organism/2 first argument values (hs, gallus and mouse for now)
+    one of bio_db_organism/2 first argument values
   * org_exp_id(OrgExpId)
     the type of the experimental gene ids for the organism. The default depends on Org, but currently all map to symb.
   * stem(Stem=false)
