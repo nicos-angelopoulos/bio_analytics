@@ -1,14 +1,17 @@
 
+:- lib(stoics_lib:known/1).
 :- lib(stoics_lib:kv_decompose/3).
 
 exp_reac_over_defaults( Args, Defs ) :-
                     Defs = [ debug(true),
                              org(hs),
                              gid(ncbi),
-                             gid_to(Gto)
+                             gid_to(Gto),
+                             universe(experiment)
                            ],
-          % exp_reac_gid_default( Org, Gid ),
-          options_return( gid_to(Gto), Args, [pack(bio_analytics),pred(ex_reac_over/3),option(gid_to(Gto))] ).
+     % exp_reac_gid_default( Org, Gid ),
+     options_return( gid_to(Gto), Args, [pack(bio_analytics),pred(ex_reac_over/3),option(gid_to(Gto))] ),
+     Gto = ncbi.
 
 /** exp_reac_over(+Etx, +Opts).
 
@@ -38,7 +41,7 @@ Examples
 @see bio_diffex/4
 @see mtx/2
 @see bio_db_organism/2
-@see org_id_map/3
+@see org_gid_map/3
 
 */
 
@@ -49,8 +52,8 @@ exp_reac_over( Etx, ReOver, Args ) :-
      debuc( Self, length, [dx,non_dx]/[DEPrs,NDPrs] ),
      kv_decompose( DEPrs, DEs, _ ),
      kv_decompose( NDPrs, NDs, _ ),
-     org_id_map( DEs, IdsDE, Opts ),
-     org_id_map( NDs, IdsND, Opts ),
+     org_gid_map( DEs, IdsDE, Opts ),
+     org_gid_map( NDs, IdsND, Opts ),
      length( IdsDE, DENof ),
      % length( IdsND, NDNof ),
      % find all background genes in any reactome pathway = Pop
