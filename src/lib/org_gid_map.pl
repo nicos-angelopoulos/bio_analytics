@@ -6,7 +6,11 @@
 
 org_gid_map_defaults( Def ) :-
      Defs = [  debug(true),
-               org(hs)
+               gid(hgnc),
+               org(hs),
+               % gid_to(_),
+               rmv_e(true),
+               sort(true)
             ].
 
 /** org_gid_map(+Ids,-ToIds,+Opts).
@@ -22,6 +26,10 @@ Opts
     gene id source database
   * gid_to(ToDb)
     gene id target database
+  * rmv_e(RmvE=true)
+    whether to remove '' entries
+  * sort(Sort=true)
+    whether to sort the results
 
 Examples
 ==
@@ -47,7 +55,20 @@ org_gid_map( Ids, ToIds, Args ) :-
      bio_db_org_in_opts( Org, Opts ),
      options( gid(Gid), Opts ),
      options( gid_to(Gto), Opts ),
-     org_gid_map_to( Org, Gid, Gto, Ids, ToIds ).
+     org_gid_map_to( Org, Gid, Gto, Ids, ToIdsPrv ),
+     options( sort(Sort), Opts ),
+     options( rmv_e(RmvE), Opts ),
+     once( org_gid_map_clean( Sort, RmvE, ToIdsPrv, ToIds ) ).
+
+org_gid_map_clean( true, true, ToIdsPrv, ToIds ) :-
+     sort( ToIdsPrv, Ord ),
+     ( select('',Ord,ToIds) -> true; ToIds = Ord ).
+org_gid_map_clean( true, false, ToIdsPrv, ToIds ) :-
+     sort( ToIdsPrv, ToIds ).
+org_gid_map_clean( false, true, ToIdsPrv, ToIds ) :-
+     findall( Id, (member(Id,ToIdsPrv),Id \== ''), ToIds ).
+org_gid_map_clean( false, false, ToIdsPrv, ToIds ) :-
+     ToIdsPrv = ToIds.
 
 org_gid_map_to( Org, Gid, Gto, Ids, ToIds ) :-
      Gto == Gid,

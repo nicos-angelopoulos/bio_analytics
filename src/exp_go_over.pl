@@ -12,10 +12,10 @@ exp_go_over_bioc_deps_load :-
      lib(suggests(bioc("Category"))),  % installed with GOstats
      assert(exp_go_over_bioc_deps).
 
-exp_go_gid_default(chicken, symb).
-exp_go_gid_default(  human, symb ).
-exp_go_gid_default(  mouse, symb).
-exp_go_gid_default(    pig, ensg).
+exp_go_gid_default(chicken, symb, ncbi).
+exp_go_gid_default(  human, symb, ncbi).
+exp_go_gid_default(  mouse, symb, mgim).
+exp_go_gid_default(    pig, ensg, ncbi).
 
 exp_go_over_defaults( Args, Defs ) :-
     Defs = [
@@ -25,13 +25,22 @@ exp_go_over_defaults( Args, Defs ) :-
                 org(hs),
                 % org_exp_id(ExpId),
                 gid(Gid),
+                gid_to(Gto),
                 stem(go_over),
                 to_file(false),
                 universe(go_exp)
     ],
     ( (memberchk(org(InOrg),Args),ground(InOrg)) -> true; InOrg=hs ),
     bio_db_organism( InOrg, BdOrg ),
-    exp_go_gid_default( BdOrg, Gid ).
+    exp_go_gid_default( BdOrg, Gid, Gto ),
+    ( memberchk(gid_to(ArgsGto),Args) ->
+          ( ArgsGto = Gto -> 
+                 true
+                 ;
+                 throw( only_use_opt_as_ret(gid_to), [pack(bio_analytcs),pred(ex_go_over/3)] )
+               
+          )
+    ).
 
 /** exp_go_over( +CsvF, -GoOver, +Opts ).
 
@@ -134,7 +143,7 @@ exp_go_over( CsvF, GoOver, Args ) :-
     bio_list_sort_ne( DEGenes, DEGenesSet ),
     debug_call( exp_go_over, length, de_genes_set/DEGenesSet ),
     bio_list_sort_ne( DEGenes, DEGenesSet ),
-    org_gid_map( DEGenesSet, Gids, Opts ).
+    org_gid_map( DEGenesSet, Gids, Opts ),
     debug_call( exp_go_over, length, gids/Gids ),
     options( go_frame(GfOpt), Opts ), 
     go_over_frame( GfOpt, Org, goFrameData, GofOrg ),
@@ -143,7 +152,7 @@ exp_go_over( CsvF, GoOver, Args ) :-
     gsc <- 'GeneSetCollection'(goAllFrame, setType = 'GOCollection'() ),
     genes <- Gids,
     options( universe(UnivOpt), Opts ),
-    go_over_universe( UnivOpt, Org, ExpId, Gids, NDEPrs, Univ ),
+    go_over_universe( UnivOpt, Org, Gids, NDEPrs, Univ, Opts ),
     debug_call( exp_go_over, length, universe/Univ ),
     options( go(GoAspect), Opts ),
     universe <- Univ,
@@ -196,7 +205,7 @@ exp_go_over_return( GoOver, DfOveR, CsvF, Use, Opts ) :-
     % <- print( warnings() ),
     debug( Self, 'Wrote: ~p', GoOver ).
 
-%% go_over_universe( +Token, +Org, +ExpIdTkn, +DEGenes, +NDEPrs, -Universe )
+%% go_over_universe( +Token, +Org, +DEGenes, +NDEPrs, -Universe, +Opts )
 %
 % Universe is the list of gene identifiers to be used as universe/background for GOstats.
 %
@@ -205,14 +214,14 @@ exp_go_over_return( GoOver, DfOveR, CsvF, Use, Opts ) :-
 % expressed Symbol-Pvalue pairs.
 % 
 % ExpIdTkn identifies the type of ids coming in in NDEPrs, DEGens, are already in standard form for Org.
-go_over_universe( experiment, Org, ExpId, DeGids, NDEPrs, Univ ) :-
-    go_over_universe_exp( Org, ExpId, DeGids, NDEPrs, Univ ).
-go_over_universe( genome, Org, _ExpId, _DEGids, _NDEPrs, Univ ) :-
+go_over_universe( experiment, Org, DeGids, NDEPrs, Univ, Opts ) :-
+    go_over_universe_exp( Org, DeGids, NDEPrs, Univ, Opts ).
+go_over_universe( genome, Org, _DEGids, _NDEPrs, Univ, _Opts ) :-
     go_over_universe_genome( Org, Univ ).
-go_over_universe( go, Org, _ExpId, _DEGids, _NDEPrs, Univ ) :-
+go_over_universe( go, Org, _DEGids, _NDEPrs, Univ, _Opts ) :-
     go_over_universe_go( Org, Univ ).
-go_over_universe( go_exp, Org, ExpId, DEGids, NDEPrs, Univ ) :-
-    go_over_universe_go_exp( Org, ExpId, DEGids, NDEPrs, Univ ).
+go_over_universe( go_exp, Org, DEGids, NDEPrs, Univ, Opts ) :-
+    go_over_universe_go_exp( Org, DEGids, NDEPrs, Univ, Opts ).
 
 go_over_universe_genome( gallus, Univ ) :-
     findall( Ncbi, cgnc_galg_cgnc_ncbi(_Cgnc,Ncbi), Ncbis ),
@@ -268,36 +277,36 @@ go_over_universe_exp( mouse, DeGids, NDEPrs, Univ ) :-
     append( DeGids, NDEMgims, Mgims ),
     sort( Mgims, Univ ).
 
-go_over_universe_exp( chicken, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
-     go_over_universe_exp( gallus, ExpIdTkn, DEGids, NDEPrs, Univ ).
-go_over_universe_exp( gallus, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
+go_over_universe_exp( chicken, DEGids, NDEPrs, Univ, Opts ) :-
+     go_over_universe_exp( gallus, DEGids, NDEPrs, Univ, Opts ).
+go_over_universe_exp( gallus, DEGids, NDEPrs, Univ, Opts ) :-
     findall( Id, member(Id-_,NDEPrs), Ids ),
-    org_go_over_std_gene_ids_chicken( ExpIdTkn, Ids, NDGids ),
+    org_gid_map( Ids, NDGids, Opts ), 
     append( DEGids, NDGids, ExpGids ),
     % fixme: we can add tests here, that the ids exist in some table ? 
     bio_list_sort_ne( ExpGids, Univ ).
-go_over_universe_exp( hs, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
+go_over_universe_exp( hs, DEGids, NDEPrs, Univ, Opts ) :-
     findall( Id, member(Id-_,NDEPrs), Ids ),
-    org_go_over_std_gene_ids_hs( ExpIdTkn, Ids, NDGids ),
+    org_gid_map( Ids, NDGids, Opts ), 
     append( DEGids, NDGids, ExpGids ),
     % fixme: we can add tests here, that the ids exist in some table ? 
     bio_list_sort_ne( ExpGids, Univ ).
-go_over_universe_exp( mouse, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
+go_over_universe_exp( mouse, DEGids, NDEPrs, Univ, Opts ) :-
     findall( Id, member(Id-_,NDEPrs), Ids ),
-    org_go_over_std_gene_ids_hs( ExpIdTkn, Ids, NDGids ),
+    org_gid_map( Ids, NDGids, Opts ), 
     append( DEGids, NDGids, ExpGids ),
     % fixme: we can add tests here, that the ids exist in some table ? 
     bio_list_sort_ne( ExpGids, Univ ).
-go_over_universe_exp( pig, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
+go_over_universe_exp( pig, DEGids, NDEPrs, Univ, Opts ) :-
     findall( Id, member(Id-_,NDEPrs), Ids ),
-    org_go_over_std_gene_ids_pig( ExpIdTkn, Ids, NDGids ),
+    org_gid_map( Ids, NDGids, Opts ), 
     append( DEGids, NDGids, ExpGids ),
     % fixme: we can add tests here, that the ids exist in some table ? 
     bio_list_sort_ne( ExpGids, Univ ).
 
-go_over_universe_go_exp( chicken, ExpId, DEGids, NDEPrs, Univ ) :-
+go_over_universe_go_exp( chicken, DEGids, NDEPrs, Univ, Opts ) :-
     findall( Id, member(Id-_,NDEPrs), Ids ),
-    org_go_over_std_gene_ids_chicken( ExpId, Ids, NDGids ),
+    org_gid_map( Ids, NDGids, Opts ),
     append( DEGids, NDGids, ExpGids ),
     findall( ExpGid,( member(ExpGid,ExpGids),   % these are std form, here NCBI Gene ids
                       cgnc_galg_cgnc_ncbi(Cgnc,ExpGid),
@@ -306,9 +315,9 @@ go_over_universe_go_exp( chicken, ExpId, DEGids, NDEPrs, Univ ) :-
                     ),
                          List ),
     bio_list_sort_ne( List, Univ ).
-go_over_universe_go_exp( hs, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
+go_over_universe_go_exp( hs, DEGids, NDEPrs, Univ, Opts ) :-
     findall( Id, member(Id-_,NDEPrs), Ids ),
-    org_go_over_std_gene_ids_hs( ExpIdTkn, Ids, NDGids ),
+    org_gid_map( Ids, NDGids, Opts ),
     append( DEGids, NDGids, ExpGids ),
     findall( Ncbi,  ( member(Ncbi,ExpGids),
                       hgnc_homs_symb_ncbi(Symb,Ncbi),
@@ -316,9 +325,9 @@ go_over_universe_go_exp( hs, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
                     ),
                          List ),
     bio_list_sort_ne( List, Univ ).
-go_over_universe_go_exp( mouse, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
+go_over_universe_go_exp( mouse, DEGids, NDEPrs, Univ, Opts ) :-
     findall( Id, member(Id-_,NDEPrs), Ids ),
-    org_go_over_std_gene_ids_hs( ExpIdTkn, Ids, NDGids ),
+    org_gid_map( Ids, NDGids, Opts ),
     append( DEGids, NDGids, ExpGids ),
     findall( Mgim,  ( member(Mgim,ExpGids),
                       mgim_musm_mgim_symb(Mgim,Symb),
@@ -326,10 +335,10 @@ go_over_universe_go_exp( mouse, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
                     ), 
                          List ),
     bio_list_sort_ne( List, Univ ).
-go_over_universe_go_exp( pig, ExpIdTkn, DEGids, NDEPrs, Univ ) :-
+go_over_universe_go_exp( pig, DEGids, NDEPrs, Univ, Opts ) :-
     % fixme: we should be using go_exp probably, because it only comes gont only comes with symbs and unlikely to have a good coverage.
     findall( Id, member(Id-_,NDEPrs), Ids ),
-    org_go_over_std_gene_ids_pig( ExpIdTkn, Ids, NDGids ),
+    org_gid_map( Ids, NDGids, Opts ),
     append( DEGids, NDGids, ExpGids ),
     findall( Ncbi, ( member(Ncbi,ExpGids), 
                      ncbi_suss_ncbi_ensg(Ncbi,EnsG),
