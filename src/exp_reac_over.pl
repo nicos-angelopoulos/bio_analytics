@@ -122,7 +122,6 @@ exp_reac_hygeom( Self, IdsDE, IdsUniv, Func, Okn, UniVNof, ReacDENof, Pway, Row 
      % fixme: use fisher.test() to also test the OddsRatio ? and double check
      % also check dhyper
      Pv <- phyper(InPwayDEsNof,InPwayUniVsNof,NotInPwayUniVsNof,ReacDENof,'lower.tail'='FALSE'),
-     debuc( Self, 'Got: ~w', [Pv <- phyper(InPwayDEsNof,InPwayUniVsNof,NotInPwayUniVsNof,ReacDENof,'lower.tail'='FALSE')] ),
      at_con( [reac,Okn,reap,repn], '_', RecnFnc ),
      RecnG =.. [RecnFnc,Pway,Pwnm],
      call( RecnG ),
