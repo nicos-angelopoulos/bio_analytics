@@ -127,7 +127,7 @@ exp_reac_over_universe_ids( experiment, _Self, Fun, IdsDE, IdsND, IdsUniv ) :-
      % findall( Ncbi, ((member(Id,IdsDE);member(Id,IdsND)),reac_homs_ncbi_reap(Ncbi,_,_Reap)), NcbisL ),
      % all the experimental ids that participate in at least 1 pathway
      Goal =.. [Fun,Ncbi,_,_],
-     findall( Ncbi, ((member(Id,IdsDE);member(Id,IdsND)),Goal), NcbisL ),
+     findall( Ncbi, ((member(Ncbi,IdsDE);member(Ncbi,IdsND)),Goal), NcbisL ),
      sort( IdsUniv, NcbisL ).
 exp_reac_over_universe_ids( reac, _Self, Func, _IdsDE, _IdsND, IdsUniv ) :-
      Goal =.. [Func,Ncbi,_,_],
