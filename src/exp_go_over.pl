@@ -63,9 +63,11 @@ Opts
     p value filter for the results
   * org(Org=hs)
     one of bio_db_organism/2 first argument values
-  * gid(OrgExpId)
-    the type of the experimental gene ids for the organism. The default depends on Org, but currently all map to symb.
+  * gid(Gid)
+    the type of the experimental gene ids for the organism. The default depends on Org, most take symb, apart for pig which takes ensg
     (Caution, this used to be org_exp_id(OrgExpId).)
+  * gid_to(GidTo)
+    returns the db type for gene ids used in underlying call, mostly ncbi, apart for mouse where it is mgim
   * stem(Stem=false)
     stem for output csv file. When false, use basename of CsvF.
   * to_file(ToF=false)
