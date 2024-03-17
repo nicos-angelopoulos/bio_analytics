@@ -83,7 +83,7 @@ org_gid_map_to( Org, Gid, Gto, Ids, ToIds ) :-
      org_gid_map_1( Org, Gid, Gto, [Ids], [ToIds] ),
      !.
 org_gid_map_to( Org, Gid, Gto, _Ids, _ToIds ) :-
-     throw( cannot_map_gids(Org,Gid,Gto) ).
+     throw( cannot_map_gids(Org,Gid,Gto), [pack(bio_analytics),pred(org_gid_map/3)] ).
 
 org_gid_map_1( chicken, Gid, Gto, Ids, ToIds ) :-
      org_gid_map_galg( Gid, Gto, Ids, ToIds ).
