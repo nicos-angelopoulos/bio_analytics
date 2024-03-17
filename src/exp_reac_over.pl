@@ -141,6 +141,6 @@ exp_reac_over_universe_ids( reac, _Self, Func, _IdsDE, _IdsND, IdsUniv ) :-
      sort( NcbisL, IdsUniv ).
 
 exp_reac_over_ncbi_reactome( Ncbis, Func, IdsUniv ) :-
-     Goal =.. [Fun,Ncbi,_,_],
+     Goal =.. [Func,Ncbi,_,_],
      findall( Ncbi, (member(Ncbi,Ncbis),Goal), NcbisL ),
      sort( NcbisL, IdsUniv ).
