@@ -94,6 +94,7 @@ org_gid_map_1( mouse, Gid, Gto, Ids, ToIds ) :-
 org_gid_map_1( pig, Gid, Gto, Ids, ToIds ) :-
      org_gid_map_suss( Gid, Gto, Ids, ToIds ).
 
+% fixme: add ensg -> ncbi, from ifitm project
 org_gid_map_galg( cgnc, ncbi, Ids, ToIds ) :-
     findall( Ncbi,  (member(Cgnc,Ids),cgnc_galg_cgnc_ncbi(Cgnc,Ncbi)), ToIds ).
 % org_go_over_std_gene_ids_chicken( SrcT, Set, Gids ) :-

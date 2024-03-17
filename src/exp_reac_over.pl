@@ -1,16 +1,13 @@
 
 :- lib(stoics_lib:kv_decompose/3).
 
-exp_reac_gid_default
-
 exp_reac_over_defaults( Args, Defs ) :-
                     Defs = [ debug(true),
                              org(hs),
-                             gid(Gid),
+                             gid(ncbi),
                              gid_to(Gto)
                            ],
-          ( memberchk(org(Org),Args)->true; Org=hs ),
-          exp_reac_gid_default( Org, Gid ),
+          % exp_reac_gid_default( Org, Gid ),
           options_return( gid_to(Gto), Args, [pack(bio_analytics),pred(ex_reac_over/3),option(gid_to(Gto))] ).
 
 /** exp_reac_over(+Etx, +Opts).
@@ -57,21 +54,34 @@ exp_reac_over( Etx, ReOver, Args ) :-
      length( IdsDE, DENof ),
      % length( IdsND, NDNof ),
      % find all background genes in any reactome pathway = Pop
+     bio_db_org_in_opts( _Org, [org_tkn(Okn)|Opts] ),
      options( universe(Univ), Opts ),
-     known( exp_reac_over_universe_ids(Univ,Self,IdsDE,IdsND,IdsUniv) ),
-     length( IdsUniv, UnivNof ),
+     at_con( [reac,Okn,ncbi,reap], '_', Func ),
+     known( exp_reac_over_universe_ids(Univ,Self,Func,IdsDE,IdsND,IdsUniV) ),
+     length( IdsUniV, UniVNof ),
      % find all reactome pathways that have at least 1 DE product
-     findall( 
-
+     Goal =.. [Func,ADEId,_,APway],
+     findall( APway, (member(ADEId,IdsDE),Goal), PwaysL ),
+     sort( Pways, PwaysL ),
+     maplist( exp_reac_hygeom(IdsDE,IdsUniV,Func,Okn,UniVNof,DENof), Pways, ReOverRows ),
+      /* 
       for each pathway 
           find DE genes in pathway (PathDENof)
           find background genes in pathway (PathBkNof)
           <- phyper(PathDENof,PathBkNof,Pop - PathBkNof,DENof,lower.tail='FALSE')
-
+     */
+     Hdr = row(reactome,'p.value',expected,count,size,pathway),
+     % "GOMFID","Pvalue","adj.pvalue","OddsRatio","ExpCount","Count","Size","Term"
+     exp_reac_over_return( [Hdr|ReOverRows], ReOver, Etx ),
      debuc( Self, end, true ).
 
+exp_reac_over_return( Rtx, ReOver, _Etx ) :-
+     ground( ReOver ),
+     !,
+     mtx( ReOver, Rtx ).
+
 /*   ?-
-        reac_galg_reap_repn(Reap,Repn), 
+        reac_galg_reap_repn(Reap,Repn),
         findall(Gene,reac_galg_ncbi_reap(Gene,_,Reap),Genes), 
         sort(Genes,Unes), length(Unes,Len), 
         write( Repn:Len), nl, 
@@ -88,11 +98,35 @@ exp_reac_over( Etx, ReOver, Args ) :-
        ?- Ph <- phyper(62,1998,5260-1998,131-62,lower.tail='FALSE').
        Ph = 1.3718295741097734e-20.
         
+"GOMFID","Pvalue","adj.pvalue","OddsRatio","ExpCount","Count","Size","Term"
+
 */
 
-exp_reac_over_universe_ids( experiment, Self, IdsDE, IdsND, IdsUniv ) :-
-     findall( Ncbi, ((member(Id,IdsDE);member(Id,IdsND)),reac_homs_ncbi_reap(Ncbi,_,_Reap)), NcbisL ),
-     sort( IdsUniv, NcbisL ),
-exp_reac_over_universe_ids( reac, IdsDE, IdsND, IdsUniv ) :-
-     findall( Ncbi, reac_homs_ncbi_reap(Ncbi,_,Reap), NcbisL ),
-     sort( IdsUniv, NcbisL ),
+exp_reac_hygeom( IdsDE, IdsUniv, Func, Okn, UniVNof, DENof, Pway, Row ) :-
+     GoalDE =.. [Func,InPwayDE,_,Pway],
+     findall( InPwayDE, (member(InPwayDE,IdsDE),GoalDE), InPwayDEs ),
+     GoalUniv =.. [Func,InPwayUniv,_,Pway],
+     findall( InPwayUniv, (member(InPwayUniv,IdsUniv),GoalUniv), InPwayUniVs ),
+     maplist( length, [InPwayDEs,InPwayUniVs], [InPwayDEsNof,InPwayUniVsNof] ),
+     NotInPwayUniVsNof is UniVNof - InPwayUniVsNof,
+     % fixme: use fisher.test() to also test the OddsRatio ? and double check
+     % also check dhyper
+     Pv <- phyper(InPwayDEsNof,InPwayUniVsNof,NotInPwayUniVsNof,DENof,'lower.tail'='FALSE'),
+     at_con( [reac,Okn,reap,repn], '_', RecnFnc ),
+     RecnG =.. [RecnFnc,Pway,Pwnm],
+     call( RecnG ),
+     Exp is (InPwayUniVsNof * DENof) / UniVNof,
+     Row = row(Pway,Pv,DENof,Exp,InPwayDEsNof,InPwayUniVsNof,Pwnm).
+
+exp_reac_over_universe_ids( experiment, _Self, Fun, IdsDE, IdsND, IdsUniv ) :-
+     % findall( Ncbi, ((member(Id,IdsDE);member(Id,IdsND)),reac_homs_ncbi_reap(Ncbi,_,_Reap)), NcbisL ),
+     % all the experimental ids that participate in at least 1 pathway
+     Goal =.. [Fun,Ncbi,_,_],
+     findall( Ncbi, ((member(Id,IdsDE);member(Id,IdsND)),Goal), NcbisL ),
+     sort( IdsUniv, NcbisL ).
+exp_reac_over_universe_ids( reac, _Self, Func, _IdsDE, _IdsND, IdsUniv ) :-
+     Goal =.. [Func,Ncbi,_,_],
+     % findall( Ncbi, reac_homs_ncbi_reap(Ncbi,_,Reap), NcbisL ),
+     findall( Ncbi, Goal, NcbisL ),
+     sort( IdsUniv, NcbisL ).
+

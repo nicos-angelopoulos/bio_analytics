@@ -91,7 +91,7 @@ bio_analytics_version( 0:6:0, date(2023,6,6) ).
 :- lib(bio_symbols/3).
 :- lib(bio_org/0).
 :- lib(bio_p_adjust/3).
-:- lib(bio_reac_over/3).
+:- lib(exp_reac_over/3).
 :- lib(end(bio_analytics), homonyms(true)).
 
 pack_errors:message( cannot_map_gids(Org,Gid,Gto) ) -->
