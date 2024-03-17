@@ -45,7 +45,7 @@ Examples
 
 */
 
-exp_reac_over( Etx, Args ) :-
+exp_reac_over( Etx, ReOver, Args ) :-
      Self = exp_reac_over,
      options_append( Self, Args, Opts ),
      bio_diffex( Etx, DEPrs, NDPrs, Opts ),
@@ -59,8 +59,10 @@ exp_reac_over( Etx, Args ) :-
      % find all background genes in any reactome pathway = Pop
      options( universe(Univ), Opts ),
      known( exp_reac_over_universe_ids(Univ,Self,IdsDE,IdsND,IdsUniv) ),
+     length( IdsUniv, UnivNof ),
+     % find all reactome pathways that have at least 1 DE product
+     findall( 
 
-     find all reactome pathways
       for each pathway 
           find DE genes in pathway (PathDENof)
           find background genes in pathway (PathBkNof)
@@ -90,7 +92,7 @@ exp_reac_over( Etx, Args ) :-
 
 exp_reac_over_universe_ids( experiment, Self, IdsDE, IdsND, IdsUniv ) :-
      findall( Ncbi, ((member(Id,IdsDE);member(Id,IdsND)),reac_homs_ncbi_reap(Ncbi,_,_Reap)), NcbisL ),
-     sort( Ncbi, NcbisL ),
+     sort( IdsUniv, NcbisL ),
 exp_reac_over_universe_ids( reac, IdsDE, IdsND, IdsUniv ) :-
      findall( Ncbi, reac_homs_ncbi_reap(Ncbi,_,Reap), NcbisL ),
-     sort( Ncbi, NcbisL ),
+     sort( IdsUniv, NcbisL ),

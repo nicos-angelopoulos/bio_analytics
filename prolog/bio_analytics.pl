@@ -5,9 +5,10 @@
                 bio_symbols/3,                    % +Vect, -Symbs, +Opts
                 bio_volcano_plot/2,               % +Mtx, Opts
                 exp_gene_family_string_graph/4,   % +Exp, +Fam, -Graph, +Opts
-                exp_go_over/3,                    % +Exp, NDEs, +Opts
+                exp_go_over/3,                    % +Exp, -GoOver, +Opts
                 exp_go_over_string_graphs/4,      % +Exp, ?GoOver, ?Dir, +Opts
                 exp_go_over_string_graphs_multi/1,% +Opts
+                exp_reac_over/3,                  % +Exp, -ReOver, +Opts
                 gene_family/3,                    % +Alias, -Symbols, +Opts
                 go_org_symbol/3,                  % +Org, +GoT, -Symbol
                 go_org_symbols/3,                 % +Org, +GoT, -Symbols
@@ -90,6 +91,7 @@ bio_analytics_version( 0:6:0, date(2023,6,6) ).
 :- lib(bio_symbols/3).
 :- lib(bio_org/0).
 :- lib(bio_p_adjust/3).
+:- lib(bio_reac_over/3).
 :- lib(end(bio_analytics), homonyms(true)).
 
 pack_errors:message( cannot_map_gids(Org,Gid,Gto) ) -->
