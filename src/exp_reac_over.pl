@@ -1,5 +1,4 @@
 
-:- lib(stoics_lib:known/1).
 :- lib(stoics_lib:kv_decompose/3).
 
 exp_reac_over_defaults( Args, Defs ) :-
@@ -60,12 +59,15 @@ exp_reac_over( Etx, ReOver, Args ) :-
      bio_db_org_in_opts( _Org, [org_tkn(Okn)|Opts] ),
      options( universe(Univ), Opts ),
      at_con( [reac,Okn,ncbi,reap], '_', Func ),
-     known( exp_reac_over_universe_ids(Univ,Self,Func,IdsDE,IdsND,IdsUniV) ),
+     debuc( Self, length, de_ids/IdsDE ),
+     exp_reac_over_universe_ids( Univ, Self, Func, IdsDE, IdsND, IdsUniV ),
+     debuc( Self, length, univ_ids/IdsUniV ),
      length( IdsUniV, UniVNof ),
      % find all reactome pathways that have at least 1 DE product
      Goal =.. [Func,ADEId,_,APway],
      findall( APway, (member(ADEId,IdsDE),Goal), PwaysL ),
      sort( Pways, PwaysL ),
+     debuc( Self, length, pways/Pways ),
      maplist( exp_reac_hygeom(IdsDE,IdsUniV,Func,Okn,UniVNof,DENof), Pways, ReOverRows ),
       /* 
       for each pathway 
