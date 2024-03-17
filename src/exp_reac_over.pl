@@ -28,7 +28,7 @@ Opts
     returns the gene id db token identifier for interrogating the reactome db
     (currently returns ncbi)
   * universe(Univ=experiment)
-    the universe, or background for genes in the statistical test (also: =|reac|=)
+    the universe, or background for genes in the statistical test (also: =|reac(tome)|=)
 
 Examples
 ==
@@ -112,7 +112,7 @@ exp_reac_over_return( Rtx, ReOver, _Etx ) :-
 
 */
 
-exp_reac_hygeom( Self, IdsDE, IdsUniv, Func, Okn, UniVNof, ReacDENof, Pway, Row ) :-
+exp_reac_hygeom( _Self, IdsDE, IdsUniv, Func, Okn, UniVNof, ReacDENof, Pway, Row ) :-
      GoalDE =.. [Func,InPwayDE,_,Pway],
      findall( InPwayDE, (member(InPwayDE,IdsDE),GoalDE), InPwayDEs ),
      GoalUniv =.. [Func,InPwayUniv,_,Pway],
@@ -133,7 +133,9 @@ exp_reac_over_universe_ids( experiment, _Self, Func, IdsDE, IdsND, IdsUniv ) :-
      % all the experimental ids that participate in at least 1 pathway
      append( IdsDE, IdsND, Ids ),
      exp_reac_over_ncbi_reactome( Ids, Func, IdsUniv ).
-exp_reac_over_universe_ids( reac, _Self, Func, _IdsDE, _IdsND, IdsUniv ) :-
+exp_reac_over_universe_ids( reac, Self, Func, IdsDE, IdsND, IdsUniv ) :-
+     exp_reac_over_universe_ids( reactome, Self, Func, IdsDE, IdsND, IdsUniv ).
+exp_reac_over_universe_ids( reactome, _Self, Func, _IdsDE, _IdsND, IdsUniv ) :-
      Goal =.. [Func,Ncbi,_,_],
      % findall( Ncbi, reac_homs_ncbi_reap(Ncbi,_,Reap), NcbisL ),
      findall( Ncbi, Goal, NcbisL ),
