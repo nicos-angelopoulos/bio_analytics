@@ -76,10 +76,12 @@ exp_reac_over( Etx, ReOver, Args ) :-
           <- phyper(PathDENof,PathBkNof,Pop - PathBkNof,DENof,lower.tail='FALSE')
      */
      keysort( ReOverPrs, OrdROPrs ),
-     kv_decompose( OrdROPrs, _OrdPvs, ReOverRows ),
+     kv_decompose( OrdROPrs, OrdPvs, ReOverRows ),
+     OrdQvs <- 'p.adjust'( OrdPvs, method =+'BH' ),
      Hdr = row(reactome,'p.value',expected,count,size,pathway),
+     mtx_column_add [Hdr|ReOverRows], 2, ['adj.pvalue'|OrdQvs], AdjMtx ),
      % "GOMFID","Pvalue","adj.pvalue","OddsRatio","ExpCount","Count","Size","Term"
-     exp_reac_over_return( [Hdr|ReOverRows], ReOver, Etx ),
+     exp_reac_over_return( AdjMtx, ReOver, Etx ),
      debuc( Self, end, true ).
 
 exp_reac_over_return( Rtx, ReOver, _Etx ) :-
