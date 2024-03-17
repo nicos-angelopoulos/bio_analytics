@@ -66,7 +66,7 @@ exp_reac_over( Etx, ReOver, Args ) :-
      % find all reactome pathways that have at least 1 DE product
      Goal =.. [Func,ADEId,_,APway],
      findall( APway, (member(ADEId,IdsDE),Goal), PwaysL ),
-     sort( Pways, PwaysL ),
+     sort( PwaysL, Pways ),
      debuc( Self, length, pways/Pways ),
      maplist( exp_reac_hygeom(IdsDE,IdsUniV,Func,Okn,UniVNof,DENof), Pways, ReOverRows ),
       /* 
