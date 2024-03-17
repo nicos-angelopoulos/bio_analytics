@@ -68,7 +68,7 @@ exp_reac_over( Etx, ReOver, Args ) :-
      findall( APway, (member(ADEId,IdsDE),Goal), PwaysL ),
      sort( PwaysL, Pways ),
      debuc( Self, length, pways/Pways ),
-     maplist( exp_reac_hygeom(IdsDE,IdsUniV,Func,Okn,UniVNof,DENof), Pways, ReOverPrs ),
+     maplist( exp_reac_hygeom(Self,IdsDE,IdsUniV,Func,Okn,UniVNof,DENof), Pways, ReOverPrs ),
       /* 
       for each pathway 
           find DE genes in pathway (PathDENof)
@@ -111,7 +111,7 @@ exp_reac_over_return( Rtx, ReOver, _Etx ) :-
 
 */
 
-exp_reac_hygeom( IdsDE, IdsUniv, Func, Okn, UniVNof, DENof, Pway, Row ) :-
+exp_reac_hygeom( Self, IdsDE, IdsUniv, Func, Okn, UniVNof, DENof, Pway, Row ) :-
      GoalDE =.. [Func,InPwayDE,_,Pway],
      findall( InPwayDE, (member(InPwayDE,IdsDE),GoalDE), InPwayDEs ),
      GoalUniv =.. [Func,InPwayUniv,_,Pway],
@@ -121,6 +121,7 @@ exp_reac_hygeom( IdsDE, IdsUniv, Func, Okn, UniVNof, DENof, Pway, Row ) :-
      % fixme: use fisher.test() to also test the OddsRatio ? and double check
      % also check dhyper
      Pv <- phyper(InPwayDEsNof,InPwayUniVsNof,NotInPwayUniVsNof,DENof,'lower.tail'='FALSE'),
+     debuc( Self, 'Got: ~w', [Pv <- phyper(InPwayDEsNof,InPwayUniVsNof,NotInPwayUniVsNof,DENof,'lower.tail'='FALSE')] ),
      at_con( [reac,Okn,reap,repn], '_', RecnFnc ),
      RecnG =.. [RecnFnc,Pway,Pwnm],
      call( RecnG ),
