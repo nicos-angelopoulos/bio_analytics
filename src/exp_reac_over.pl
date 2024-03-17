@@ -68,7 +68,10 @@ exp_reac_over( Etx, ReOver, Args ) :-
      findall( APway, (member(ADEId,IdsDE),Goal), PwaysL ),
      sort( PwaysL, Pways ),
      debuc( Self, length, pways/Pways ),
-     maplist( exp_reac_hygeom(Self,IdsDE,IdsUniV,Func,Okn,UniVNof,DENof), Pways, ReOverPrs ),
+     exp_reac_over_ncbi_reactome( IdsDE, Func, ReacIdsDE ),
+     length( ReacIdsDE, ReacIdsDENof ),
+     debuc( Self, length, reac_ids_de/ReacIdsDE ),
+     maplist( exp_reac_hygeom(Self,IdsDE,IdsUniV,Func,Okn,UniVNof,ReacIdsDENof), Pways, ReOverPrs ),
       /* 
       for each pathway 
           find DE genes in pathway (PathDENof)
@@ -111,7 +114,7 @@ exp_reac_over_return( Rtx, ReOver, _Etx ) :-
 
 */
 
-exp_reac_hygeom( Self, IdsDE, IdsUniv, Func, Okn, UniVNof, DENof, Pway, Row ) :-
+exp_reac_hygeom( Self, IdsDE, IdsUniv, Func, Okn, UniVNof, ReacDENof, Pway, Row ) :-
      GoalDE =.. [Func,InPwayDE,_,Pway],
      findall( InPwayDE, (member(InPwayDE,IdsDE),GoalDE), InPwayDEs ),
      GoalUniv =.. [Func,InPwayUniv,_,Pway],
@@ -120,23 +123,26 @@ exp_reac_hygeom( Self, IdsDE, IdsUniv, Func, Okn, UniVNof, DENof, Pway, Row ) :-
      NotInPwayUniVsNof is UniVNof - InPwayUniVsNof,
      % fixme: use fisher.test() to also test the OddsRatio ? and double check
      % also check dhyper
-     Pv <- phyper(InPwayDEsNof,InPwayUniVsNof,NotInPwayUniVsNof,DENof,'lower.tail'='FALSE'),
-     debuc( Self, 'Got: ~w', [Pv <- phyper(InPwayDEsNof,InPwayUniVsNof,NotInPwayUniVsNof,DENof,'lower.tail'='FALSE')] ),
+     Pv <- phyper(InPwayDEsNof,InPwayUniVsNof,NotInPwayUniVsNof,ReacDENof,'lower.tail'='FALSE'),
+     debuc( Self, 'Got: ~w', [Pv <- phyper(InPwayDEsNof,InPwayUniVsNof,NotInPwayUniVsNof,ReacDENof,'lower.tail'='FALSE')] ),
      at_con( [reac,Okn,reap,repn], '_', RecnFnc ),
      RecnG =.. [RecnFnc,Pway,Pwnm],
      call( RecnG ),
-     Exp is (InPwayUniVsNof * DENof) / UniVNof,
-     Row = Pv-row(Pway,Pv,DENof,Exp,InPwayDEsNof,InPwayUniVsNof,Pwnm).
+     Exp is (InPwayUniVsNof * ReacDENof) / UniVNof,
+     Row = Pv-row(Pway,Pv,ReacDENof,Exp,InPwayDEsNof,InPwayUniVsNof,Pwnm).
 
-exp_reac_over_universe_ids( experiment, _Self, Fun, IdsDE, IdsND, IdsUniv ) :-
+exp_reac_over_universe_ids( experiment, _Self, Func, IdsDE, IdsND, IdsUniv ) :-
      % findall( Ncbi, ((member(Id,IdsDE);member(Id,IdsND)),reac_homs_ncbi_reap(Ncbi,_,_Reap)), NcbisL ),
      % all the experimental ids that participate in at least 1 pathway
-     Goal =.. [Fun,Ncbi,_,_],
-     findall( Ncbi, ((member(Ncbi,IdsDE);member(Ncbi,IdsND)),Goal), NcbisL ),
-     sort( NcbisL, IdsUniv ).
+     append( IdsDE, IdsND, Ids ),
+     exp_reac_over_ncbi_reactome( Ids, Func, IdsUniv ).
 exp_reac_over_universe_ids( reac, _Self, Func, _IdsDE, _IdsND, IdsUniv ) :-
      Goal =.. [Func,Ncbi,_,_],
      % findall( Ncbi, reac_homs_ncbi_reap(Ncbi,_,Reap), NcbisL ),
      findall( Ncbi, Goal, NcbisL ),
      sort( NcbisL, IdsUniv ).
 
+exp_reac_over_ncbi_reactome( Ncbis, Func, NcbisSubset ) :-
+     Goal =.. [Fun,Ncbi,_,_],
+     findall( Ncbi, (member(Ncbi,Ncbis),Goal), NcbisL ),
+     sort( NcbisL, IdsUniv ).
