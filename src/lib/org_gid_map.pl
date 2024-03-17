@@ -4,7 +4,7 @@
 :- lib(options).
 :- lib(debug_call).
 
-org_gid_map_defaults( Def ) :-
+org_gid_map_defaults( Defs ) :-
      Defs = [  debug(true),
                gid(hgnc),
                org(hs),
@@ -70,13 +70,13 @@ org_gid_map_clean( false, true, ToIdsPrv, ToIds ) :-
 org_gid_map_clean( false, false, ToIdsPrv, ToIds ) :-
      ToIdsPrv = ToIds.
 
-org_gid_map_to( Org, Gid, Gto, Ids, ToIds ) :-
+org_gid_map_to( _Org, Gid, Gto, Ids, ToIds ) :-
      Gto == Gid,
      !,
      ToIds = Ids.
 org_gid_map_to( Org, Gid, Gto, Ids, ToIds ) :-
      is_list( Ids ),
-     org_gid_map_1( Org, Gid, Gto, Ids, ToIdsPrv ),
+     org_gid_map_1( Org, Gid, Gto, Ids, ToIds ),
      !.
 org_gid_map_to( Org, Gid, Gto, Ids, ToIds ) :-
      \+ is_list( Ids ),
