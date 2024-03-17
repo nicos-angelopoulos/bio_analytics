@@ -9,16 +9,9 @@ exp_reac_over_defaults( Args, Defs ) :-
                              gid(Gid),
                              gid_to(Gto)
                            ],
-
           ( memberchk(org(Org),Args)->true; Org=hs ),
           exp_reac_gid_default( Org, Gid ),
-          ( memberchk(gid_to(ArgsGto),Args) ->
-                    ( ArgsGto = Gto -> 
-                         true
-                         ;
-                         throw( only_use_opt_as_ret(gid_to), [pack(bio_analytcs),pred(ex_go_over/3)] )
-                    )
-          ).
+          options_return( gid_to(Gto), Args, [pack(bio_analytics),pred(ex_reac_over/3),option(gid_to(Gto))] ).
 
 /** exp_reac_over(+Etx, +Opts).
 
@@ -33,8 +26,10 @@ Opts
   * gid(Gid)
     the gene id db token identifier for the genes in Etx. Default depends on Org.
   * gid_to(Gto)
-    returns the gene id db token identfier for interrogating the reactome db
+    returns the gene id db token identifier for interrogating the reactome db
     (currently returns ncbi)
+  * universe(Univ=experiment)
+    the universe, or background for genes in the statistical test (also: =|reac|=)
 
 Examples
 ==
@@ -61,7 +56,10 @@ exp_reac_over( Etx, Args ) :-
      org_id_map( NDs, IdsND, Opts ),
      length( IdsDE, DENof ),
      % length( IdsND, NDNof ),
-     find all background genes in any reactome pathway = Pop
+     % find all background genes in any reactome pathway = Pop
+     options( universe(Univ), Opts ),
+     known( exp_reac_over_universe_ids(Univ,Self,IdsDE,IdsND,IdsUniv) ),
+
      find all reactome pathways
       for each pathway 
           find DE genes in pathway (PathDENof)
@@ -89,3 +87,10 @@ exp_reac_over( Etx, Args ) :-
        Ph = 1.3718295741097734e-20.
         
 */
+
+exp_reac_over_universe_ids( experiment, Self, IdsDE, IdsND, IdsUniv ) :-
+     findall( Ncbi, ((member(Id,IdsDE);member(Id,IdsND)),reac_homs_ncbi_reap(Ncbi,_,_Reap)), NcbisL ),
+     sort( Ncbi, NcbisL ),
+exp_reac_over_universe_ids( reac, IdsDE, IdsND, IdsUniv ) :-
+     findall( Ncbi, reac_homs_ncbi_reap(Ncbi,_,Reap), NcbisL ),
+     sort( Ncbi, NcbisL ),

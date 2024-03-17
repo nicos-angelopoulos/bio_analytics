@@ -33,14 +33,7 @@ exp_go_over_defaults( Args, Defs ) :-
     ( (memberchk(org(InOrg),Args),ground(InOrg)) -> true; InOrg=hs ),
     bio_db_organism( InOrg, BdOrg ),
     exp_go_gid_default( BdOrg, Gid, Gto ),
-    ( memberchk(gid_to(ArgsGto),Args) ->
-          ( ArgsGto = Gto -> 
-                 true
-                 ;
-                 throw( only_use_opt_as_ret(gid_to), [pack(bio_analytcs),pred(ex_go_over/3)] )
-               
-          )
-    ).
+    options_return( gid_to(Gto), Args, [pack(bio_analytics),pred(ex_go_over/3),option(gid_to(Gto))] ).
 
 /** exp_go_over( +CsvF, -GoOver, +Opts ).
 
