@@ -68,13 +68,15 @@ exp_reac_over( Etx, ReOver, Args ) :-
      findall( APway, (member(ADEId,IdsDE),Goal), PwaysL ),
      sort( PwaysL, Pways ),
      debuc( Self, length, pways/Pways ),
-     maplist( exp_reac_hygeom(IdsDE,IdsUniV,Func,Okn,UniVNof,DENof), Pways, ReOverRows ),
+     maplist( exp_reac_hygeom(IdsDE,IdsUniV,Func,Okn,UniVNof,DENof), Pways, ReOverPrs ),
       /* 
       for each pathway 
           find DE genes in pathway (PathDENof)
           find background genes in pathway (PathBkNof)
           <- phyper(PathDENof,PathBkNof,Pop - PathBkNof,DENof,lower.tail='FALSE')
      */
+     keysort( ReOverPrs, OrdROPrs ),
+     kv_decompose( OrdROPrs, _OrdPvs, ReOverRows ),
      Hdr = row(reactome,'p.value',expected,count,size,pathway),
      % "GOMFID","Pvalue","adj.pvalue","OddsRatio","ExpCount","Count","Size","Term"
      exp_reac_over_return( [Hdr|ReOverRows], ReOver, Etx ),
@@ -121,7 +123,7 @@ exp_reac_hygeom( IdsDE, IdsUniv, Func, Okn, UniVNof, DENof, Pway, Row ) :-
      RecnG =.. [RecnFnc,Pway,Pwnm],
      call( RecnG ),
      Exp is (InPwayUniVsNof * DENof) / UniVNof,
-     Row = row(Pway,Pv,DENof,Exp,InPwayDEsNof,InPwayUniVsNof,Pwnm).
+     Row = Pv-row(Pway,Pv,DENof,Exp,InPwayDEsNof,InPwayUniVsNof,Pwnm).
 
 exp_reac_over_universe_ids( experiment, _Self, Fun, IdsDE, IdsND, IdsUniv ) :-
      % findall( Ncbi, ((member(Id,IdsDE);member(Id,IdsND)),reac_homs_ncbi_reap(Ncbi,_,_Reap)), NcbisL ),
