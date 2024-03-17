@@ -53,8 +53,6 @@ exp_reac_over( Etx, ReOver, Args ) :-
      kv_decompose( NDPrs, NDs, _ ),
      org_gid_map( DEs, IdsDE, Opts ),
      org_gid_map( NDs, IdsND, Opts ),
-     length( IdsDE, DENof ),
-     % length( IdsND, NDNof ),
      % find all background genes in any reactome pathway = Pop
      bio_db_org_in_opts( _Org, [org_tkn(Okn)|Opts] ),
      options( universe(Univ), Opts ),
