@@ -79,7 +79,7 @@ exp_reac_over( Etx, ReOver, Args ) :-
      kv_decompose( OrdROPrs, OrdPvs, ReOverRows ),
      OrdQvs <- 'p.adjust'( OrdPvs, method =+'BH' ),
      Hdr = row(reactome,'p.value',expected,count,size,pathway),
-     mtx_column_add [Hdr|ReOverRows], 2, ['adj.pvalue'|OrdQvs], AdjMtx ),
+     mtx_column_add( [Hdr|ReOverRows], 2, ['adj.pvalue'|OrdQvs], AdjMtx ),
      % "GOMFID","Pvalue","adj.pvalue","OddsRatio","ExpCount","Count","Size","Term"
      exp_reac_over_return( AdjMtx, ReOver, Etx ),
      debuc( Self, end, true ).
