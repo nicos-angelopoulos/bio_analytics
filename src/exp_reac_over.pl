@@ -6,13 +6,15 @@ exp_reac_over_defaults( Args, Defs ) :-
                              org(hs),
                              gid(ncbi),
                              gid_to(Gto),
+                             mtx_cutoff(_,_,false),
+                             % mtx_cutoff(0.05,'adj.pvalue',<),
                              universe(experiment)
                            ],
      % exp_reac_gid_default( Org, Gid ),
      options_return( gid_to(Gto), Args, [pack(bio_analytics),pred(ex_reac_over/3),option(gid_to(Gto))] ),
      Gto = ncbi.
 
-/** exp_reac_over(+Etx, +Opts).
+/** exp_reac_over(+Etx, ?ReOver, +Opts).
 
 Perform reactome pathway over-representation analysis.
 
@@ -27,12 +29,15 @@ Opts
   * gid_to(Gto)
     returns the gene id db token identifier for interrogating the reactome db
     (currently returns ncbi)
+  * mtx_cutoff(Val=_,Cnm=_,Dir=false)
+    filter the output matrix (see mtx_column_threshold/3)
   * universe(Univ=experiment)
     the universe, or background for genes in the statistical test (also: =|reac(tome)|=)
 
 Examples
 ==
 ?- exp_reac_over([]).
+?- exp_reac_over([mtx_cutoff(0.05,'adj.pvalue',<)]).
 ==
 
 @author nicos angelopoulos
@@ -82,13 +87,15 @@ exp_reac_over( Etx, ReOver, Args ) :-
      Hdr = row(reactome,'p.value',expected,count,size,pathway),
      mtx_column_add( [Hdr|ReOverRows], 3, ['adj.pvalue'|OrdQvs], AdjMtx ),
      % "GOMFID","Pvalue","adj.pvalue","OddsRatio","ExpCount","Count","Size","Term"
-     exp_reac_over_return( AdjMtx, ReOver, Etx ),
+     mtx_column_threshold( AdjMtx, ThreshMtx, Opts ),
+     exp_reac_over_return( ThreshMtx, ReOver, Etx ),
      debuc( Self, end, true ).
 
 exp_reac_over_return( Rtx, ReOver, _Etx ) :-
      ground( ReOver ),
      !,
      mtx( ReOver, Rtx ).
+exp_reac_over_return( _Rtx, _ReOver, _Etx ).
 
 /*   ?-
         reac_galg_reap_repn(Reap,Repn),
