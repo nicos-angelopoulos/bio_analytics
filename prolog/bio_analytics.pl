@@ -95,4 +95,4 @@ bio_analytics_version( 0:6:0, date(2023,6,6) ).
 :- lib(end(bio_analytics), homonyms(true)).
 
 pack_errors:message( cannot_map_gids(Org,Gid,Gto) ) -->
-    ['Predicate org_gid_map/3 could not convert gids from: ~w to: ~w in organism: ~w.'-[Org,Gid,Gto]].
+    ['Predicate org_gid_map/3 could not convert gids from: ~w to: ~w in organism: ~w.'-[Gid,Gto,Org]].
