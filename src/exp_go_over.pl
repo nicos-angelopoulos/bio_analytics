@@ -250,7 +250,7 @@ go_over_universe_go( mouse, Univ ) :-
     findall( Mgim, gont_musm_mgim_gont(Mgim,_E,_G), Mgims ),
     sort( Mgims, Univ ).
 go_over_universe_go( pig, Univ ) :-
-     findall( Ncbi, (gont_suss_symb_gont(Symb,_,_,_),ense_suss_ensg_symb(EnsG,Symb),ncbi_suss_ensg_ncbi(EnsG,Ncbi)), Ncbis ),
+     findall( Ncbi, (gont_suss_symb_gont(Symb,_,_,_),ense_suss_ensg_symb(EnsG,Symb),ncbi_suss_ncbi_ensg(Ncbi,EnsG)), Ncbis ),
      sort( Ncbis, Univ ).
 
 % fixme: give doc here, what is this for ?

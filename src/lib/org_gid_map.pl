@@ -119,5 +119,5 @@ org_gid_map_suss( symb, ncbi, Ids, ToIds ) :-
                     ), 
                                              ToIds ).
 org_gid_map_suss_ensg_ncbi( EnsG, Ncbi ) :-
-     ncbi_suss_ensg_ncbi( EnsG, Ncbi ),
+     ncbi_suss_ncbi_ensg( Ncbi, EnsG ),
      !.
