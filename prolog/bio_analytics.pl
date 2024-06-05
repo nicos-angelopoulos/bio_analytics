@@ -12,6 +12,7 @@
                 gene_family/3,                    % +Alias, -Symbols, +Opts
                 go_org_symbol/3,                  % +Org, +GoT, -Symbol
                 go_org_symbols/3,                 % +Org, +GoT, -Symbols
+                go_over_plot/2,                   % +GovF, +Opts
                 go_string_graph/3,                % +GoT, -Graph, +Opts
                 go_symbols_reach/3,               % +GoT, -Symbs, +Opts
                 symbols_string_graph/3            % +Symbs, -Graph, +Opts
@@ -66,6 +67,7 @@ bio_analytics_version( 0:6:0, date(2023,6,6) ).
 
 :- lib(mtx).
 :- lib(real).
+:- lib(b_real).
 :- lib(bio_db).
 :- lib(os_lib).
 :- lib(options).
