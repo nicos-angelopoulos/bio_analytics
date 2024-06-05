@@ -21,6 +21,8 @@ Opts
     informational, progress messages
   * go(GoSec)
     gene ontology section, in: =|[BP,MF,CC]|=, used for the label. Default is looked for in the filename.
+  * pfx_len(PfxLen=50)
+    how many initial characters of the GO term name should be included ?
   * pos_go_term(GoTPos=8)
     argument/column position for the GO term name
   * pos_p_val(PvalPos=2)
