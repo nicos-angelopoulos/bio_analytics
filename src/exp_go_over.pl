@@ -218,10 +218,10 @@ go_over_universe( go, Org, _DEGids, _NDEPrs, Univ, _Opts ) :-
 go_over_universe( go_exp, Org, DEGids, NDEPrs, Univ, Opts ) :-
     go_over_universe_go_exp( Org, DEGids, NDEPrs, Univ, Opts ).
 
-go_over_universe_genome( gallus, Univ ) :-
+go_over_universe_genome( chicken, Univ ) :-
     findall( Ncbi, cgnc_galg_cgnc_ncbi(_Cgnc,Ncbi), Ncbis ),
     sort( Ncbis, Univ ).
-go_over_universe_genome( hs, Univ ) :-
+go_over_universe_genome( human, Univ ) :-
     findall( Ncbi, hgnc_homs_symb_ncbi(_Symb,Ncbi), Ncbis ),
     sort( Ncbis, Univ ).
 go_over_universe_genome( mouse, Univ ) :-
@@ -231,7 +231,7 @@ go_over_universe_genome( pig, Univ ) :-
      findall( Ncbi, ncbi_suss_ncbi_ensg(Ncbi,_), Ncbis ),
      sort( Ncbis, Univ ).
 
-go_over_universe_go( gallus, Univ ) :-
+go_over_universe_go( chicken, Univ ) :-
     findall( Ncbi, ( gont_galg_symb_gont(Symb,_Rl,_Ev,_Go),
                      cgnc_galg_cgnc_symb(Cgnc,Symb),
                      cgnc_galg_cgnc_ncbi(Cgnc,Ncbi)
@@ -239,7 +239,7 @@ go_over_universe_go( gallus, Univ ) :-
                     Ncbis
            ),
     sort( Ncbis, Univ ).
-go_over_universe_go( hs, Univ ) :-
+go_over_universe_go( human, Univ ) :-
     findall( Ncbi,   (   gont_homs_edge_symb(_Go,_En,Symb),
                          hgnc_homs_symb_ncbi(Symb,Ncbi)
                      ),
@@ -254,14 +254,14 @@ go_over_universe_go( pig, Univ ) :-
      sort( Ncbis, Univ ).
 
 % fixme: give doc here, what is this for ?
-go_over_universe_exp( gallus, DeGids, NDEPrs, Univ ) :-
+go_over_universe_exp( chicken, DeGids, NDEPrs, Univ ) :-
     findall( Ncbi, ( member(Symb-NDEPrs),
                      cgnc_galg_cgnc_symb(Cgnc,Symb),
                      cgnc_galg_cgnc_ncbi(Cgnc,Ncbi)
                    ), NDENcbis ),
     append( DeGids, NDENcbis, Ncbis ),
     sort( Ncbis, Univ ).
-go_over_universe_exp( hs, DeGids, NDEPrs, Univ ) :-
+go_over_universe_exp( human, DeGids, NDEPrs, Univ ) :-
     findall( Ncbi, (member(Symb-_,NDEPrs),hgnc_homs_symb_ncbi(Symb,Ncbi)), NDENcbis ),
     % findall( Entz1, (member(Symb,DEGenes),hgnc_homs_symb_entz(Symb,Entz1)), DEEntzs ),
     % append( DEEntzs, NDEEntzs, Entzs ),
@@ -280,7 +280,7 @@ go_over_universe_exp( gallus, DEGids, NDEPrs, Univ, Opts ) :-
     append( DEGids, NDGids, ExpGids ),
     % fixme: we can add tests here, that the ids exist in some table ? 
     bio_list_sort_ne( ExpGids, Univ ).
-go_over_universe_exp( hs, DEGids, NDEPrs, Univ, Opts ) :-
+go_over_universe_exp( human, DEGids, NDEPrs, Univ, Opts ) :-
     findall( Id, member(Id-_,NDEPrs), Ids ),
     org_gid_map( Ids, NDGids, Opts ), 
     append( DEGids, NDGids, ExpGids ),
@@ -310,7 +310,7 @@ go_over_universe_go_exp( chicken, DEGids, NDEPrs, Univ, Opts ) :-
                     ),
                          List ),
     bio_list_sort_ne( List, Univ ).
-go_over_universe_go_exp( hs, DEGids, NDEPrs, Univ, Opts ) :-
+go_over_universe_go_exp( human, DEGids, NDEPrs, Univ, Opts ) :-
     findall( Id, member(Id-_,NDEPrs), Ids ),
     org_gid_map( Ids, NDGids, Opts ),
     append( DEGids, NDGids, ExpGids ),

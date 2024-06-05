@@ -5,7 +5,7 @@ symbols_string_graph_defaults( Defs ) :-
      Defs = [
                 cohese(max),
                 include_orphans(true),
-                org(hs),
+                org(human),
                 minw(500),
                 sort_pairs(true),
                 sort_graph(true)
@@ -24,7 +24,7 @@ Opts
   * include_orphans(Orph=true)
     set to false to exclude orphans from Graph
 
-  * org(Org=hs)
+  * org(Org=human)
     which organism do the gene symbols come from, via bio_db_organism/2
 
   * minw(500)
