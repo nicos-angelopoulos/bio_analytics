@@ -1,6 +1,4 @@
 
-:- lib(promise(pl_vector/3,b_real:pl_vector/3)).
-
 bio_p_adjust_defaults( Defs ) :-
                Defs = [
                          debug(true),
