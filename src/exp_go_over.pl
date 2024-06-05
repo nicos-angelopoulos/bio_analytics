@@ -198,7 +198,7 @@ exp_go_over_return( GoOver, DfOveR, CsvF, Use, Opts ) :-
     (var(GoOver) -> os_postfix(Postfixes, TempF, GoOver) ; true),
     <- 'write.csv'(DfOveR, file=+GoOver, 'row.names'='FALSE'),
     % <- print( warnings() ),
-    debug( Self, 'Wrote: ~p', GoOver ).
+    debuc( Self, 'Wrote: ~p', GoOver ).
 
 %% go_over_universe( +Token, +Org, +DEGenes, +NDEPrs, -Universe, +Opts )
 %
