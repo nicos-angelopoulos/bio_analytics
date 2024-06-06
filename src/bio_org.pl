@@ -155,12 +155,11 @@ bio_symbol_map_human( ncbi, Ncbi, Symb ) :-
      ).
 bio_symbol_map_human( hgnc, Hgnc, Symb ) :-
      hgnc_homs_hgnc_ncbi( Hgnc, Symb ).
-bio_symbols_map_mouse( ncbi, Ncbi, Symb ) :-
+bio_symbol_map_mouse( ncbi, Ncbi, Symb ) :-
      % fixme: additionals ?
      mgim_musm_mgim_ncbi( Mgim, Ncbi ),
      mgim_musm_mgim_symb( Mgim, Symb ).
-
-bio_symbols_map_pig( ensg, EnsG, Symb ) :-
+bio_symbol_map_pig( ensg, EnsG, Symb ) :-
      % fixme: check if there are alternatives+additionals ?
      ense_suss_ensg_symb( EnsG, Symb ).
  
