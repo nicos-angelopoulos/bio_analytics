@@ -29,7 +29,7 @@ Opts
   * gid_to(Gto)
     returns the gene id db token identifier for interrogating the reactome db
     (currently returns ncbi)
-  * mtx_cutoff(Val=_,Cnm=_,Dir=false)
+  * mtx_cutoff(Cnm=_,Val=_,Dir=false)
     filter the output matrix (see mtx_column_threshold/3)
   * universe(Univ=experiment)
     the universe, or background for genes in the statistical test (also: =|reac(tome)|=)
@@ -46,6 +46,7 @@ Examples
 @see mtx/2
 @see bio_db_organism/2
 @see org_gid_map/3
+@tbd add oddsRatios to make the output equivalent to output from exp_go_over/3.
 
 */
 
@@ -133,7 +134,8 @@ exp_reac_hygeom( _Self, IdsDE, IdsUniv, Func, Okn, UniVNof, ReacDENof, Pway, Row
      RecnG =.. [RecnFnc,Pway,Pwnm],
      call( RecnG ),
      Exp is (InPwayUniVsNof * ReacDENof) / UniVNof,
-     Row = Pv-row(Pway,Pv,ReacDENof,Exp,InPwayDEsNof,InPwayUniVsNof,Pwnm).
+     % Row = Pv-row(Pway,Pv,ReacDENof,Exp,InPwayDEsNof,InPwayUniVsNof,Pwnm).
+     Row = Pv-row(Pway,Pv,Exp,InPwayDEsNof,InPwayUniVsNof,Pwnm).
 
 exp_reac_over_universe_ids( experiment, _Self, Func, IdsDE, IdsND, IdsUniv ) :-
      % findall( Ncbi, ((member(Id,IdsDE);member(Id,IdsND)),reac_homs_ncbi_reap(Ncbi,_,_Reap)), NcbisL ),

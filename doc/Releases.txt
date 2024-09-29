@@ -5,6 +5,7 @@ TBD
       20.09.06    EXAMPLES: mouse examples
 
 0.7
+      24.09.29    FIXED:    removed total of DEs in reactome from output mtx
       24.06.05    FIXED:    gallus->chicken + hs->human for universe sets
                   CHANGED:  bio_symbols/3 option org_exp_id() to gid()
                   IFACE:    go_over_plot/2
