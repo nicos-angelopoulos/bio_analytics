@@ -7,6 +7,7 @@ exp_reac_over_defaults( Args, Defs ) :-
                              gid(ncbi),
                              gid_to(Gto),
                              mtx_cutoff(_,_,false),
+                             pways(univ),
                              % mtx_cutoff(0.05,'adj.pvalue',<),
                              universe(experiment)
                            ],
@@ -31,8 +32,19 @@ Opts
     (currently returns ncbi)
   * mtx_cutoff(Cnm=_,Val=_,Dir=false)
     filter the output matrix (see mtx_column_threshold/3)
+  * pways(Pways=univ)
+    pathways to consider, the value only affects the corrected p.values as the longer the 
+    list of pathways the stronger the correction. In order of tightness: 
+    * dx(Dx) 
+      pathways that contain at least one Gid picked by bio_diffex/4
+    * exp(Exp) 
+      pathways that contain at least one Gid in Etx
+    * univ(PwUniv)
+      pathways that contain at least one Gid in Univ (below option universe())
+    * reac(Reac)
+      all reactome pathways for Org
   * universe(Univ=experiment)
-    the universe, or background for genes in the statistical test (also: =|reac(tome)|=)
+    the genes universe, or background for genes in the statistical test (also: =|reac(tome)|=)
 
 Examples
 ==
@@ -64,13 +76,13 @@ exp_reac_over( Etx, ReOver, Args ) :-
      options( universe(Univ), Opts ),
      at_con( [reac,Okn,ncbi,reap], '_', Func ),
      debuc( Self, length, de_ids/IdsDE ),
+     debuc( Self, length, non_de_ids/IdsND ),
      exp_reac_over_universe_ids( Univ, Self, Func, IdsDE, IdsND, IdsUniV ),
      debuc( Self, length, univ_ids/IdsUniV ),
      length( IdsUniV, UniVNof ),
      % find all reactome pathways that have at least 1 DE product
-     Goal =.. [Func,ADEId,_,APway],
-     findall( APway, (member(ADEId,IdsDE),Goal), PwaysL ),
-     sort( PwaysL, Pways ),
+     options( pways(WhcPways), Opts ),
+     exp_reac_over_pways( WhcPways, Func, IdsDE, IdsND, IdsUniV, Pways ),
      debuc( Self, length, pways/Pways ),
      exp_reac_over_ncbi_reactome( IdsDE, Func, ReacIdsDE ),
      length( ReacIdsDE, ReacIdsDENof ),
@@ -91,6 +103,21 @@ exp_reac_over( Etx, ReOver, Args ) :-
      mtx_column_threshold( AdjMtx, ThreshMtx, Opts ),
      exp_reac_over_return( ThreshMtx, ReOver, Etx ),
      debuc( Self, end, true ).
+
+exp_reac_over_pways( dx, Func, IdsDE, _IdsND, _IdsUniV, Pways ) :-
+     Goal =.. [Func,ADEId,_,APway],
+     findall( APway, (member(ADEId,IdsDE),Goal), PwaysL ),
+     sort( PwaysL, Pways ).
+exp_reac_over_pways( exp, Func, IdsDE, IdsND, _IdsUniV, Pways ) :-
+     append( IdsDE, IdsND, AllIds ),
+     sort( AllIds, Ids ),
+     Goal =.. [Func,ADEId,_,APway],
+     findall( APway, (member(ADEId,Ids),Goal), PwaysL ),
+     sort( PwaysL, Pways ).
+exp_reac_over_pways( univ, Func, _IdsDE, _IdsND, IdsUniV, Pways ) :-
+     Goal =.. [Func,ADEId,_,APway],
+     findall( APway, (member(ADEId,IdsUniV),Goal), PwaysL ),
+     sort( PwaysL, Pways ).
 
 exp_reac_over_return( Rtx, ReOver, _Etx ) :-
      ground( ReOver ),
