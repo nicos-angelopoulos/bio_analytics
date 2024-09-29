@@ -118,6 +118,10 @@ exp_reac_over_pways( univ, Func, _IdsDE, _IdsND, IdsUniV, Pways ) :-
      Goal =.. [Func,ADEId,_,APway],
      findall( APway, (member(ADEId,IdsUniV),Goal), PwaysL ),
      sort( PwaysL, Pways ).
+exp_reac_over_pways( reac, Func, _IdsDE, _IdsND, _IdsUniV, Pways ) :-
+     Goal =.. [Func,_,_,APway],
+     findall( APway, Goal, PwaysL ),
+     sort( PwaysL, Pways ).
 
 exp_reac_over_return( Rtx, ReOver, _Etx ) :-
      ground( ReOver ),
