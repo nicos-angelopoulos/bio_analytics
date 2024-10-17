@@ -1,6 +1,6 @@
 name(bio_analytics).
 title( 'Computational biology data analytics.' ).
-version('0.6').
+version('0.7').
 author( 'Nicos Angelopoulos', 'http://stoics.org.uk/~nicos' ).
 packager( 'Nicos Angelopoulos', 'http://stoics.org.uk/~nicos' ).
 maintainer( 'Nicos Angelopoulos', 'http://stoics.org.uk/~nicos' ).
