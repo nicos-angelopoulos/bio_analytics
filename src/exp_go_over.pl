@@ -63,6 +63,8 @@ Opts
     returns the db type for gene ids used in underlying call, mostly ncbi, apart for mouse where it is mgim
   * stem(Stem=false)
     stem for output csv file. When false, use basename of CsvF.
+  * symb(Symb=false)
+    record the symbols for each term
   * to_file(ToF=false)
     when GoOver is unbound, this controls whether the output goes to a file or a values list 
   * universe(Univ=go_exp)
@@ -174,6 +176,9 @@ exp_go_over( CsvF, GoOver, Args ) :-
     dfOver <- 'data.frame'( summary(over) ),
     dfOver$'adj.pvalue' <- 'p.adjust'( dfOver$'Pvalue', method=+'BH' ),
     dfOver <- dfOver[*,c(1,2,8,3,4,5,6,7)],
+    trace,
+    Gcats <- geneIdsByCategory(over),
+    findall( _, (nth1(Nc,Gcats,NthGc-NthGns),atomic_list_concat(NthGns,';',AtmGns),dfOver[Nc,9] <- AtmGns), _ ),
     Use = use(Self,GoAspect,UnivOpt,PvCut),
     exp_go_over_return( GoOver, dfOver, CsvF, Use, Opts ).
 
