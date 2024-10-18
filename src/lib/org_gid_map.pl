@@ -1,8 +1,11 @@
 
+:- use_module(library(apply)).  % maplist/3.
 :- use_module(library(lib)).
 
 :- lib(options).
 :- lib(debug_call).
+
+:- lib(stoics_lib:map_succ_list/3).
 
 org_gid_map_defaults( Defs ) :-
      Defs = [  debug(true),
@@ -46,6 +49,8 @@ Symb = 'LMTK3'.
 
 @author nicos angelopoulos
 @version  0.1 2024/03/16
+@version  0.2 2024/10/18,  recipe for chicken: ncbi -> symb
+@tbd needs some resilience options, what happens if an id cannot be mapped ? (call pred, or fail, or now=skip)
 
 */
 
@@ -97,6 +102,22 @@ org_gid_map_1( pig, Gid, Gto, Ids, ToIds ) :-
 % fixme: add ensg -> ncbi, from ifitm project
 org_gid_map_galg( cgnc, ncbi, Ids, ToIds ) :-
     findall( Ncbi,  (member(Cgnc,Ids),cgnc_galg_cgnc_ncbi(Cgnc,Ncbi)), ToIds ).
+org_gid_map_galg( ncbi, symb, Ids, ToIds ) :-
+     map_succ_list( bio_analytics:org_gid_map_galg_ncbi_symb, Ids, ToIds ).
+
+org_gid_map_galg_ncbi_symb( Ncbi, Symb ) :-
+     ncbi_galg_ncbi_symb( Ncbi, Symb ),
+     !.
+org_gid_map_galg_ncbi_symb( Ncbi, Symb ) :-
+     cgnc_galg_cgnc_ncbi( Cgnc, Ncbi ),
+     cgnc_galg_cgnc_symb( Cgnc, Symb ),
+     !.
+% fixme: i doubt this gives anything new, we can test in bio_db
+org_gid_map_galg_ncbi_symb( Ncbi, Symb ) :-
+     unip_galg_unip_ncbi( Unip, Ncbi ),
+     unip_galg_unip_symb( Unip, Symb ),
+     !.
+
 % org_go_over_std_gene_ids_chicken( SrcT, Set, Gids ) :-
 %    atom_concat( cgnc_galg_cgnc_, SrcT, SrcNm ),
 %    findall( Ncbi,  (member(SrcG,Set),call(SrcNm,Cgnc,SrcG),cgnc_galg_cgnc_ncbi(Cgnc,Ncbi)), Ncbis ),

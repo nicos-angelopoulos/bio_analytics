@@ -1,9 +1,12 @@
 
 :- lib(promise(exp_go_over_bioc_deps/0,call(exp_go_over_bioc_deps_load))).
+:- lib(stoics_lib:break_nth/4).
 :- lib(stoics_lib:kv_decompose/3).
 
+:- lib(bio_gid_std/3).
 :- lib(org_gid_map/3).
 :- lib(bio_list_sort_ne/2).
+
 
 exp_go_over_bioc_deps_load :-
      lib(suggests(bioc("GOstats"))),
@@ -27,6 +30,9 @@ exp_go_over_defaults( Args, Defs ) :-
                 gid(Gid),
                 gid_to(Gto),
                 stem(go_over),
+                symbs(false),
+                symbs_hdr("symbols"),
+                symbs_max(inf),
                 to_file(false),
                 universe(go_exp)
     ],
@@ -63,8 +69,12 @@ Opts
     returns the db type for gene ids used in underlying call, mostly ncbi, apart for mouse where it is mgim
   * stem(Stem=false)
     stem for output csv file. When false, use basename of CsvF.
-  * symb(Symb=false)
-    record the symbols for each term
+  * symbs(Symbs=false)
+    record the symbols for each term (; separated single entry)
+  * symbs_hdr(Hdr="symbols")
+    header for the Symbs column
+  * symbs_max(SyMax=inf)
+    how many symbols to include in the symbols entry (as defined above)
   * to_file(ToF=false)
     when GoOver is unbound, this controls whether the output goes to a file or a values list 
   * universe(Univ=go_exp)
@@ -176,11 +186,47 @@ exp_go_over( CsvF, GoOver, Args ) :-
     dfOver <- 'data.frame'( summary(over) ),
     dfOver$'adj.pvalue' <- 'p.adjust'( dfOver$'Pvalue', method=+'BH' ),
     dfOver <- dfOver[*,c(1,2,8,3,4,5,6,7)],
-    trace,
-    Gcats <- geneIdsByCategory(over),
-    findall( _, (nth1(Nc,Gcats,NthGc-NthGns),atomic_list_concat(NthGns,';',AtmGns),dfOver[Nc,9] <- AtmGns), _ ),
+    options( symbs(SymbsEnt), Opts ),
+    exp_go_over_symbs_entry( SymbsEnt, Org, over, dfOver, Opts ),
     Use = use(Self,GoAspect,UnivOpt,PvCut),
     exp_go_over_return( GoOver, dfOver, CsvF, Use, Opts ).
+
+exp_go_over_symbs_entry( true, Org, Rov, Rdf, Opts ) :-
+    !,
+    Signs <- Rdf[*,1],
+    Gcats <- geneIdsByCategory(Rov),
+    options( gid_to(Gto), Opts ),
+    options( symbs_max(Syx), Opts ),
+    exp_go_over_symbs( Gcats, Signs, Gto, Syx, GcSymbs, [gid(Gto),gid_to(symb),org(Org)] ),
+    Rdf[*,9] <- GcSymbs,
+    Names <- names(Rdf),
+    once( append(Fames,[_],Names) ),
+    options( symbs_hdr(SyHdr), Opts ),
+    append( Fames, [SyHdr], NewNames ),
+    names(Rdf) <- NewNames.
+    % names(Rdf[9]) <- "symbols". -> this or colnames() should work, but it doesnt...
+% defaulty:
+exp_go_over_symbs_entry( _SymbsEnt, _Org, _Rov, _Rdf, _Opts ).
+
+exp_go_over_symbs( [], _Signs, _Gto, _Syx, [], _Opts ).
+exp_go_over_symbs( [NthGc=NthGnsPrv|Prs], Signs, Gto, Syx, SyAtms, Opts ) :-
+     % ( NthGc=='GO:0048534' -> trace; true),
+     % ( NthGc=='GO:0050789' -> trace; true),
+     ( memberchk(NthGc,Signs) ->
+          ( is_list(NthGnsPrv) -> NthGnsPrv = NthGns; NthGns = [NthGnsPrv] ),
+          bio_gid_std( Gto, NthGns, NthIns ),
+          org_gid_map( NthIns, AllSymbs, Opts ),
+          ( Syx =:= inf ->
+               AllSymbs = Symbs
+               ;
+               break_nth( Syx, AllSymbs, Symbs, at_short(true) )
+          ),
+          atomic_list_concat( Symbs, ';', SyAtm ), 
+          SyAtms = [SyAtm|TyAtms]
+          ;
+          SyAtms = TyAtms 
+     ),
+     exp_go_over_symbs( Prs, Signs, Gto, Syx, TyAtms, Opts ).
 
 exp_go_over_return( GoOver, DfOveR, _CsvF, _Use, Opts ) :-
     var( GoOver ),
