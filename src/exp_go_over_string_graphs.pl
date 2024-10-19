@@ -8,7 +8,7 @@ exp_go_over_string_graphs_defaults( Defs ) :-
 
 /** exp_go_over_string_graphs( +Exp, ?GoOver, ?Dir, -Opts )
 
-Create string graphs for all the over-represented terms in GoOver.
+Create string graphs for all the over-represented Exp-eriment terms in GoOver.
 
 When GoOver is a variable exp_go_over/3 is called to generate it.
 
