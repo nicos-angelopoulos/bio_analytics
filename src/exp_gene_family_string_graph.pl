@@ -86,6 +86,7 @@ Produces file: bt.svg
 
 @author nicos angelopoulos
 @version  0.1 2019/4/15
+@version  0.2 2024/10/20,    option extra_symbol_prefix(Xfx)
 @see bio_diffex/4, bio_symbols/3, symbols_string_graph/3
 @see gene_family/3
 @see wgraph_plot/2
