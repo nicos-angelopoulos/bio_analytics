@@ -71,7 +71,7 @@ Opts
     stem for output csv file. When false, use basename of CsvF.
   * symbs(Symbs=false)
     record the symbols for each term (; separated single entry)
-  * symbs_hdr(Hdr="symbols")
+  * symbs_hdr(Hymbs="symbols")
     header for the Symbs column
   * symbs_max(SyMax=inf)
     how many symbols to include in the symbols entry (as defined above)
@@ -134,8 +134,11 @@ OverF = '.../swipl/pack/bio_analytics/data/silac/bt_gontBP_p0.05_univExp.csv'.
 @author nicos angelopoulos
 @version  0.1 2019/5/2
 @version  0.2 2022/12/20,   =|Univ=go|= and =|Org=gallus|=
-@version  0.3 2023/6/5,   option go_frame(GoFrame)
+@version  0.3 2023/6/5,     option go_frame(GoFrame)
+@version  0.4 2024/10/20,   options symbs(Cymbs), symbs_hdr(Hymbs) and symbs_max(SyMax)
 @see go_over_universe/6
+@tbd 24.10.20, investigate whether the symbs(Cymbs) option can be generalised to save any gene_id
+               particularly the NCBI ones that are used by R libs 
 
 */
 exp_go_over( CsvF, GoOver, Args ) :-
