@@ -23,7 +23,8 @@ Opts
   * ov_max(MaxOvs=false)
     when a number, it is taken as the maximal integer of terms to plot graphs for
   * symbols_column(Cymbs=0)
-    any non-zero value is the column containing Symb1;Symb2... values which are pushed down instead of the GOid
+    any non-zero value is the column containing Symb1;Symb2... values which are pushed down 
+    instead of the GOid means of identifying the family members (GOid is still used for filename)
   * stem_type(Sty=go_pair_ord)
     similar to go_string_graph/3, but different default, others: =|go_name, go_id|=.
     Here the length of GO terms (Len) is added to form go_pair_ord(I,Len) for forwarding
@@ -50,7 +51,7 @@ Options are passed to exp_gene_family_string_graph/4.
 @author nicos angelopoulos
 @version  0.1 2019/5/5
 @version  0.2 2020/9/6,     option ov_max(OvMax)
-@version  0.3 2024/10/20,   option extra_symbols_column(Xsymc)
+@version  0.3 2024/10/20,   options extra_symbols_column(Xsymc), symbols_column(Cymbs)
 @see exp_go_over/3
 @see exp_gene_family_string_graph/4
 

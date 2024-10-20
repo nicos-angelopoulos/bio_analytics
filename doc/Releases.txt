@@ -5,7 +5,7 @@ TBD
       20.09.06    EXAMPLES: mouse examples
 
 0.8
-      24.10.20    OPTS:     extra_symbols_column(Xsymc) in exp_go_over_string_graphs/4
+      24.10.20    OPTS:     extra_symbols_column(Xsymc), symbols_column(Cymbs), in exp_go_over_string_graphs/4
                   OPTS:     extra_symbol_prefix(Xfx), extra_symbols(Xymbs) in exp_gene_family_string_graph/4
       24.10.18    ADDED:    recipe for mapping chicken: ncbi -> symb
                   OPTS:     symbs(S), symbs_max(X) and symbs_hdr(H) for symbols in over-represented GO terms, exp_go_over/3
