@@ -8,6 +8,9 @@ exp_reac_over_defaults( Args, Defs ) :-
                              gid_to(Gto),
                              mtx_cutoff(_,_,false),
                              pways(univ),
+                             rec_clm(symbols),
+                             rec_ids(false),
+                             rec_sep(';'),
                              % mtx_cutoff(0.05,'adj.pvalue',<),
                              universe(experiment)
                            ],
@@ -43,6 +46,13 @@ Opts
       pathways that contain at least one Gid in Univ (below option universe())
     * reac(Reac)
       all reactome pathways for Org
+  * rec_clm(Rlm=symbols)
+    name for extra ids column, iff _Rids\==false_ 
+  * rec_ids(Rids=false)
+    whether to record memeber gids of each pathway (give a -(Gid,Rec) pairlist if you want to map)
+    (atom recorded is of the form: Rec1<Rep>Rec2<Rep>Rec3)
+  * rec_sep(Rep=';')
+    separator for Rids concatenation
   * universe(Univ=experiment)
     the genes universe, or background for genes in the statistical test (also: =|reac(tome)|=)
 
@@ -87,7 +97,8 @@ exp_reac_over( Etx, ReOver, Args ) :-
      exp_reac_over_ncbi_reactome( IdsDE, Func, ReacIdsDE ),
      length( ReacIdsDE, ReacIdsDENof ),
      debuc( Self, length, reac_ids_de/ReacIdsDE ),
-     maplist( exp_reac_hygeom(Self,IdsDE,IdsUniV,Func,Okn,UniVNof,ReacIdsDENof), Pways, ReOverPrs ),
+     options( [rec_clm(Rlm),rec_ids(Rids),rec_sep(Rep)], Opts ),
+     maplist( exp_reac_hygeom(Self,IdsDE,IdsUniV,Func,Okn,UniVNof,ReacIdsDENof,Rids,Rep), Pways, ReOverPrs ),
       /* 
       for each pathway 
           find DE genes in pathway (PathDENof)
@@ -97,7 +108,11 @@ exp_reac_over( Etx, ReOver, Args ) :-
      keysort( ReOverPrs, OrdROPrs ),
      kv_decompose( OrdROPrs, OrdPvs, ReOverRows ),
      OrdQvs <- 'p.adjust'( OrdPvs, method =+'BH' ),
-     Hdr = row(reactome,'p.value',expected,count,size,pathway),
+     ( Rids == false ->
+          Hdr = row(reactome,'p.value',expected,count,size,pathway)
+          ;
+          Hdr = row(reactome,'p.value',expected,count,size,pathway,Rlm)
+     ),
      mtx_column_add( [Hdr|ReOverRows], 3, ['adj.pvalue'|OrdQvs], AdjMtx ),
      % "GOMFID","Pvalue","adj.pvalue","OddsRatio","ExpCount","Count","Size","Term"
      mtx_column_threshold( AdjMtx, ThreshMtx, Opts ),
@@ -151,7 +166,7 @@ exp_reac_over_return( _Rtx, _ReOver, _Etx ).
 
 */
 
-exp_reac_hygeom( _Self, IdsDE, IdsUniv, Func, Okn, UniVNof, ReacDENof, Pway, Row ) :-
+exp_reac_hygeom( _Self, IdsDE, IdsUniv, Func, Okn, UniVNof, ReacDENof, Rid, Rep, Pway, Row ) :-
      GoalDE =.. [Func,InPwayDE,_,Pway],
      findall( InPwayDE, (member(InPwayDE,IdsDE),GoalDE), InPwayDEs ),
      GoalUniv =.. [Func,InPwayUniv,_,Pway],
@@ -166,7 +181,21 @@ exp_reac_hygeom( _Self, IdsDE, IdsUniv, Func, Okn, UniVNof, ReacDENof, Pway, Row
      call( RecnG ),
      Exp is (InPwayUniVsNof * ReacDENof) / UniVNof,
      % Row = Pv-row(Pway,Pv,ReacDENof,Exp,InPwayDEsNof,InPwayUniVsNof,Pwnm).
-     Row = Pv-row(Pway,Pv,Exp,InPwayDEsNof,InPwayUniVsNof,Pwnm).
+     ( Rid == false -> 
+          Row = Pv-row(Pway,Pv,Exp,InPwayDEsNof,InPwayUniVsNof,Pwnm)
+          ;
+          ( Rid == true -> 
+               atomic_list_concat(InPwayDEs,Rep,Ral)
+               ;
+               ( Rid = [_-_|_] ->
+                    findall( Val, (member(InP,InPwayDEs),memberchk(InP-Val,Rid)), Vals ),
+                    atomic_list_concat( Vals, Rep, Ral )
+                    ;
+                    throw( cannot_decipher_rid(Rid) )
+               )
+          ),
+          Row = Pv-row(Pway,Pv,Exp,InPwayDEsNof,InPwayUniVsNof,Pwnm,Ral)
+     ).
 
 exp_reac_over_universe_ids( experiment, _Self, Func, IdsDE, IdsND, IdsUniv ) :-
      % findall( Ncbi, ((member(Id,IdsDE);member(Id,IdsND)),reac_homs_ncbi_reap(Ncbi,_,_Reap)), NcbisL ),

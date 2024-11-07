@@ -7,7 +7,7 @@ exp_go_over_string_graphs_defaults( Defs ) :-
              symbols_column(0),
              viz_de_opts([]), wgraph_plot_opts(Wplots) ].
 
-/** exp_go_over_string_graphs( +Exp, ?GoOver, ?Dir, -Opts )
+/** exp_go_over_string_graphs( +Exp, ?GoOver, ?Dir, -Opts ).
 
 Create string graphs for all the over-represented Exp-eriment terms in GoOver.
 
@@ -120,8 +120,6 @@ go_over_string_graphs_dir( [GoPrv|Gos], [Xymb|Xymbs], I, Exp, Dir, WgOpts, Sty, 
     directory_file_path( Dir, GoTkn, DirGo ),
     debuc( Self, 'GOid: ~w, File: ~p', [Go,GoTkn] ),
     GoWgOpts = [stem(DirGo)|WgOpts],
-    ( Xymb = ['STMN1'] -> trace; true ),
-    ( Xymb = ['ANK2'|_] -> trace; true ),
     ( (is_list(Xymb), Xymb \== []) -> GnOpts=[extra_symbols(Xymb)|Opts] ; GnOpts = Opts ),
     % here check if we are carrying the symbols and extras and plot directly
     exp_gene_family_string_graph( Exp, Fam, DEPrs, NonDEPrs, _, [wgraph_plot_opts(GoWgOpts)|GnOpts] ),

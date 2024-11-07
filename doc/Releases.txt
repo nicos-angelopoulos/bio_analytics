@@ -7,6 +7,7 @@ TBD
                             any gene_id particularly the NCBI ones that are used by R libs
 
 0.8
+      24.11.07    OPTS:     rec_{clm,ids,sep} for recording pway mebers as concat.atom in exp_reac_over/3
       24.10.20    OPTS:     extra_symbols_column(Xsymc), symbols_column(Cymbs), in exp_go_over_string_graphs/4
                   OPTS:     extra_symbol_prefix(Xfx), extra_symbols(Xymbs) in exp_gene_family_string_graph/4
                   OPTS:     symbs(Cymbs), symbs_hdr(Hymbs) and symbs_max(SyMax) in exp_go_over/3
