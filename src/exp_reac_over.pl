@@ -6,6 +6,8 @@ exp_reac_over_defaults( Args, Defs ) :-
                              org(hs),
                              gid(ncbi),
                              gid_to(Gto),
+                             ids_de(_IdsDE),
+                             ids_de_reac(_ReacIdsDE),
                              mtx_cutoff(_,_,false),
                              pways(univ),
                              rec_clm(symbols),
@@ -33,6 +35,10 @@ Opts
   * gid_to(Gto)
     returns the gene id db token identifier for interrogating the reactome db
     (currently returns ncbi)
+  * ids_de(IdsDE)
+    returns the de ids
+  * ids_de_reac(IdsDE)
+    returns the de ids that appear in Reactome pathways
   * mtx_cutoff(Cnm=_,Val=_,Dir=false)
     filter the output matrix (see mtx_column_threshold/3)
   * pways(Pways=univ)
@@ -98,6 +104,9 @@ exp_reac_over( Etx, ReOver, Args ) :-
      length( ReacIdsDE, ReacIdsDENof ),
      debuc( Self, length, reac_ids_de/ReacIdsDE ),
      options( [rec_clm(Rlm),rec_ids(Rids),rec_sep(Rep)], Opts ),
+     options( ids_de(IdsDE), Opts ),
+     options( ids_de_reac(ReacIdsDE), Opts ),
+     % fixme: should the following be using ReacIdsDE instead of IdsDE
      maplist( exp_reac_hygeom(Self,IdsDE,IdsUniV,Func,Okn,UniVNof,ReacIdsDENof,Rids,Rep), Pways, ReOverPrs ),
       /* 
       for each pathway 
