@@ -24,7 +24,11 @@ exp_reac_over_defaults( Args, Defs ) :-
 
 Perform reactome pathway over-representation analysis.
 
-Etx is the matrix of experimental values (should pass as 1st arg in mtx/2).
+Etx is the matrix of experimental values (should pass as 1st arg in mtx/2).<br>
+If ReOver is ground at call, it is taken to be a filename on which the matrix results are written to using mtx/2.<br>
+If ReOver is not ground at call, it is unified to the resulting matrix.<br>
+Note, that the representation of ReOver is different to that of the 2nd argument of exp_go_over/3.
+
 Opts
   * debug(Dbg=false)
     informational, progress messages
@@ -151,7 +155,7 @@ exp_reac_over_return( Rtx, ReOver, _Etx ) :-
      ground( ReOver ),
      !,
      mtx( ReOver, Rtx ).
-exp_reac_over_return( _Rtx, _ReOver, _Etx ).
+exp_reac_over_return( Rtx, Rtx, _Etx ).
 
 /*   ?-
         reac_galg_reap_repn(Reap,Repn),
