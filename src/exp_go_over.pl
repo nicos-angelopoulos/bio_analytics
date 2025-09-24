@@ -41,14 +41,12 @@ exp_go_over_defaults( Args, Defs ) :-
     exp_go_gid_default( BdOrg, Gid, Gto ),
     options_return( gid_to(Gto), Args, [pack(bio_analytics),pred(ex_go_over/3),option(gid_to(Gto))] ).
 
-/** exp_go_over( +CsvF, -GoOver, +Opts ).
+/** exp_go_over( +Mtx, -GoOver, +Opts ).
 
 Perform gene ontology over-representation analysis.
 
-For experimental data in CsvF select de-regulated genes and on<br>
-those perform over representation analysis in gene ontology.<br>
-Results in GoOver are either as a values list or a csv file, the name of which is 
-assumed to be the ground value of GoOVer.
+For experimental data in Mtx select de-regulated genes and on those perform over representation analysis in gene ontology.
+Results in GoOver are either as a values list or a csv file, the name of which is assumed to be the ground value of GoOVer.
 
 
 Opts
