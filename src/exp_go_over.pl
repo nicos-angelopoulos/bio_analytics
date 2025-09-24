@@ -29,6 +29,7 @@ exp_go_over_defaults( Args, Defs ) :-
                 % org_exp_id(ExpId),
                 gid(Gid),
                 gid_to(Gto),
+                min_count(0),
                 stem(go_over),
                 symbs(false),
                 symbs_hdr("symbols"),
@@ -65,6 +66,8 @@ Opts
     (Caution, this used to be org_exp_id(OrgExpId).)
   * gid_to(GidTo)
     returns the db type for gene ids used in underlying call, mostly ncbi, apart for mouse where it is mgim
+  * min_count(MinCount=0)
+    min DE symbols in GO term required for a term to be included
   * stem(Stem=false)
     stem for output csv file. When false, use basename of CsvF.
   * symbs(Symbs=false)
@@ -134,6 +137,7 @@ OverF = '.../swipl/pack/bio_analytics/data/silac/bt_gontBP_p0.05_univExp.csv'.
 @version  0.2 2022/12/20,   =|Univ=go|= and =|Org=gallus|=
 @version  0.3 2023/6/5,     option go_frame(GoFrame)
 @version  0.4 2024/10/20,   options symbs(Cymbs), symbs_hdr(Hymbs) and symbs_max(SyMax)
+@version  0.5 2025/09/24,   option min_count(MinCnt)
 @see go_over_universe/6
 @tbd 24.10.20, investigate whether the symbs(Cymbs) option can be generalised to save any gene_id
                particularly the NCBI ones that are used by R libs 
@@ -190,7 +194,8 @@ exp_go_over( CsvF, GoOver, Args ) :-
     options( symbs(SymbsEnt), Opts ),
     exp_go_over_symbs_entry( SymbsEnt, Org, over, dfOver, Opts ),
     Use = use(Self,GoAspect,UnivOpt,PvCut),
-    exp_go_over_return( GoOver, dfOver, CsvF, Use, Opts ).
+    options( min_count(MinCnt), Opts ),
+    exp_go_over_return( GoOver, dfOver, CsvF, Use, MinCnt, Self, Opts ).
 
 exp_go_over_symbs_entry( true, Org, Rov, Rdf, Opts ) :-
     !,
@@ -229,15 +234,23 @@ exp_go_over_symbs( [NthGc=NthGnsPrv|Prs], Signs, Gto, Syx, SyAtms, Opts ) :-
      ),
      exp_go_over_symbs( Prs, Signs, Gto, Syx, TyAtms, Opts ).
 
-exp_go_over_return( GoOver, DfOveR, _CsvF, _Use, Opts ) :-
+exp_go_over_return( GoOver, DfOveR, _CsvF, _Use, MinCnt, Self, Opts ) :-
     var( GoOver ),
     options( to_file(false), Opts ),
     !,
     Rlist <- 'as.list'(DfOveR),
     findall( List, (member(Head=Tail,Rlist),List=[Head|Tail]), Lists),
-    mtx_lists( GoOver, Lists ).
-
-exp_go_over_return( GoOver, DfOveR, CsvF, Use, Opts ) :-
+    mtx_lists( Mtx, Lists ),
+    ( MinCnt > 0 ->
+          mtx_column_include_rows( Mtx, 'Count', >=(MinCnt), GoOver ),
+          length( Mtx, NrBef ),
+          length( GoOver, NrAft ),
+          debuc( Self, 'Min count of: ~w, reduced matrix rows from: ~d to ~d', [MinCnt,NrBef,NrAft] )
+          ;
+          debuc( Self, 'Not applying min count contraint, value given: ~w', [MinCnt] ),
+          Mtx = GoOver
+    ).
+exp_go_over_return( GoOver, DfOveR, CsvF, Use, MinCnt, Self, Opts ) :-
     Use = use(Self,GoAspect,UnivOpt,PvCut),
     SubSep = '',
     options( stem(Stem), Opts ),
@@ -248,6 +261,14 @@ exp_go_over_return( GoOver, DfOveR, CsvF, Use, Opts ) :-
     atom_concat( p, PvCut, PvTkn ),
     Postfixes = [GontAspTkn,PvTkn,UnivTkn],
     (var(GoOver) -> os_postfix(Postfixes, TempF, GoOver) ; true),
+    ( MinCnt > 0 -> 
+          NrBef  <- nrow(DfOveR),
+          DfOveR <- DfOveR[DfOveR$'Count'>=MinCnt,*],
+          NrAft  <- nrow(DfOveR),
+          debuc( Self, 'Min count of: ~w, reduced matrix rows from: ~d to ~d', [MinCnt,NrBef,NrAft] )
+          ;
+          debuc( Self, 'Not applying min count contraint, value given: ~w', [MinCnt] )
+    ),
     <- 'write.csv'(DfOveR, file=+GoOver, 'row.names'='FALSE'),
     % <- print( warnings() ),
     debuc( Self, 'Wrote: ~p', GoOver ).
