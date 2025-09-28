@@ -247,7 +247,7 @@ exp_go_over_return( GoOver, DfOveR, _CsvF, _Use, MinCnt, Self, Opts ) :-
           length( GoOver, NrAft ),
           debuc( Self, 'Min count of: ~w, reduced matrix rows from: ~d to ~d', [MinCnt,NrBef,NrAft] )
           ;
-          debuc( Self, 'Not applying min count contraint, value given: ~w', [MinCnt] ),
+          debuc( Self, 'Not applying min count constraint, value given: ~w', [MinCnt] ),
           Mtx = GoOver
     ).
 exp_go_over_return( GoOver, DfOveR, CsvF, Use, MinCnt, Self, Opts ) :-
