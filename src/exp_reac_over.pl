@@ -8,6 +8,7 @@ exp_reac_over_defaults( Args, Defs ) :-
                              gid_to(Gto),
                              ids_de(_IdsDE),
                              ids_de_reac(_ReacIdsDE),
+                             min_count(0),
                              mtx_cutoff(_,_,false),
                              pways(univ),
                              rec_clm(symbols),
@@ -43,8 +44,10 @@ Opts
     returns the de ids
   * ids_de_reac(IdsDE)
     returns the de ids that appear in Reactome pathways
+  * min_count(MinCount=0)
+    min DE symbols in a Reactome pathway required for it to be included
   * mtx_cutoff(Cnm=_,Val=_,Dir=false)
-    filter the output matrix (see mtx_column_threshold/3)
+    filter the output matrix- meant for FDR cutoffs (see mtx_column_threshold/3)
   * pways(Pways=univ)
     pathways to consider, the value only affects the corrected p.values as the longer the 
     list of pathways the stronger the correction. In order of tightness: 
@@ -74,6 +77,7 @@ Examples
 
 @author nicos angelopoulos
 @version  0.1 2024/03/16
+@version  0.2 2025/09/28,  option min_count(MinCount)
 @see bio_diffex/4
 @see mtx/2
 @see bio_db_organism/2
@@ -128,8 +132,27 @@ exp_reac_over( Etx, ReOver, Args ) :-
      ),
      mtx_column_add( [Hdr|ReOverRows], 3, ['adj.pvalue'|OrdQvs], AdjMtx ),
      % "GOMFID","Pvalue","adj.pvalue","OddsRatio","ExpCount","Count","Size","Term"
-     mtx_column_threshold( AdjMtx, ThreshMtx, Opts ),
-     exp_reac_over_return( ThreshMtx, ReOver, Etx ),
+     CutOpt = mtx_cutoff(_CutClm,_CutVal,CutDir),
+     options( CutOpt, Opts ),
+     ( CutDir == false -> 
+          debuc( Self, 'Not curtailing matrix on p values. Given: ~w', [CutOpt] )
+          ;
+          mtx_column_threshold( AdjMtx, AdjThreshMtx, Opts ),
+          length( AdjMtx, NrBefCut ),
+          length( AdjThreshMtx, NrAftCut ),
+          debuc( Self, 'P values cutoff term: ~w, reduced matrix length from: ~d to ~d', [CutOpt,NrBefCut,NrAftCut] )
+     ),
+     options( min_count(MinCnt), Opts ),
+     ( MinCnt > 0 -> 
+          mtx_column_include_rows( AdjThreshMtx, 'Count', >=(MinCnt), ThreshMtx ),
+          length( AdjThreshMtx, NrBefMc ),
+          length( ThreshMtx, NrAftMc ),
+          debuc( Self, 'Min count of: ~w, reduced matrix length from: ~d to ~d', [MinCnt,NrBefMc,NrAftMc] )
+          ;
+          debuc( Self, 'Not applying min count constraint, value given: ~w', [MinCnt] ),
+          AdjThreshMtx = ThreshMtx
+     ),
+     exp_reac_over_return( ThreshMtx, Etx, ReOver ),
      debuc( Self, end, true ).
 
 exp_reac_over_pways( dx, Func, IdsDE, _IdsND, _IdsUniV, Pways ) :-
@@ -151,11 +174,11 @@ exp_reac_over_pways( reac, Func, _IdsDE, _IdsND, _IdsUniV, Pways ) :-
      findall( APway, Goal, PwaysL ),
      sort( PwaysL, Pways ).
 
-exp_reac_over_return( Rtx, ReOver, _Etx ) :-
+exp_reac_over_return( Rtx, _Etx, ReOver ) :-
      ground( ReOver ),
      !,
      mtx( ReOver, Rtx ).
-exp_reac_over_return( Rtx, Rtx, _Etx ).
+exp_reac_over_return( Rtx, _Etx, Rtx ).
 
 /*   ?-
         reac_galg_reap_repn(Reap,Repn),

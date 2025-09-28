@@ -7,6 +7,7 @@ TBD
                             any gene_id particularly the NCBI ones that are used by R libs
 
 0.8
+      25.09.28    OPTS:     min_count(MinCnt) for exp_reac_over/3
       25.09.24    OPTS:     min_count(MinCnt) restrict the terms returned
       25.01.03    OPTS:     return opts ids_de(IdsDE) and ids_de(IdsDE) in exp_reac_over/3
                   FIXED:    exp_reac_over/3 with non-ground 2nd arg (also documented this argument)
