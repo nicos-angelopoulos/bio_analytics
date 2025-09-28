@@ -144,7 +144,7 @@ exp_reac_over( Etx, ReOver, Args ) :-
      ),
      options( min_count(MinCnt), Opts ),
      ( MinCnt > 0 -> 
-          mtx_column_include_rows( AdjThreshMtx, count, >=(MinCnt), ThreshMtx ),
+          mtx_column_include_rows( AdjThreshMtx, count, =<(MinCnt), ThreshMtx ),
           length( AdjThreshMtx, NrBefMc ),
           length( ThreshMtx, NrAftMc ),
           debuc( Self, 'Min count of: ~w, reduced matrix length from: ~d to ~d', [MinCnt,NrBefMc,NrAftMc] )
