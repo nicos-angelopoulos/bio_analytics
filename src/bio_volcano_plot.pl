@@ -13,6 +13,7 @@ bio_volcano_plot_defaults( Args, Defs ) :-
                clr_up(cadmiumred),
                ext(pdf),
                debug(true),
+               labels(false),
                legend_cnm(regulation),
                legend_down("down"),
                legend_inv("invariant"),
@@ -23,6 +24,8 @@ bio_volcano_plot_defaults( Args, Defs ) :-
                lim_y_min(0),
                % lim_y_max(_),
                plot_file(_),
+               repel_box_pad(0.5),
+               repel_max_overlaps('Inf',
                rvar_cv(bvp_cv),
                rvar_df(bvp_df),
                rvar_gt(bvp_gt),
@@ -55,6 +58,8 @@ Opts
     informational, progress messages
   * ext(Ext=pdf)
     extension that defines the type of output (passed to os_dir_stem_ext/2)
+  * labels(Lbls=false)
+    labels column id, or =|false|= or free variable for no labels
   * legend_cnm(LgCnm='regulation')
     the legend frame column name (also appears as legend title, if none is given)
   * legend_down(LegUp="down")
@@ -77,6 +82,10 @@ Opts
     as understood by os_dir_stem_ext/2- preferred to Dir above
   * plot_file(File)
     returns the output file
+  * repel_box_pad(Rbp=0.5)
+    box.padding argument for geom_text_repel() R function from library(ggrepel)
+  * repel_max_overlaps(Rmo='Inf')
+    max.overlaps argument for geom_text_repel() R function from library(ggrepel)
   * rvar_cv(Rvar=bvp_cv)
     R var for colors vector
   * rvar_df(Rvar=bvp_df)
@@ -99,6 +108,7 @@ Examples, fixme: use iris dataset.
 
 @author nicos angelopoulos
 @version  0.1 2022/12/15
+@version  0.2 2025/10/5   added support for labels with options: labels(Lbls), repel_box_padding(Rbp) and repel_max_overlaps(Rmo)
 @see bio_diffex/4
 @see os_dir_stem_ext/2
 @tbd add args for influencing of the gg term and the output-to-file call
@@ -119,7 +129,18 @@ bio_volcano_plot( Mtx, Args ) :-
      options( legend_cnm(LgCnm), Opts ),
      options( legend_inv(LgIv), Opts ),
      options( [rvar_cv(Rcv),rvar_df(Rdf),rvar_gt(Rgt)], Opts ),
-     Rdf <- 'data.frame'(EvCnm=Evs,PvCnm=Pvs,LgCnm=LgIv),
+     options( labels(LblsCnm), Opts ),
+     mtx_column( Mtx, LblsCnm, Lbls ),
+     ( (var(Lbls);Lbls==false) ->
+          HasLbls = false,
+          Rdf <- 'data.frame'(EvCnm=Evs,PvCnm=Pvs,LgCnm=LgIv),
+          Aes = aes(x=EvCnm, y= -log10(PvCnm), col=LgCnmAtm)
+          ;
+          <- library("ggrepel"),
+          HasLbls = true,
+          Rdf <- 'data.frame'(EvCnm=Evs,PvCnm=Pvs,LgCnm=LgIv,labels=Lbls),
+          Aes = aes(x=EvCnm, y= -log10(PvCnm), col=LgCnmAtm, label=labels)
+     ),
      options( legend_up(LgUp), Opts ),
      options( legend_down(LgDw), Opts ),
      lexi( LgCnm, +(LgCnmAtm) ),
@@ -130,7 +151,14 @@ bio_volcano_plot( Mtx, Args ) :-
      options( theme(GGthemeTkn), Opts ),
      atom_concat( theme_, GGthemeTkn, GGthemeNm ),
      atom_concat( GGthemeNm, '()', GGthemeTerm ),
-     Rgt <- ggplot(data=Rdf, aes(x=EvCnm, y= -log10(PvCnm), col=LgCnmAtm)) + geom_point() + GGthemeTerm,
+     Rgt <- ggplot(data=Rdf, Aes) + geom_point() + GGthemeTerm,
+     ( HasLbls == true ->
+               % Rgt <- Rgt + geom_text(hjust=0, vjust=0)
+               options( repel_box_pad(Rbp), Opts ),
+               Rgt <- Rgt + geom_text_repel('box.padding' = Rbp, 'max.overlaps' = 'Inf')
+               ;
+               true
+     ),
      options( [clr_down(ClrDw),clr_inv(ClrIv),clr_line(ClrLn),clr_up(ClrUp)], Opts ),
      maplist( colour_hex, [ClrDw,ClrIv,ClrLn,ClrUp], [HexDw,HexIv,HexLn,HexUp] ),
      options( [exp_ev_cut_let(CutLw),exp_ev_cut_get(CutUp),exp_pv_cut(CutPv)], Opts ),
