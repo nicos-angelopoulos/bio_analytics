@@ -101,10 +101,12 @@ Opts
 
 Opts are passed to bio_diffex/4. This predicate also pinches the defaults from there.
 
-Examples, fixme: use iris dataset.
+Examples, fixme: use iris or other R dataset.
 ==
 ?- bio_volcano_plot([]).
 ==
+
+As of v0.2 labels can be added by including a label column and passing option 
 
 @author nicos angelopoulos
 @version  0.1 2022/12/15
