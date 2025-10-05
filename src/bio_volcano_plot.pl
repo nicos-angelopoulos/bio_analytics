@@ -25,7 +25,7 @@ bio_volcano_plot_defaults( Args, Defs ) :-
                % lim_y_max(_),
                plot_file(_),
                repel_box_pad(0.5),
-               repel_max_overlaps('Inf',
+               repel_max_overlaps('Inf'),
                rvar_cv(bvp_cv),
                rvar_df(bvp_df),
                rvar_gt(bvp_gt),
